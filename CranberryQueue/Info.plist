@@ -41,5 +41,21 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>spotify</string>
+        <string>spotify-action</string>
+    </array>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>rolflocher.CranberryQueue</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>cranberryqueue</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
