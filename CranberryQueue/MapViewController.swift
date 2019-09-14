@@ -8,17 +8,25 @@
 
 import UIKit
 
+protocol mapControllerDelegate: class {
+    func addTapped()
+}
+
 class MapViewController: UIViewController, mapDelegate {
     
     @IBOutlet var cityLabel: UILabel!
     
     @IBOutlet var regionLabel: UILabel!
     
+    @IBOutlet var addIconImageView: UIImageView!
+    
+    weak var delegate: mapControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupScreen()
+        setupGestureRecognizers()
     }
     
     func updateGeoCode(city: String, region: String) {
@@ -38,6 +46,16 @@ class MapViewController: UIViewController, mapDelegate {
         
     }
     
+    func setupGestureRecognizers() {
+        let addTap = UITapGestureRecognizer(target: self, action: #selector(addTapped))
+        addIconImageView.addGestureRecognizer(addTap)
+        addIconImageView.isUserInteractionEnabled = true
+    }
+    
+    @objc func addTapped() {
+        delegate?.addTapped()
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -47,6 +65,7 @@ class MapViewController: UIViewController, mapDelegate {
         {
             let vc = segue.destination as? MapController
             vc?.delegate = self
+            self.delegate = vc
         }
     }
 

@@ -13,11 +13,15 @@ protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
 }
 
-class MapController: UIViewController, CLLocationManagerDelegate {
+class MapController: UIViewController, CLLocationManagerDelegate, mapControllerDelegate {
 
     weak var delegate: mapDelegate?
     
     var locationManager : CLLocationManager!
+    
+    var map: GMSMapView? = nil
+    
+    var curCoords: CLLocationCoordinate2D? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,23 +56,19 @@ class MapController: UIViewController, CLLocationManagerDelegate {
         }
         
         mapView0.isMyLocationEnabled = true
+        map = mapView0
         
         DispatchQueue.main.async {
             self.view = mapView0
         }
-        
-        //        // Creates a marker in the center of the map.
-        //        let marker = GMSMarker()
-        //        marker.position = coords
-        //        marker.title = "Sydney"
-        //        marker.snippet = "Australia"
-        //        marker.map = mapView0
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations.last
         let center = CLLocationCoordinate2D(latitude: (location?.coordinate.latitude)!, longitude: (location?.coordinate.longitude)!)
         print(center)
+        
+        curCoords = center
         
         setupMap(withCoords: center)
         getGeoCode(withLocation: location!)
@@ -85,6 +85,18 @@ class MapController: UIViewController, CLLocationManagerDelegate {
             }
             self.delegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
         }
+        
+    }
+    
+    func addTapped() {
+        print("yes")
+        
+        let marker = GMSMarker()
+        marker.position = curCoords!
+        marker.map = map
+    }
+    
+    func createQueue() {
         
     }
     

@@ -10,9 +10,15 @@ import UIKit
 import Firebase
 import GoogleMaps
 
+protocol mainDelegate : class {
+    func updateConnectionStatus(connected: Bool)
+}
+
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate, SPTAppRemotePlayerStateDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate {
     var window: UIWindow?
+    
+    weak var delegate: mainDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
     let SpotifyRedirectURL = URL(string: "CranberryQueue://spotify-login-callback")!
@@ -33,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
         return manager
     }()
     
+    var token = ""
+    
     lazy var appRemote: SPTAppRemote = {
         let appRemote = SPTAppRemote(configuration: configuration, logLevel: .debug)
         appRemote.delegate = self
@@ -45,8 +53,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
         GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
         //GMSPlacesClient.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
         // Insanely important 2 lines below
-        //let requestedScopes: SPTScope = [.appRemoteControl]
-        //self.sessionManager.initiateSession(with: requestedScopes, options: .default)
+        let requestedScopes: SPTScope = [.appRemoteControl]
+        self.sessionManager.initiateSession(with: requestedScopes, options: .default)
         
         return true
     }
@@ -58,6 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     }
     
     func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+        token = session.accessToken
         self.appRemote.connectionParameters.accessToken = session.accessToken
         self.appRemote.connect()
     }
@@ -73,12 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("connected")
         
-        self.appRemote.playerAPI?.delegate = self
-        self.appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
-            if let error = error {
-                debugPrint(error.localizedDescription)
-            }
-        })
+        delegate?.updateConnectionStatus(connected: true)
         
         // Want to play a new track?
         // self.appRemote.playerAPI?.play("spotify:track:13WO20hoD72L0J13WTQWlT", callback: { (result, error) in
@@ -94,21 +98,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("failed")
-    }
-    
-    func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-        print("player state changed")
-        print("isPaused", playerState.isPaused)
-        print("track.uri", playerState.track.uri)
-        print("track.name", playerState.track.name)
-        print("track.imageIdentifier", playerState.track.imageIdentifier)
-        print("track.artist.name", playerState.track.artist.name)
-        print("track.album.name", playerState.track.album.name)
-        print("track.isSaved", playerState.track.isSaved)
-        print("playbackSpeed", playerState.playbackSpeed)
-        print("playbackOptions.isShuffling", playerState.playbackOptions.isShuffling)
-        print("playbackOptions.repeatMode", playerState.playbackOptions.repeatMode.hashValue)
-        print("playbackPosition", playerState.playbackPosition)
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
