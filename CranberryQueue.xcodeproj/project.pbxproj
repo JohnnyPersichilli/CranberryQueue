@@ -121,9 +121,9 @@
 		4CED2E07232DB0F6008C6DAA /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */,
 				4C55CCBD232CB8C00059C898 /* CustomObjects.swift */,
 				4C4CD3DE232C964700F17BB8 /* Extensions.swift */,
+				4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
