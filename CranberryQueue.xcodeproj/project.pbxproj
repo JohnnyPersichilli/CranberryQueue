@@ -11,6 +11,12 @@
 		4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CD3D6232C60A400F17BB8 /* MapController.swift */; };
 		4C4CD3D9232C6C5B00F17BB8 /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */; };
 		4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CD3DA232C959100F17BB8 /* createQueueForm.swift */; };
+		4C4CD3DD232C95BE00F17BB8 /* createQueueForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C4CD3DC232C95BE00F17BB8 /* createQueueForm.xib */; };
+		4C4CD3DF232C964700F17BB8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CD3DE232C964700F17BB8 /* Extensions.swift */; };
+		4C4CD3E1232C9D1500F17BB8 /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CD3E0232C9D1500F17BB8 /* QueueViewController.swift */; };
+		4C55CCB8232CB1F30059C898 /* SongTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCB7232CB1F30059C898 /* SongTableView.swift */; };
+		4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */; };
+		4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBD232CB8C00059C898 /* CustomObjects.swift */; };
 		4CDB8456232BD2A1002559BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDB8455232BD2A1002559BB /* AppDelegate.swift */; };
 		4CDB8458232BD2A1002559BB /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDB8457232BD2A1002559BB /* MapViewController.swift */; };
 		4CDB845B232BD2A1002559BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB8459232BD2A1002559BB /* Main.storyboard */; };
@@ -27,6 +33,12 @@
 		4C4CD3D6232C60A400F17BB8 /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
 		4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		4C4CD3DA232C959100F17BB8 /* createQueueForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = createQueueForm.swift; sourceTree = "<group>"; };
+		4C4CD3DC232C95BE00F17BB8 /* createQueueForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = createQueueForm.xib; sourceTree = "<group>"; };
+		4C4CD3DE232C964700F17BB8 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		4C4CD3E0232C9D1500F17BB8 /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
+		4C55CCB7232CB1F30059C898 /* SongTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableView.swift; sourceTree = "<group>"; };
+		4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueTableViewCell.swift; sourceTree = "<group>"; };
+		4C55CCBD232CB8C00059C898 /* CustomObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObjects.swift; sourceTree = "<group>"; };
 		4CDB8452232BD2A1002559BB /* CranberryQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CranberryQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CDB8455232BD2A1002559BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4CDB8457232BD2A1002559BB /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
@@ -77,17 +89,23 @@
 			isa = PBXGroup;
 			children = (
 				4CDB8455232BD2A1002559BB /* AppDelegate.swift */,
+				4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */,
+				4C55CCBD232CB8C00059C898 /* CustomObjects.swift */,
+				4C55CCB7232CB1F30059C898 /* SongTableView.swift */,
 				4C4CD3D4232C556F00F17BB8 /* style.json */,
 				4CDB8457232BD2A1002559BB /* MapViewController.swift */,
 				4C4CD3DA232C959100F17BB8 /* createQueueForm.swift */,
+				4C4CD3DC232C95BE00F17BB8 /* createQueueForm.xib */,
 				4C4CD3D6232C60A400F17BB8 /* MapController.swift */,
 				4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */,
+				4C4CD3E0232C9D1500F17BB8 /* QueueViewController.swift */,
 				4CDB8459232BD2A1002559BB /* Main.storyboard */,
 				4CDB845C232BD2A2002559BB /* Assets.xcassets */,
 				4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */,
 				4CDB8461232BD2A2002559BB /* Info.plist */,
 				4CDB846E232C45D6002559BB /* GoogleService-Info.plist */,
 				4CDB8467232BD592002559BB /* SpotifyiOS.framework */,
+				4C4CD3DE232C964700F17BB8 /* Extensions.swift */,
 			);
 			path = CranberryQueue;
 			sourceTree = "<group>";
@@ -171,6 +189,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */,
+				4C4CD3DD232C95BE00F17BB8 /* createQueueForm.xib in Resources */,
 				4CDB846F232C45D6002559BB /* GoogleService-Info.plist in Resources */,
 				4CDB845D232BD2A2002559BB /* Assets.xcassets in Resources */,
 				4C4CD3D5232C556F00F17BB8 /* style.json in Resources */,
@@ -270,7 +289,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C55CCB8232CB1F30059C898 /* SongTableView.swift in Sources */,
+				4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */,
 				4CDB8458232BD2A1002559BB /* MapViewController.swift in Sources */,
+				4C4CD3DF232C964700F17BB8 /* Extensions.swift in Sources */,
+				4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */,
+				4C4CD3E1232C9D1500F17BB8 /* QueueViewController.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerViewController.swift in Sources */,
 				4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */,
