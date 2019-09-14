@@ -26,6 +26,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
     
     var db : Firestore? = nil
     
+    var uid = String()
+    
     weak var delegate: mapControllerDelegate?
     
     override func viewDidLoad() {
@@ -37,6 +39,15 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         setupGestureRecognizers()
         
         createQueueForm.queueNameTextField.delegate = self
+        
+        Auth.auth().signInAnonymously { (result, error) in
+            if let data = result {
+                self.uid = data.user.uid
+            }
+            else {
+                print( error! )
+            }
+        }
     }
     
     func updateGeoCode(city: String, region: String) {
@@ -80,6 +91,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         {
             let vc = segue.destination as? MapController
             vc?.delegate = self
+            vc?.uid = uid
             self.delegate = vc
         }
     }
@@ -104,22 +116,25 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         ref = db?.collection("location").addDocument(data: [
             "lat" : coords?["lat"] ?? 0,
             "long" : coords?["long"] ?? 0,
-            "city": "",
-            "region": "",
-            "numMembers": "",
+            "city": cityLabel.text ?? "",
+            "region": regionLabel.text ?? "",
+            "numMembers": 1,
             "currentSong": "",
             "name" : name
         ]) { (val) in
             let id = ref!.documentID
+            self.db?.collection("contributors").addDocument(data: [
+                "hostID": self.uid
+                ])
+            
             
             let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
             
             let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
             vc.queueName = self.createQueueForm.queueNameTextField.text
             vc.queueId = id
-            
-            
-            
+            vc.uid = self.uid
+            vc.isHost = true
             self.present(vc, animated:true, completion:nil)
         }
     }

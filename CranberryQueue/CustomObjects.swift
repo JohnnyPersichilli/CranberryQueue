@@ -14,3 +14,12 @@ struct Song {
     var imageURL = String()
     var docID = String()
 }
+
+struct CQLocation {
+    var name = String()
+    var city = String()
+    var region = String()
+    var long = Double()
+    var lat = Double()
+    var queueId = String()
+}

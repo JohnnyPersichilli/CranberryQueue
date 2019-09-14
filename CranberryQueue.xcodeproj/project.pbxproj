@@ -17,6 +17,8 @@
 		4C55CCB8232CB1F30059C898 /* SongTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCB7232CB1F30059C898 /* SongTableView.swift */; };
 		4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */; };
 		4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBD232CB8C00059C898 /* CustomObjects.swift */; };
+		4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */; };
+		4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC04232D4B8D007F8D38 /* SearchController.swift */; };
 		4CDB8456232BD2A1002559BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDB8455232BD2A1002559BB /* AppDelegate.swift */; };
 		4CDB8458232BD2A1002559BB /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDB8457232BD2A1002559BB /* MapViewController.swift */; };
 		4CDB845B232BD2A1002559BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB8459232BD2A1002559BB /* Main.storyboard */; };
@@ -39,6 +41,8 @@
 		4C55CCB7232CB1F30059C898 /* SongTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongTableView.swift; sourceTree = "<group>"; };
 		4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueTableViewCell.swift; sourceTree = "<group>"; };
 		4C55CCBD232CB8C00059C898 /* CustomObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObjects.swift; sourceTree = "<group>"; };
+		4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
+		4CA5BC04232D4B8D007F8D38 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 		4CDB8452232BD2A1002559BB /* CranberryQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CranberryQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CDB8455232BD2A1002559BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4CDB8457232BD2A1002559BB /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
@@ -90,6 +94,8 @@
 			children = (
 				4CDB8455232BD2A1002559BB /* AppDelegate.swift */,
 				4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */,
+				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
+				4CA5BC04232D4B8D007F8D38 /* SearchController.swift */,
 				4C55CCBD232CB8C00059C898 /* CustomObjects.swift */,
 				4C55CCB7232CB1F30059C898 /* SongTableView.swift */,
 				4C4CD3D4232C556F00F17BB8 /* style.json */,
@@ -292,11 +298,13 @@
 				4C55CCB8232CB1F30059C898 /* SongTableView.swift in Sources */,
 				4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */,
 				4CDB8458232BD2A1002559BB /* MapViewController.swift in Sources */,
+				4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */,
 				4C4CD3DF232C964700F17BB8 /* Extensions.swift in Sources */,
 				4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */,
 				4C4CD3E1232C9D1500F17BB8 /* QueueViewController.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerViewController.swift in Sources */,
+				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,
 				4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */,
 				4CDB8456232BD2A1002559BB /* AppDelegate.swift in Sources */,
 			);

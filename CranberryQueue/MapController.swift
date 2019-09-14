@@ -8,14 +8,18 @@
 
 import UIKit
 import GoogleMaps
+import Firebase
 
 protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
 }
 
-class MapController: UIViewController, CLLocationManagerDelegate, mapControllerDelegate {
-
+class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate {
+    
     weak var delegate: mapDelegate?
+    
+    var db: Firestore? = nil
+    var ref: ListenerRegistration? = nil
     
     var locationManager : CLLocationManager!
     
@@ -23,12 +27,65 @@ class MapController: UIViewController, CLLocationManagerDelegate, mapControllerD
     
     var curCoords: CLLocationCoordinate2D? = nil
     
+    var queues = [CQLocation]()
+    
+    var uid = String()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupLocation()
         
         self.view.layer.borderWidth = 1
+        
+        db = Firestore.firestore()
+        
+    }
+    
+    func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        
+        let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+        let data = marker.userData as? CQLocation
+        vc.queueName = data?.name
+        vc.queueId = data?.queueId
+        vc.uid = self.uid
+        vc.isHost = false
+        self.present(vc, animated:true, completion:nil)
+    }
+    
+    func watchLocationQueues(city: String, region: String) {
+        ref = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            self.queues = []
+            for doc in snap.documents {
+                let newLoc = CQLocation(
+                    name: doc.data()["name"] as! String,
+                    city: doc.data()["city"] as! String,
+                    region: doc.data()["region"] as! String,
+                    long: doc.data()["long"] as! Double,
+                    lat: doc.data()["lat"] as! Double,
+                    queueId: doc.documentID)
+                self.queues.append(newLoc)
+            }
+            self.drawMarkers()
+            
+        })
+    }
+    
+    func drawMarkers() {
+        for queue in queues {
+            let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
+            let marker = GMSMarker(position: position)
+            marker.title = queue.name
+            marker.snippet = "Tap Here to Join"
+            marker.map = map
+            marker.userData = queue
+        }
+        
     }
     
     func setupLocation() {
@@ -56,7 +113,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, mapControllerD
         }
         
         mapView0.isMyLocationEnabled = true
+        
         map = mapView0
+        map?.delegate = self
         
         DispatchQueue.main.async {
             self.view = mapView0
@@ -84,8 +143,16 @@ class MapController: UIViewController, CLLocationManagerDelegate, mapControllerD
                 return
             }
             self.delegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
+            self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
         }
         
+    }
+    
+    func getCoords() -> ([String : Double]) {
+        return [
+            "long": curCoords?.longitude ?? 0,
+            "lat": curCoords?.latitude ?? 0
+        ]
     }
     
     func addTapped() {
