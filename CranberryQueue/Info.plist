@@ -63,5 +63,7 @@
 	<string>I&apos;m doing this</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>I&apos;m also doing this</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 </dict>
 </plist>

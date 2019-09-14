@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import GoogleMaps
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate, SPTAppRemotePlayerStateDelegate {
@@ -39,9 +40,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     }()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         
         FirebaseApp.configure()
+        GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
+        //GMSPlacesClient.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
         // Insanely important 2 lines below
         //let requestedScopes: SPTScope = [.appRemoteControl]
         //self.sessionManager.initiateSession(with: requestedScopes, options: .default)

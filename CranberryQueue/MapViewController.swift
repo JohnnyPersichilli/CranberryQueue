@@ -7,33 +7,27 @@
 //
 
 import UIKit
-import MapKit
 
-class MapViewController: UIViewController, CLLocationManagerDelegate {
+class MapViewController: UIViewController, mapDelegate {
     
-    var locationManager : CLLocationManager!
+    @IBOutlet var cityLabel: UILabel!
+    
+    @IBOutlet var regionLabel: UILabel!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupScreen()
-        setupLocation()
-        
     }
     
-    func setupLocation() {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager = CLLocationManager()
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.requestAlwaysAuthorization()
-            locationManager.startUpdatingLocation()
-        }
+    func updateGeoCode(city: String, region: String) {
+        cityLabel.text = city
+        regionLabel.text = region
     }
     
     func setupScreen() {
         self.navigationController?.isNavigationBarHidden = true
-        //self.navigationController?.isToolbarHidden = true
         
         view.backgroundColor = UIColor.clear
         
@@ -41,15 +35,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         let backgroundLayer = colors.gl
         backgroundLayer?.frame = view.frame
         view.layer.insertSublayer(backgroundLayer!, at: 0)
+        
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations.last
-        let center = CLLocationCoordinate2D(latitude: (location?.coordinate.latitude)!, longitude: (location?.coordinate.longitude)!)
-        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        //self.mapView.setRegion(region, animated: true)
-        
-        self.locationManager.stopUpdatingLocation()
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.destination is MapController
+        {
+            let vc = segue.destination as? MapController
+            vc?.delegate = self
+        }
     }
 
 }
