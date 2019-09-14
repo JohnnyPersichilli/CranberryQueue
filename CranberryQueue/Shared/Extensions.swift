@@ -20,3 +20,14 @@ extension UIView
         NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: container, attribute: .bottom, multiplier: 1.0, constant: 0).isActive = true
     }
 }
+
+extension UIImageView
+{
+    override open func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let radius: CGFloat = self.bounds.size.width / 2.0
+        
+        self.layer.cornerRadius = radius
+    }
+}

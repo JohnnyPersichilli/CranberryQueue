@@ -20,6 +20,8 @@ class QueueTableViewCell: UITableViewCell {
     
     @IBOutlet var downvoteButtonImageView: UIImageView!
     
+    @IBOutlet var shadowView: UIView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -33,6 +35,10 @@ class QueueTableViewCell: UITableViewCell {
         let downvoteTap = UITapGestureRecognizer(target: self, action: #selector(downvoteTapped))
         downvoteButtonImageView.addGestureRecognizer(downvoteTap)
         downvoteButtonImageView.isUserInteractionEnabled = true
+        
+        shadowView.layer.shadowRadius = 15
+        shadowView.layer.shadowColor = UIColor.black.cgColor
+        self.clipsToBounds = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

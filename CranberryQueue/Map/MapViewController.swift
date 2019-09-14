@@ -94,6 +94,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             vc?.uid = uid
             self.delegate = vc
         }
+        if segue.destination is PlayerViewController {
+            let vc = segue.destination as? PlayerViewController
+            
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

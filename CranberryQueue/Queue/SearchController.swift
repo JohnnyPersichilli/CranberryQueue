@@ -31,6 +31,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         searchTextField.delegate = self
         
         db = Firestore.firestore()
+        
+        
     }
     
     var songs = [Song]()
@@ -119,20 +121,28 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         return songs.count
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
-            return 90
-        }
-        else {
-            return 60
-        }
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        if indexPath.section == 0 {
+//            return 90
+//        }
+//        else {
+//            return 60
+//        }
+//    }
+    
+    func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        (view as! UITableViewHeaderFooterView).backgroundView?.backgroundColor = UIColor.clear
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 15
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = searchTableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SearchTableViewCell
         cell.songLabel.text = songs[indexPath.section].name
         cell.artistLabel.text = songs[indexPath.section].artist
-        cell.layer.borderWidth = 1
+        //cell.layer.borderWidth = 1
         
         cell.song = songs[indexPath.section]
         

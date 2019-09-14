@@ -14,6 +14,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         if connected {
             let delegate = UIApplication.shared.delegate as! AppDelegate
             let appRemote = delegate.appRemote
+            print(appRemote.isConnected)
             appRemote.playerAPI?.delegate = self
             appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
                 if let error = error {

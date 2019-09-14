@@ -22,13 +22,12 @@ class SearchTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+    
         albumImageView.layer.cornerRadius = albumImageView.frame.height/2
         albumImageView.clipsToBounds = true
         
         self.layer.borderColor = UIColor.clear.cgColor
         
-        self.layer.shadowOffset = CGSize(width: 2, height: 2)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
