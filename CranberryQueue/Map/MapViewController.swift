@@ -24,6 +24,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
     
     @IBOutlet var createQueueForm: createQueueForm!
     
+    @IBOutlet var settingsIconImageView: UIImageView!
+    
+    
     var db : Firestore? = nil
     
     var uid = String()
@@ -71,6 +74,17 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         let addTap = UITapGestureRecognizer(target: self, action: #selector(addTapped))
         addIconImageView.addGestureRecognizer(addTap)
         addIconImageView.isUserInteractionEnabled = true
+        
+        let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
+        settingsIconImageView.addGestureRecognizer(settingsTap)
+        settingsIconImageView.isUserInteractionEnabled = true
+    }
+    
+    @objc func settingsTapped() {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
+        vc.uid = self.uid
+        self.present(vc, animated:true, completion:nil)
     }
     
     @objc func addTapped() {
@@ -95,7 +109,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             self.delegate = vc
         }
         if segue.destination is PlayerViewController {
-            let vc = segue.destination as? PlayerViewController
+            //let vc = segue.destination as? PlayerViewController
             
         }
     }

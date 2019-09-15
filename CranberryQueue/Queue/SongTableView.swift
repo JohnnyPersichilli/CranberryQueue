@@ -76,9 +76,10 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+        let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
         cell.songLabel.text = songs[indexPath.section].name
         cell.artistLabel.text = songs[indexPath.section].artist
+        
         //cell.layer.borderWidth = 1
         
         let url = URL(string: songs[indexPath.section].imageURL)
