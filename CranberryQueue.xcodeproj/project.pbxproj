@@ -27,11 +27,11 @@
 		4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */; };
 		4CDB8468232BD592002559BB /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CDB8467232BD592002559BB /* SpotifyiOS.framework */; };
 		4CDB846F232C45D6002559BB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB846E232C45D6002559BB /* GoogleService-Info.plist */; };
-		8064BC3170761750B2E24B65 /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFA13BA8990A06AC43EC114 /* Pods_CranberryQueue.framework */; };
+		95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		46A4C6392126929D753C4CF4 /* Pods-CranberryQueue.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.release.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.release.xcconfig"; sourceTree = "<group>"; };
+		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4CD3D4232C556F00F17BB8 /* style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = style.json; sourceTree = "<group>"; };
 		4C4CD3D6232C60A400F17BB8 /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
 		4C4CD3D8232C6C5B00F17BB8 /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
@@ -55,8 +55,8 @@
 		4CDB8467232BD592002559BB /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		4CDB8469232BD7A6002559BB /* CranberryQueue-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CranberryQueue-Bridging-Header.h"; sourceTree = "<group>"; };
 		4CDB846E232C45D6002559BB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		940BC92B33E2F4AD9C20CB17 /* Pods-CranberryQueue.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.debug.xcconfig"; sourceTree = "<group>"; };
-		AFFA13BA8990A06AC43EC114 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.release.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.release.xcconfig"; sourceTree = "<group>"; };
+		FF8680CDC734AC1CC305B32B /* Pods-CranberryQueue.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,21 +65,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CDB8468232BD592002559BB /* SpotifyiOS.framework in Frameworks */,
-				8064BC3170761750B2E24B65 /* Pods_CranberryQueue.framework in Frameworks */,
+				95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		12547C6EDEA2690E05C9CF60 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		4CDB8449232BD2A1002559BB = {
 			isa = PBXGroup;
 			children = (
 				4CDB8469232BD7A6002559BB /* CranberryQueue-Bridging-Header.h */,
 				4CDB8454232BD2A1002559BB /* CranberryQueue */,
 				4CDB8453232BD2A1002559BB /* Products */,
-				C8BB0F67670BBE270F5315BF /* Pods */,
-				ED459352DDBF1B418CC2FC2F /* Frameworks */,
+				EEA6493014A3F051A5A326D1 /* Pods */,
+				12547C6EDEA2690E05C9CF60 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -143,21 +151,13 @@
 			path = Queue;
 			sourceTree = "<group>";
 		};
-		C8BB0F67670BBE270F5315BF /* Pods */ = {
+		EEA6493014A3F051A5A326D1 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				940BC92B33E2F4AD9C20CB17 /* Pods-CranberryQueue.debug.xcconfig */,
-				46A4C6392126929D753C4CF4 /* Pods-CranberryQueue.release.xcconfig */,
+				FF8680CDC734AC1CC305B32B /* Pods-CranberryQueue.debug.xcconfig */,
+				C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */,
 			);
 			name = Pods;
-			sourceTree = "<group>";
-		};
-		ED459352DDBF1B418CC2FC2F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				AFFA13BA8990A06AC43EC114 /* Pods_CranberryQueue.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,12 +167,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4CDB8464232BD2A2002559BB /* Build configuration list for PBXNativeTarget "CranberryQueue" */;
 			buildPhases = (
-				BD1DFB70C816D33491A16AF9 /* [CP] Check Pods Manifest.lock */,
+				A72E299CE8C514836CBEA694 /* [CP] Check Pods Manifest.lock */,
 				4CDB844E232BD2A1002559BB /* Sources */,
 				4CDB844F232BD2A1002559BB /* Frameworks */,
 				4CDB8450232BD2A1002559BB /* Resources */,
-				0BFEC5962ED116AD60594855 /* [CP] Embed Pods Frameworks */,
-				60B385159446908D6E5B1F2C /* [CP] Copy Pods Resources */,
+				500D0EC5B826EC42D9E6EE83 /* [CP] Embed Pods Frameworks */,
+				876AF423925315885F1DBACD /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -233,7 +233,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0BFEC5962ED116AD60594855 /* [CP] Embed Pods Frameworks */ = {
+		500D0EC5B826EC42D9E6EE83 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -269,7 +269,7 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		60B385159446908D6E5B1F2C /* [CP] Copy Pods Resources */ = {
+		876AF423925315885F1DBACD /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -293,7 +293,7 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BD1DFB70C816D33491A16AF9 /* [CP] Check Pods Manifest.lock */ = {
+		A72E299CE8C514836CBEA694 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -478,7 +478,7 @@
 		};
 		4CDB8465232BD2A2002559BB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 940BC92B33E2F4AD9C20CB17 /* Pods-CranberryQueue.debug.xcconfig */;
+			baseConfigurationReference = FF8680CDC734AC1CC305B32B /* Pods-CranberryQueue.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -503,7 +503,7 @@
 		};
 		4CDB8466232BD2A2002559BB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 46A4C6392126929D753C4CF4 /* Pods-CranberryQueue.release.xcconfig */;
+			baseConfigurationReference = C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
