@@ -66,13 +66,15 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
+            if let res = response {
+                print(res)
+                return
+            }
+            if let err = error {
+                print(err)
+                return
+            }
             guard let data0 = data else {
-                if let res = response {
-                    print(res)
-                }
-                if let err = error {
-                    print(err)
-                }
                 return
             }
             do {
