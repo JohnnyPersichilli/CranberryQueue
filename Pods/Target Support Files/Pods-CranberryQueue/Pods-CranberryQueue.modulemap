@@ -1,0 +1,6 @@
+framework module Pods_CranberryQueue {
+  umbrella header "Pods-CranberryQueue-umbrella.h"
+
+  export *
+  module * { export * }
+}
