@@ -68,7 +68,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             
             if let res = response {
                 print(res)
-                return
             }
             if let err = error {
                 print(err)
