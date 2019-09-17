@@ -43,7 +43,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = self
         
-        
+        db = Firestore.firestore()
         
         if !isHost && queueId != nil { // observing
             setupGuestListeners()
