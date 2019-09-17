@@ -23,3 +23,12 @@ struct CQLocation {
     var lat = Double()
     var queueId = String()
 }
+
+struct PlaybackInfo {
+    var name = String()
+    var artist = String()
+    var imageURL = String()
+    var duration = Int()
+    var completion = Int()
+    var isPaused = Bool()
+}
