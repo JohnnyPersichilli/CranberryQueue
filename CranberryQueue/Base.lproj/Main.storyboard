@@ -349,6 +349,7 @@
                         <viewLayoutGuide key="safeArea" id="ynW-1B-QQI"/>
                     </view>
                     <connections>
+                        <outlet property="globeIcon" destination="odU-bL-SM0" id="ybe-X4-375"/>
                         <outlet property="nameLabel" destination="QUe-8O-nZT" id="p1k-Q1-eDc"/>
                         <outlet property="nextUpLabel" destination="z4l-cv-zzi" id="NsT-RM-fke"/>
                         <outlet property="numMembersLabel" destination="rlb-aE-c6W" id="69g-Cl-boB"/>

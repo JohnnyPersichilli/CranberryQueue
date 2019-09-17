@@ -29,7 +29,8 @@ class QueueViewController: UIViewController, searchDelegate {
     
     @IBOutlet var searchView: UIView!
     
-    @IBOutlet weak var globeButton: UIImageView!
+    @IBOutlet var globeIcon: UIImageView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,8 +55,8 @@ class QueueViewController: UIViewController, searchDelegate {
     
     func setupGestureRecognizers() {
         let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))
-        globeButton.addGestureRecognizer(globeTapGesture)
-        globeButton.isUserInteractionEnabled = true
+        globeIcon.addGestureRecognizer(globeTapGesture)
+        globeIcon.isUserInteractionEnabled = true
     }
     
     @objc func globeTapped() {
