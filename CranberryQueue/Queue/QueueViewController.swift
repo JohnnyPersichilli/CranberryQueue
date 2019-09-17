@@ -29,6 +29,7 @@ class QueueViewController: UIViewController, searchDelegate {
     
     @IBOutlet var searchView: UIView!
     
+    @IBOutlet weak var globeButton: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,10 +45,23 @@ class QueueViewController: UIViewController, searchDelegate {
         
         songTableView.queueId = queueId
         songTableView.watchPlaylist()
+        setupGestureRecognizers()
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
         }
+    }
+    
+    func setupGestureRecognizers() {
+        let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))
+        globeButton.addGestureRecognizer(globeTapGesture)
+        globeButton.isUserInteractionEnabled = true
+    }
+    
+    @objc func globeTapped() {
+        self.presentingViewController?.dismiss(animated: true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
     }
     
     func setupScreen() {
