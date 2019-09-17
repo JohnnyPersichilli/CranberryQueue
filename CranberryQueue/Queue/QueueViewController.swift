@@ -44,6 +44,10 @@ class QueueViewController: UIViewController, searchDelegate {
         
         songTableView.queueId = queueId
         songTableView.watchPlaylist()
+        
+        if (UIApplication.shared.delegate as! AppDelegate).token == "" {
+            searchIconImageView.isUserInteractionEnabled = false
+        }
     }
     
     func setupScreen() {
