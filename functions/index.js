@@ -5,7 +5,7 @@ const functions = require('firebase-functions');
 //
 
 exports.updateNetVotes = functions.firestore
-    .document('songs/{songId}')
+    .document('songs/{songId}/upvoteUsers/{uid}')
     .onUpdate((change, context) => {
       // Get an object representing the document
       // e.g. {'name': 'Marie', 'age': 66}
