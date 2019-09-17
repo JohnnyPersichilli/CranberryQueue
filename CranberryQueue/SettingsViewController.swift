@@ -9,17 +9,87 @@
 import UIKit
 
 class SettingsViewController: UIViewController {
-
-    @IBOutlet var uidLabel: UILabel!
     
-    var uid: String? = nil
+    @IBOutlet weak var mapIcon: UIImageView!
+    
+    @IBOutlet weak var spotifyProfilePicture: UIImageView!
+    
+    @IBOutlet weak var spotifyProfileView: UIView!
+    
+    @IBOutlet weak var nameLabel: UILabel!
+    
+    @IBOutlet weak var spotifyUsernameLabel: UILabel!
+    
+    var token: String {
+        get {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            return delegate.token
+        }
+    }
+    
+    func setupGestureRecognizers() {
+        let addTap = UITapGestureRecognizer(target: self, action: #selector(globeTapped))
+        mapIcon.addGestureRecognizer(addTap)
+        mapIcon.isUserInteractionEnabled = true
+    }
+    
+    @objc func globeTapped() {
+        self.presentingViewController?.dismiss(animated:true, completion: { self.navigationController?.popToRootViewController(animated: true)
+        })
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setupGestureRecognizers()
+        self.getUserSpotifyInfo()
+    }
+    
+    func getUserSpotifyInfo()-> Bool {
 
-        uidLabel.text = uid ?? "fail"
+        let url = URL(string: "https://api.spotify.com/v1/me")!
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+
+            if let res = response {
+                print(res)
+            }
+            if let err = error {
+                print(err)
+                return
+            }
+            guard let data0 = data else {
+                return
+            }
+            do {
+                let jsonRes = try JSONSerialization.jsonObject(with: data0, options: []) as? [String: Any]
+                print(jsonRes)
+                DispatchQueue.main.async {
+                    self.nameLabel.text = jsonRes?["display_name"] as? String
+                    self.spotifyUsernameLabel.text = jsonRes?["id"] as? String
+                }
+                
+                let url = URL(string: (jsonRes?["images"] as! [[String:Any]])[0]["url"] as! String)!
+                let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+                    guard let data = data else {
+                        print("no data")
+                        return }
+                    DispatchQueue.main.async {
+                        self.spotifyProfilePicture.image = UIImage(data: data)
+                    }
+                }
         
-        
+                task.resume()
+
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        task.resume()
+
+        return true
     }
     
 }

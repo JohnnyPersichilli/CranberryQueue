@@ -27,6 +27,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
     @IBOutlet var settingsIconImageView: UIImageView!
     
     
+    
     var db : Firestore? = nil
     
     var uid = String()
@@ -83,7 +84,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
     @objc func settingsTapped() {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
-        vc.uid = self.uid
         self.present(vc, animated:true, completion:nil)
     }
     
