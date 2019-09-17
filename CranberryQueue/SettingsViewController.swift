@@ -66,10 +66,12 @@ class SettingsViewController: UIViewController {
             do {
                 let jsonRes = try JSONSerialization.jsonObject(with: data0, options: []) as? [String: Any]
                 print(jsonRes)
-                self.nameLabel.text = jsonRes?["display_name"] as? String
-                self.spotifyUsernameLabel.text = jsonRes?["id"] as? String
+                DispatchQueue.main.async {
+                    self.nameLabel.text = jsonRes?["display_name"] as? String
+                    self.spotifyUsernameLabel.text = jsonRes?["id"] as? String
+                }
                 
-                let url = URL(string: (jsonRes?["id"] as! [[String:Any]])[0]["url"] as! String)!
+                let url = URL(string: (jsonRes?["images"] as! [[String:Any]])[0]["url"] as! String)!
                 let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
                     guard let data = data else {
                         print("no data")
