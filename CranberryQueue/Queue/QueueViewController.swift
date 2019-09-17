@@ -45,14 +45,14 @@ class QueueViewController: UIViewController, searchDelegate {
         
         songTableView.queueId = queueId
         songTableView.watchPlaylist()
-        setupPlayerGestureRecognizers()
+        setupGestureRecognizers()
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
         }
     }
     
-    func setupPlayerGestureRecognizers() {
+    func setupGestureRecognizers() {
         let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))
         globeButton.addGestureRecognizer(globeTapGesture)
         globeButton.isUserInteractionEnabled = true
