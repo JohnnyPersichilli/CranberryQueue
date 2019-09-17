@@ -28,7 +28,7 @@ struct PlaybackInfo {
     var name = String()
     var artist = String()
     var imageURL = String()
+    var position = Int()
     var duration = Int()
-    var completion = Int()
     var isPaused = Bool()
 }

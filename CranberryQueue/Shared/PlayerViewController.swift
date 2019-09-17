@@ -43,7 +43,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = self
         
-        db = Firestore.firestore()
+        
         
         if !isHost && queueId != nil { // observing
             setupGuestListeners()
@@ -131,7 +131,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         playback["artist"] = playerState.track.artist.name
         playback["imageURL"] = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
         playback["isPaused"] = playerState.isPaused
-        playback["completion"] = playerState.playbackPosition
+        playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
         return playback
     }
@@ -142,7 +142,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         playback.artist = json["artist"] as! String
         playback.imageURL = json["imageURL"] as! String
         playback.isPaused = json["isPaused"] as! Bool
-        playback.completion = json["completion"] as! Int
+        playback.position = json["position"] as! Int
         playback.duration = json["duration"] as! Int
         return playback
     }
