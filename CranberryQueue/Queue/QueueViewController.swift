@@ -86,6 +86,8 @@ class QueueViewController: UIViewController, searchDelegate {
         if segue.destination is PlayerViewController
         {
             let vc = segue.destination as? PlayerViewController
+            vc?.queueId = queueId
+            vc?.isHost = isHost
             vc?.updateConnectionStatus(connected: true)
         }
         else if segue.destination is SearchController {
@@ -96,6 +98,7 @@ class QueueViewController: UIViewController, searchDelegate {
             searchIconImageView.isUserInteractionEnabled = true
             vc?.delegate = self
             vc?.queueId = queueId
+            
         }
     }
 
