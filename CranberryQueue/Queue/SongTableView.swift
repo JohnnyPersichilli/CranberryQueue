@@ -33,9 +33,15 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
             self.songs = []
             guard let snap = snapshot else {
                 print(error!)
+                DispatchQueue.main.async {
+                    self.reloadData()
+                }
                 return
             }
             if snap.documents.count == 0 {
+                DispatchQueue.main.async {
+                    self.reloadData()
+                }
                 return
             }
             for song in snap.documents {
