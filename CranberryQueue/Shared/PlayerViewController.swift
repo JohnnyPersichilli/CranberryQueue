@@ -60,6 +60,51 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
             showHelpText()
         }
         
+        setupGestureRecognizers()
+        
+    }
+    
+    func setupGestureRecognizers() {
+        let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
+        forwardSwipe.direction = .left
+        self.view.addGestureRecognizer(forwardSwipe)
+    }
+    
+    @objc func swiped() {
+        if queueId != nil && isHost {
+            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                if snap.count == 0 {
+                    self.remote?.playerAPI?.skip(toNext: { (_, error) in
+                        if let err = error {
+                            print(err)
+                            return
+                        }
+                    })
+                    return
+                }
+                let nextSongJSON = snap.documents[0].data()
+                
+                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
+                    guard let res = response else {
+                        print(error!)
+                        return
+                    }
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
+                    self.remote?.playerAPI?.skip(toNext: { (_, error) in
+                        if let err = error {
+                            print(err)
+                            return
+                        }
+                    })
+                })
+            })
+            
+            
+        }
     }
     
     func runTimer() {
@@ -77,7 +122,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
         }
-        if Int(duration/1000) - Int(position/1000) == 5 {
+        if Int(duration/1000) - Int(position/1000) == 2 {
             db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
                     print(error!)
