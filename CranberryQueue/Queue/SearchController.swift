@@ -143,6 +143,10 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = searchTableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SearchTableViewCell
+        if !songs.indices.contains(indexPath.section) {
+            print("bad error searchcontroller L147")
+            return cell
+        }
         cell.songLabel.text = songs[indexPath.section].name
         cell.artistLabel.text = songs[indexPath.section].artist
         //cell.layer.borderWidth = 1

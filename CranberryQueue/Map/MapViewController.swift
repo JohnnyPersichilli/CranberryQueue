@@ -45,7 +45,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         
         createQueueForm.queueNameTextField.delegate = self
         
-        
+        UIApplication.shared.isIdleTimerDisabled = true
     }
     
     func updateGeoCode(city: String, region: String) {
