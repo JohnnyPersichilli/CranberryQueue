@@ -30,14 +30,20 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         db = Firestore.firestore()
         
         db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+            self.songs = []
             guard let snap = snapshot else {
                 print(error!)
+                DispatchQueue.main.async {
+                    self.reloadData()
+                }
                 return
             }
             if snap.documents.count == 0 {
+                DispatchQueue.main.async {
+                    self.reloadData()
+                }
                 return
             }
-            self.songs = []
             for song in snap.documents {
                 let newSong = Song(
                     name: song["name"] as! String,

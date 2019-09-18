@@ -14,12 +14,12 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
+            token = delegate.token
             remote = delegate.appRemote
             setupHostListeners()
         }
     }
     
-
     @IBOutlet var albumImageView: UIImageView!
     
     @IBOutlet var titleLabel: UILabel!
@@ -39,6 +39,8 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     
     var duration = 200
     var position = 0
+    
+    var token: String? = nil
     
     
     override func viewDidLoad() {
@@ -74,6 +76,26 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         updateTimerUI()
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
+        }
+        if Int(duration/1000) - Int(position/1000) == 5 {
+            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                if snap.count == 0 {
+                    return
+                }
+                let nextSongJSON = snap.documents[0].data()
+                
+                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
+                    guard let res = response else {
+                        print(error!)
+                        return
+                    }
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
+                })
+            })
         }
     }
     

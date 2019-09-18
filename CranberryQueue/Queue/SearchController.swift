@@ -67,7 +67,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             if let res = response {
-                print(res)
+                //print(res)
             }
             if let err = error {
                 print(err)
@@ -98,7 +98,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 DispatchQueue.main.async {
                     self.searchTableView.reloadData()
                 }
-                print(self.songs)
                 
             } catch {
                 print(error.localizedDescription)
@@ -144,6 +143,10 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = searchTableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SearchTableViewCell
+        if !songs.indices.contains(indexPath.section) {
+            print("bad error searchcontroller L147")
+            return cell
+        }
         cell.songLabel.text = songs[indexPath.section].name
         cell.artistLabel.text = songs[indexPath.section].artist
         //cell.layer.borderWidth = 1
