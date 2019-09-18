@@ -90,7 +90,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                         artist: artistInfo[0]["name"] as! String,
                         imageURL: imageInfo[0]["url"] as! String,
                         docID: "f",
-                        votes: 0
+                        votes: 0,
+                        uri: x["uri"] as! String
                     )
                     self.songs.append(newSong)
                 }
@@ -202,7 +203,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             "name": song.name,
             "imageURL": song.imageURL,
             "docID": song.docID,
-            "votes": 0
+            "votes": 0,
+            "uri": song.uri
         ]
     }
 

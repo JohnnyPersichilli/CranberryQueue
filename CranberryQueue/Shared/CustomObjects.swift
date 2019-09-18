@@ -14,6 +14,7 @@ struct Song {
     var imageURL = String()
     var docID = String()
     var votes = 0
+    var uri = String()
 }
 
 struct CQLocation {
