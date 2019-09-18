@@ -89,7 +89,9 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                         name: x["name"] as! String,
                         artist: artistInfo[0]["name"] as! String,
                         imageURL: imageInfo[0]["url"] as! String,
-                        docID: "f")
+                        docID: "f",
+                        votes: 0
+                    )
                     self.songs.append(newSong)
                 }
                 DispatchQueue.main.async {
@@ -188,12 +190,12 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 "queueId": self.queueId!
                 ], completion: { (val) in
                     newSong["docID"] = ref!.documentID
-                    self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong)
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+                    })
             })
         }
     }
-    
     func songToJSON(song: Song) -> [String:Any] {
         return [
             "artist": song.artist,
