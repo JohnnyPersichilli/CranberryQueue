@@ -27,16 +27,16 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        db?.collection("playlist").document(queueId!).addSnapshotListener({ (snapshot, error) in
+        db?.collection("playlist").document(queueId!).collection("songs").addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            if snap.data()?["songs"] == nil {
+            if snap.documents.count == 0 {
                 return
             }
             self.songs = []
-            for song in snap.data()?["songs"] as! [[String:Any]] {
+            for song in snap.documents {
                 let newSong = Song(
                     name: song["name"] as! String,
                     artist: song["artist"] as! String,
