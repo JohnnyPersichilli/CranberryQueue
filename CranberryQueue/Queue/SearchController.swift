@@ -13,7 +13,21 @@ protocol searchDelegate: class {
     func addSongTapped(song: Song)
 }
 
-class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, queueDelegate {
+    
+    func searchTapped(shouldHideContents: Bool) {
+        if(shouldHideContents) {
+            songs = []
+            searchTextField.resignFirstResponder()
+            searchTextField.text = ""
+            DispatchQueue.main.async {
+                self.searchTableView.reloadData()
+            }
+        } else {
+            searchTextField.becomeFirstResponder()
+        }
+    }
+    
 
     @IBOutlet var searchTextField: UITextField!
     
@@ -22,6 +36,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     weak var delegate: searchDelegate?
     
     var db: Firestore?
+    
+    var searchFirstTap: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,10 +66,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             let delegate = UIApplication.shared.delegate as! AppDelegate
             return delegate.token
         }
-    }
-    
-    @objc func searchTapped() {
-        searchTextField.becomeFirstResponder()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -186,6 +198,9 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         {
             delegate?.addSongTapped(song: cell.song)
             songs = []
+            DispatchQueue.main.async {
+                self.searchTableView.reloadData()
+            }
             searchTextField.text = ""
             
             var newSong = self.songToJSON(song: cell.song)
@@ -200,6 +215,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             })
         }
     }
+    
     func songToJSON(song: Song) -> [String:Any] {
         return [
             "artist": song.artist,
