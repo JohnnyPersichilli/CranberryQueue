@@ -42,6 +42,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         
     }
     
+    func setUID(id: String) {
+        uid = id
+    }
+    
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         
