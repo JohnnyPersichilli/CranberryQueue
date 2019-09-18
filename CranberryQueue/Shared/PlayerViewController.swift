@@ -14,6 +14,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
+            token = delegate.token
             remote = delegate.appRemote
             setupHostListeners()
         }
@@ -38,6 +39,8 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     
     var duration = 200
     var position = 0
+    
+    var token: String? = nil
     
     
     override func viewDidLoad() {
@@ -74,7 +77,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
         }
-        if Int(duration/1000) - Int(position/1000) < 5 {
+        if Int(duration/1000) - Int(position/1000) == 5 {
             db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
                     print(error!)
@@ -85,24 +88,37 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
                 }
                 let nextSongJSON = snap.documents[0].data()
                 
-                let songString = nextSongJSON["]
-                let url = URL(string: "https://api.spotify.com/v1/me/player/play?uris=\(searchString)&type=track")!
-                
-                var request = URLRequest(url: url)
-                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-                
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                    
-                    if let res = response {
-                        print(res)
-                    }
-                    if let err = error {
-                        print(err)
+                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
+                    guard let res = response else {
+                        print(error!)
                         return
                     }
-                    guard let data0 = data else {
-                        return
-                    }
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
+                })
+//                let songString = (nextSongJSON["uri"] as! String).addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+//                let url = URL(string: "https://api.spotify.com/v1/me/player/play?uris=\(songString)")!
+                
+//                var request = URLRequest(url: url)
+//                request.httpMethod = "PUT"
+//                print("token \(self.token)")
+//                request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+//
+//                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+//
+//                    if let res = response {
+//                        print(res)
+//                    }
+//                    if let err = error {
+//                        print(err)
+//                        return
+//                    }
+//                    guard let data0 = data else {
+//                        return
+//                    }
+//                    print(String(data: data0, encoding: .utf8))
+//
+//                }
+//                task.resume()
             })
         }
     }

@@ -67,7 +67,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             if let res = response {
-                print(res)
+                //print(res)
             }
             if let err = error {
                 print(err)
@@ -98,7 +98,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 DispatchQueue.main.async {
                     self.searchTableView.reloadData()
                 }
-                print(self.songs)
                 
             } catch {
                 print(error.localizedDescription)
