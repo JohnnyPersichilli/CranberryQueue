@@ -8,17 +8,12 @@
 
 import UIKit
 
-protocol queueDelegate: class {
-    func searchTapped(shouldHideContents: Bool)
-}
-
 class QueueViewController: UIViewController, searchDelegate {
 
     var queueName: String? = nil
     var queueId: String? = nil
     var uid: String? = nil
     var isHost = false
-    var shouldHideContents = false
     
     @IBOutlet var songTableView: SongTableView!
     
@@ -35,8 +30,6 @@ class QueueViewController: UIViewController, searchDelegate {
     @IBOutlet var searchView: UIView!
     
     @IBOutlet var globeIcon: UIImageView!
-    
-    weak var delegate: queueDelegate? = nil
     
     
     override func viewDidLoad() {
@@ -62,13 +55,9 @@ class QueueViewController: UIViewController, searchDelegate {
     }
     
     func setupGestureRecognizers() {
-        let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(globeTapped))
+        let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))
         globeIcon.addGestureRecognizer(globeTapGesture)
         globeIcon.isUserInteractionEnabled = true
-        
-        let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchTapped))
-        searchIconImageView.addGestureRecognizer(searchTap)
-        searchIconImageView.isUserInteractionEnabled = true
     }
     
     @objc func globeTapped() {
@@ -85,28 +74,14 @@ class QueueViewController: UIViewController, searchDelegate {
     }
     
     @objc func searchTapped() {
-        if(searchView.isHidden) {
-            delegate?.searchTapped(shouldHideContents: false)
-            searchView.isHidden = false
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 0
-                self.songTableView.alpha = 0
-                self.searchView.alpha = 1
-            }) { (val) in
-                self.nextUpLabel.isHidden = true
-                self.songTableView.isHidden = true
-            }
-        } else {
-            delegate?.searchTapped(shouldHideContents: true)
-            self.nextUpLabel.isHidden = false
-            self.songTableView.isHidden = false
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 1
-                self.songTableView.alpha = 1
-                self.searchView.alpha = 0
-            }) { (_) in
-                self.searchView.isHidden = true
-            }
+        searchView.isHidden = false
+        UIView.animate(withDuration: 0.4, animations: {
+            self.nextUpLabel.alpha = 0
+            self.songTableView.alpha = 0
+            self.searchView.alpha = 1
+        }) { (val) in
+            self.nextUpLabel.isHidden = true
+            self.songTableView.isHidden = true
         }
     }
     
@@ -133,11 +108,13 @@ class QueueViewController: UIViewController, searchDelegate {
         }
         else if segue.destination is SearchController {
             let vc = segue.destination as? SearchController
-            
+            let searchTap = UITapGestureRecognizer(target: vc!, action: #selector(vc!.searchTapped))
+            searchTap.addTarget(self, action: #selector(searchTapped))
+            searchIconImageView.addGestureRecognizer(searchTap)
+            searchIconImageView.isUserInteractionEnabled = true
             vc?.delegate = self
             vc?.queueId = queueId
             vc?.uid = uid
-            self.delegate = vc
         }
     }
 

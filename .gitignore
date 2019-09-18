@@ -49,4 +49,3 @@ GoogleService-Info.plist
 
 # End of https://www.gitignore.io/api/xcode,cocoapods
 CranberryQueue/GoogleService-Info.plist
-CranberryQueue.xcodeproj/project.pbxproj
