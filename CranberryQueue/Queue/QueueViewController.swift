@@ -113,7 +113,7 @@ class QueueViewController: UIViewController, searchDelegate {
             searchIconImageView.isUserInteractionEnabled = true
             vc?.delegate = self
             vc?.queueId = queueId
-            
+            vc?.uid = uid
         }
     }
 
