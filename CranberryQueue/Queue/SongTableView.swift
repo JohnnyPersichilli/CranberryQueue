@@ -34,10 +34,10 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
                 print(error!)
                 return
             }
+            self.songs = []
             if snap.documents.count == 0 {
                 return
             }
-            self.songs = []
             for song in snap.documents {
                 let newSong = Song(
                     name: song["name"] as! String,
