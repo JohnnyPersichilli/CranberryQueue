@@ -34,6 +34,12 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     
     var db: Firestore? = nil
     
+    var timer = Timer()
+    var isTimerRunning = false
+    
+    var duration = 200
+    var position = 0
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +58,41 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
             showHelpText()
         }
         
-        
+    }
+    
+    func runTimer() {
+        timer.invalidate()
+        isTimerRunning = true
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
+    }
+    
+    @objc func updateTimer () {
+        if !isTimerRunning {
+            return
+        }
+        position += 1000
+        updateTimerUI()
+        if Int(position/1000) == Int(duration/1000) {
+            isTimerRunning = false
+        }
+    }
+    
+    func updateTimerUI() {
+        let posSeconds = (position/1000) % 60
+        let posMinutes = (position/1000)/60 % 60
+        let durSeconds = (duration/1000) % 60
+        let durMinutes = (duration/1000)/60 % 60
+        var stringPosSeconds = String((position/1000) % 60)
+        var stringDurSeconds = String((duration/1000) % 60)
+        if posSeconds < 10 {
+            stringPosSeconds = "0" + String((position/1000) % 60)
+        }
+        if durSeconds < 10 {
+            stringDurSeconds = "0" + String((duration/1000) % 60)
+        }
+        DispatchQueue.main.async {
+            self.timeLabel.text = "\(posMinutes):\(stringPosSeconds) | \(durMinutes):\(stringDurSeconds)"
+        }
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
@@ -91,6 +131,16 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
         
+        duration = json["duration"] as! Int
+        position = json["position"] as! Int
+        if (json["isPaused"] as! Bool) {
+            timer.invalidate()
+            updateTimerUI()
+        }
+        else {
+            runTimer()
+        }
+        
     }
     
     func setupHostListeners() {
@@ -116,8 +166,18 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)
-            self.updateSongUI(withInfo: info)
             
+            self.updateSongUI(withInfo: info)
+            self.duration = info.duration
+            self.position = info.position
+            
+            if (info.isPaused) {
+                self.timer.invalidate()
+                self.updateTimerUI()
+            }
+            else {
+                self.runTimer()
+            }
         })
     }
     
