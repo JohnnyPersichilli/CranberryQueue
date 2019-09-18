@@ -19,7 +19,6 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         }
     }
     
-
     @IBOutlet var albumImageView: UIImageView!
     
     @IBOutlet var titleLabel: UILabel!
@@ -74,6 +73,37 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         updateTimerUI()
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
+        }
+        if Int(duration/1000) - Int(position/1000) < 5 {
+            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                if snap.count == 0 {
+                    return
+                }
+                let nextSongJSON = snap.documents[0].data()
+                
+                let songString = nextSongJSON["]
+                let url = URL(string: "https://api.spotify.com/v1/me/player/play?uris=\(searchString)&type=track")!
+                
+                var request = URLRequest(url: url)
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    
+                    if let res = response {
+                        print(res)
+                    }
+                    if let err = error {
+                        print(err)
+                        return
+                    }
+                    guard let data0 = data else {
+                        return
+                    }
+            })
         }
     }
     
