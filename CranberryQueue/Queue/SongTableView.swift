@@ -46,7 +46,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
             }
             for song in snap.documents {
                 if (song["name"] as? String) == nil {
-                    return
+                    continue
                 }
                 let newSong = Song(
                     name: song["name"] as! String,
