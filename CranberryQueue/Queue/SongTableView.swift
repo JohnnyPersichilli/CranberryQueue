@@ -41,7 +41,9 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
                     name: song["name"] as! String,
                     artist: song["artist"] as! String,
                     imageURL: song["imageURL"] as! String,
-                    docID: song["docID"] as! String)
+                    docID: song["docID"] as! String,
+                    votes: song["votes"] as! Int
+                )
                 self.songs.append(newSong)
             }
             DispatchQueue.main.async {

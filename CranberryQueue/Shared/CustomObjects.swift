@@ -13,6 +13,7 @@ struct Song {
     var artist = String()
     var imageURL = String()
     var docID = String()
+    var votes = 0
 }
 
 struct CQLocation {
