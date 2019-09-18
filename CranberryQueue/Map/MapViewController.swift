@@ -12,6 +12,7 @@ import Firebase
 protocol mapControllerDelegate: class {
     func addTapped()
     func getCoords() -> ([String:Double])
+    func setUID(id: String)
 }
 
 class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
@@ -44,14 +45,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         
         createQueueForm.queueNameTextField.delegate = self
         
-        Auth.auth().signInAnonymously { (result, error) in
-            if let data = result {
-                self.uid = data.user.uid
-            }
-            else {
-                print( error! )
-            }
-        }
+        
     }
     
     func updateGeoCode(city: String, region: String) {
@@ -107,6 +101,15 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             vc?.delegate = self
             vc?.uid = uid
             self.delegate = vc
+            Auth.auth().signInAnonymously { (result, error) in
+                if let data = result {
+                    self.uid = data.user.uid
+                    self.delegate?.setUID(id: data.user.uid)
+                }
+                else {
+                    print( error! )
+                }
+            }
         }
         if segue.destination is PlayerViewController {
             //let vc = segue.destination as? PlayerViewController
