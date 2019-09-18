@@ -44,7 +44,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
                     artist: song["artist"] as! String,
                     imageURL: song["imageURL"] as! String,
                     docID: song["docID"] as! String,
-                    votes: song["votes"] as! Int
+                    votes: song["votes"] as! Int,
+                    uri: song["uri"] as! String
                 )
                 self.songs.append(newSong)
             }
