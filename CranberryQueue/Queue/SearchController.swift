@@ -201,7 +201,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             "artist": song.artist,
             "name": song.name,
             "imageURL": song.imageURL,
-            "docID": song.docID
+            "docID": song.docID,
+            "votes": 0
         ]
     }
 

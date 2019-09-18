@@ -45,6 +45,7 @@ class QueueViewController: UIViewController, searchDelegate {
         searchView.alpha = 0
         
         songTableView.queueId = queueId
+        songTableView.uid = self.uid
         songTableView.watchPlaylist()
         setupGestureRecognizers()
         

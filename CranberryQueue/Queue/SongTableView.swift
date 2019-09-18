@@ -22,6 +22,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     var queueId: String? = nil
     var uid: String? = nil
     
+    var songId: String? = nil
+    
     var db: Firestore? = nil
     
     func watchPlaylist() {
@@ -79,8 +81,12 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
-        cell.songLabel.text = songs[indexPath.section].name
-        cell.artistLabel.text = songs[indexPath.section].artist
+        let song = songs[indexPath.section]
+        cell.songLabel.text = song.name
+        cell.artistLabel.text = song.artist
+        cell.songId = song.docID
+        cell.uid = self.uid
+        cell.voteLabel.text = String(song.votes)
         
         //cell.layer.borderWidth = 1
         
