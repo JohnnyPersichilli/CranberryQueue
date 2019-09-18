@@ -7,9 +7,12 @@
 //
 
 import UIKit
+import Firebase
 
 class QueueTableViewCell: UITableViewCell {
 
+    @IBOutlet weak var voteLabel: UILabel!
+    
     @IBOutlet var albumImageView: UIImageView!
     
     @IBOutlet var songLabel: UILabel!
@@ -22,9 +25,17 @@ class QueueTableViewCell: UITableViewCell {
     
     @IBOutlet var shadowView: UIView!
     
+    var uid: String? = nil
+    
+    var songId: String? = nil
+    
+    var db: Firestore? = nil
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
+        db = Firestore.firestore()
+
         albumImageView.layer.cornerRadius = albumImageView.frame.height/2
         albumImageView.clipsToBounds = true
         
@@ -48,11 +59,15 @@ class QueueTableViewCell: UITableViewCell {
     }
     
     @objc func upvoteTapped() {
-        
+         self.db?.collection("song").document(self.songId!).collection("upvoteUsers").document(self.uid!).setData(
+            [:], completion: { (err) in
+         })
     }
     
     @objc func downvoteTapped() {
-        
+        self.db?.collection("song").document(self.songId!).collection("downvoteUsers").document(self.uid!).setData(
+            [:], completion: { (err) in
+        })
     }
 
 }

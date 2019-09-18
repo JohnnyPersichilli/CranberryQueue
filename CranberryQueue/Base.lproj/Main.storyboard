@@ -284,6 +284,7 @@
                                             <outlet property="shadowView" destination="Tgv-c7-Tyv" id="Ohb-gK-0Ah"/>
                                             <outlet property="songLabel" destination="3hw-ji-co8" id="7cV-Xw-PMo"/>
                                             <outlet property="upvoteButtonImageView" destination="YvW-jn-Cix" id="ajb-5w-F9m"/>
+                                            <outlet property="voteLabel" destination="IqF-NZ-WwG" id="09Z-1d-agu"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
