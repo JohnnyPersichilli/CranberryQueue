@@ -13,8 +13,21 @@ protocol searchDelegate: class {
     func addSongTapped(song: Song)
 }
 
-class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
-
+class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, queueDelegate {
+    
+    func searchTapped(shouldHideContents: Bool) {
+        if(shouldHideContents) {
+            songs = []
+            searchTextField.resignFirstResponder()
+            searchTextField.text = ""
+            DispatchQueue.main.async {
+                self.searchTableView.reloadData()
+            }
+        } else {
+            searchTextField.becomeFirstResponder()
+        }
+    }
+    
     @IBOutlet var searchTextField: UITextField!
     
     @IBOutlet var searchTableView: UITableView!
@@ -23,15 +36,17 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     
     var db: Firestore?
     
+    var searchFirstTap: Bool = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         searchTableView.delegate = self
         searchTableView.dataSource = self
         searchTextField.delegate = self
+        searchTextField.returnKeyType = .search
         
         db = Firestore.firestore()
-        
         
     }
     
@@ -50,10 +65,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             let delegate = UIApplication.shared.delegate as! AppDelegate
             return delegate.token
         }
-    }
-    
-    @objc func searchTapped() {
-        searchTextField.becomeFirstResponder()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -104,14 +115,14 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             }
         }
         task.resume()
-//        let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
-//            guard let data = data else {
-//                print("no data")
-//                return }
-//            print(String(data: data, encoding: .utf8)!)
-//        }
-//
-//        task.resume()
+        //        let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+        //            guard let data = data else {
+        //                print("no data")
+        //                return }
+        //            print(String(data: data, encoding: .utf8)!)
+        //        }
+        //
+        //        task.resume()
         searchTextField.resignFirstResponder()
         return true
     }
@@ -124,14 +135,14 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         return songs.count
     }
     
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        if indexPath.section == 0 {
-//            return 90
-//        }
-//        else {
-//            return 60
-//        }
-//    }
+    //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    //        if indexPath.section == 0 {
+    //            return 90
+    //        }
+    //        else {
+    //            return 60
+    //        }
+    //    }
     
     func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         (view as! UITableViewHeaderFooterView).backgroundView?.backgroundColor = UIColor.clear
@@ -188,6 +199,10 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             songs = []
             searchTextField.text = ""
             
+            DispatchQueue.main.async {
+                self.searchTableView.reloadData()
+            }
+            
             var newSong = self.songToJSON(song: cell.song)
             var ref: DocumentReference? = nil
             ref = db?.collection("song").addDocument(data: [
@@ -195,11 +210,12 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 ], completion: { (val) in
                     newSong["docID"] = ref!.documentID
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
                     })
             })
         }
     }
+    
     func songToJSON(song: Song) -> [String:Any] {
         return [
             "artist": song.artist,
@@ -210,15 +226,15 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             "uri": song.uri
         ]
     }
-
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }
