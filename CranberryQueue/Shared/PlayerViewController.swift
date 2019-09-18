@@ -95,30 +95,6 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
                     }
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
                 })
-//                let songString = (nextSongJSON["uri"] as! String).addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-//                let url = URL(string: "https://api.spotify.com/v1/me/player/play?uris=\(songString)")!
-                
-//                var request = URLRequest(url: url)
-//                request.httpMethod = "PUT"
-//                print("token \(self.token)")
-//                request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
-//
-//                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//
-//                    if let res = response {
-//                        print(res)
-//                    }
-//                    if let err = error {
-//                        print(err)
-//                        return
-//                    }
-//                    guard let data0 = data else {
-//                        return
-//                    }
-//                    print(String(data: data0, encoding: .utf8))
-//
-//                }
-//                task.resume()
             })
         }
     }
