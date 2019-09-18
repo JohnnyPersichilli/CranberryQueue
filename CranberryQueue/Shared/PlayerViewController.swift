@@ -122,7 +122,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
         }
-        if Int(duration/1000) - Int(position/1000) == 5 {
+        if Int(duration/1000) - Int(position/1000) == 2 {
             db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
                     print(error!)
