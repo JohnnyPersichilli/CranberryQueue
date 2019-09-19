@@ -43,13 +43,13 @@ class QueueTableViewCell: UITableViewCell {
         let upvoteTap = UITapGestureRecognizer(target: self, action: #selector(upvoteTapped))
         upvoteButtonImageView.addGestureRecognizer(upvoteTap)
         upvoteButtonImageView.isUserInteractionEnabled = true
-        upvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 270*3.1415926/180)
-        
         
         let downvoteTap = UITapGestureRecognizer(target: self, action: #selector(downvoteTapped))
         downvoteButtonImageView.addGestureRecognizer(downvoteTap)
         downvoteButtonImageView.isUserInteractionEnabled = true
+        
         downvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 90*3.1415926/180)
+        upvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 270*3.1415926/180)
         
         shadowView.layer.shadowRadius = 15
         shadowView.layer.shadowColor = UIColor.black.cgColor
