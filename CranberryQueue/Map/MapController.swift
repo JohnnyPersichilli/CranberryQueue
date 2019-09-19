@@ -55,7 +55,17 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         vc.queueId = data?.queueId
         vc.uid = self.uid
         vc.isHost = false
-        self.present(vc, animated:true, completion:nil)
+        db?.collection("contributor").document(data!.queueId).getDocument(completion: { (snapshot, error) in
+            if let err = error {
+                print(err)
+            }
+            if let host = snapshot?.data()?["host"] as? String {
+                if self.uid == host {
+                    vc.isHost = true
+                }
+            }
+            self.present(vc, animated:true, completion:nil)
+        })
     }
     
     func watchLocationQueues(city: String, region: String) {
