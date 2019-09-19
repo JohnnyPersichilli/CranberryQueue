@@ -9,6 +9,10 @@
 import UIKit
 import Firebase
 
+protocol SongTableDelegate: class {
+    func updateNumSongs(_ numSongs: Int)
+}
+
 class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
     var songs = [Song]()
@@ -25,6 +29,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     var songId: String? = nil
     
     var db: Firestore? = nil
+    
+    weak var songDelegate: SongTableDelegate? = nil
     
     func watchPlaylist() {
         db = Firestore.firestore()
@@ -58,6 +64,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
                 )
                 self.songs.append(newSong)
             }
+            self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
                 self.reloadData()
             }
