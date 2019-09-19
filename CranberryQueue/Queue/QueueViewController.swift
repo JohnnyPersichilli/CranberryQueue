@@ -12,7 +12,7 @@ protocol queueDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
-class QueueViewController: UIViewController, searchDelegate {
+class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
 
     var queueName: String? = nil
     var queueId: String? = nil
@@ -54,14 +54,22 @@ class QueueViewController: UIViewController, searchDelegate {
         songTableView.queueId = queueId
         songTableView.uid = self.uid
         songTableView.watchPlaylist()
+        songTableView.songDelegate = self
+        
+        
         setupGestureRecognizers()
+
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
         }
     }
     
-    
+    func updateNumSongs(_ numSongs: Int) {
+        DispatchQueue.main.async {
+            self.numSongsLabel.text = String(numSongs)
+        }
+    }
     
     func setupGestureRecognizers() {
         let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))

@@ -71,17 +71,20 @@ class SettingsViewController: UIViewController {
                     self.spotifyUsernameLabel.text = jsonRes?["id"] as? String
                 }
                 
-                let url = URL(string: (jsonRes?["images"] as! [[String:Any]])[0]["url"] as! String)!
-                let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
-                    guard let data = data else {
-                        print("no data")
-                        return }
-                    DispatchQueue.main.async {
-                        self.spotifyProfilePicture.image = UIImage(data: data)
+                var imageRes = (jsonRes?["images"] as! [[String:Any]])
+                if(imageRes.count != 0){
+                    let url = URL(string: imageRes[0]["url"] as! String)!
+                    let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+                        guard let data = data else {
+                            print("no data")
+                            return }
+                        DispatchQueue.main.async {
+                            self.spotifyProfilePicture.image = UIImage(data: data)
+                        }
                     }
+                    
+                    task.resume()
                 }
-        
-                task.resume()
 
             } catch {
                 print(error.localizedDescription)
