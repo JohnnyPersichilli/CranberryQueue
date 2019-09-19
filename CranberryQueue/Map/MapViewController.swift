@@ -144,8 +144,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             "name" : name
         ]) { (val) in
             let id = ref!.documentID
-            self.db?.collection("contributors").addDocument(data: [
-                "hostID": self.uid
+            self.db?.collection("contributor").document(id).setData([
+                "host": self.uid
                 ])
             
             
