@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 protocol queueDelegate: class {
     func searchTapped(shouldHideContents: Bool)
@@ -19,6 +20,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var uid: String? = nil
     var isHost = false
     var shouldHideContents = false
+    
+    @IBOutlet weak var leaveQueueImage: UIImageView!
     
     @IBOutlet var songTableView: SongTableView!
     
@@ -38,9 +41,13 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     weak var delegate: queueDelegate? = nil
     
+    var db : Firestore? = nil
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        db = Firestore.firestore()
         
         setupScreen()
         songTableView.delegate = songTableView
@@ -71,6 +78,13 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
     }
     
+    //these functions may have to be in the map view controller
+    func updateNumMembers(_ numMembers: Int) {
+        DispatchQueue.main.async {
+            self.numMembersLabel.text = String(numMembers)
+        }
+    }
+    
     func setupGestureRecognizers() {
         let globeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.globeTapped))
         globeIcon.addGestureRecognizer(globeTapGesture)
@@ -79,6 +93,21 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchTapped))
         searchIconImageView.addGestureRecognizer(searchTap)
         searchIconImageView.isUserInteractionEnabled = true
+        
+        let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTap))
+        leaveQueueImage.addGestureRecognizer(leaveQueueTap)
+        leaveQueueImage.isUserInteractionEnabled = true
+    }
+    
+    @objc func leaveQueueTap() {
+        self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
+        
+        self.queueId = ""
+        
+        print("removing:", self.uid!)
+        self.presentingViewController?.dismiss(animated: true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
     }
     
     @objc func globeTapped() {
