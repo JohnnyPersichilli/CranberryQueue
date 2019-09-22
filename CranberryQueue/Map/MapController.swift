@@ -58,10 +58,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         
         self.db?.collection("contributor").document(data!.queueId).collection("members").document(self.uid).setData([:
             ], completion: { (val) in
-                print("added user:",self.uid)
-                //newSong["docID"] = ref!.documentID
-                //self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                    //self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
                 })
         
         db?.collection("contributor").document(data!.queueId).getDocument(completion: { (snapshot, error) in

@@ -66,7 +66,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         setupGestureRecognizers()
         
-        watchNumMembers()
+        watchLocationDoc()
 
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
@@ -80,12 +80,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
     }
     
-    func watchNumMembers() {
+    func watchLocationDoc() {
         db = Firestore.firestore()
         
         db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
-                
                 
                 guard let snap = snapshot else {
                     print(error!)
@@ -109,17 +108,16 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         searchIconImageView.addGestureRecognizer(searchTap)
         searchIconImageView.isUserInteractionEnabled = true
         
-        let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTap))
+        let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTapped))
         leaveQueueImage.addGestureRecognizer(leaveQueueTap)
         leaveQueueImage.isUserInteractionEnabled = true
     }
     
-    @objc func leaveQueueTap() {
+    @objc func leaveQueueTapped() {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
         
         self.queueId = nil
         
-        print("removing:", self.uid!)
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
