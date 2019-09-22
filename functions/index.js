@@ -8,6 +8,95 @@ const db = admin.firestore();
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 
+exports.removeNumMembers = functions.firestore
+    .document('contributor/{queueId}/members/{uid}')
+    .onDelete((snap, context) => {
+
+    const queueId = context.params.queueId;
+    const uid = context.params.uid;
+
+    db.collection('contributor').doc(queueId).collection('members').get()
+    .then(snapshot => {
+            if (snapshot.empty) {
+                db.collection('location').doc(queueId).set({
+                    numMembers: admin.firestore.FieldValue.decrement(1)
+                }, {merge: true})
+                .then( () => {
+                    return;
+                })
+            } 
+        
+            else {
+                var isDup = false;
+                snapshot.forEach(doc => {
+                    if (doc.id == uid) {
+                        isDup = true;
+                    }
+                });
+                if (isDup) {
+
+                }
+                else {
+                    db.collection('location').doc(queueId).set({
+                        numMembers: admin.firestore.FieldValue.decrement(1)
+                    }, {merge: true})
+                    .then( () => {
+                        return;
+                    })
+                }
+            }
+            
+        })
+    })
+
+    });
+
+exports.addNumMembers = functions.firestore
+    .document('contributor/{queueId}/members/{uid}')
+    .onCreate((snap, context) => {
+
+    const queueId = context.params.queueId;
+    const uid = context.params.uid;
+
+    db.collection('contributor').doc(queueId).collection('members').get()
+    .then(snapshot => {
+            if (snapshot.empty) {
+                db.collection('location').doc(queueId).set({
+                    numMembers: admin.firestore.FieldValue.increment(1)
+                }, {merge: true})
+                .then( () => {
+                    return;
+                })
+            } 
+        
+            else {
+                var isDup = false;
+                snapshot.forEach(doc => {
+                    if (doc.id == uid) {
+                        isDup = true;
+                    }
+                });
+                if (isDup) {
+
+                }
+                else {
+                    db.collection('location').doc(queueId).set({
+                        numMembers: admin.firestore.FieldValue.increment(1)
+                    }, {merge: true})
+                    .then( () => {
+                        return;
+                    })
+                }
+            }
+            
+        })
+    })
+
+    });
+        
+        
+        
+
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
     .onCreate((snap, context) => {
