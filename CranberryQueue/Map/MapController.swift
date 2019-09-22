@@ -55,6 +55,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         vc.queueId = data?.queueId
         vc.uid = self.uid
         vc.isHost = false
+        
+        self.db?.collection("contributor").document(data!.queueId).collection("members").document(self.uid).setData([:
+            ], completion: { (val) in
+                })
+        
         db?.collection("contributor").document(data!.queueId).getDocument(completion: { (snapshot, error) in
             if let err = error {
                 print(err)

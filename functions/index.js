@@ -8,6 +8,38 @@ const db = admin.firestore();
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 
+exports.addNumMembers = functions.firestore
+    .document('contributor/{queueId}/members/{uid}')
+    .onCreate((snap, context) => {
+    
+    const queueId = context.params.queueId;
+    
+    db.collection('location').doc(queueId).set({
+        numMembers: admin.firestore.FieldValue.increment(1)
+    }, {merge: true})
+    .then( () => {
+        return;
+    })
+
+    });
+
+exports.removeNumMembers = functions.firestore
+    .document('contributor/{queueId}/members/{uid}')
+    .onDelete((snap, context) => {
+    
+    const queueId = context.params.queueId;
+    
+    db.collection('location').doc(queueId).set({
+        numMembers: admin.firestore.FieldValue.increment(-1)
+    }, {merge: true})
+    .then( () => {
+        return;
+    })
+
+    });
+        
+        
+
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
     .onCreate((snap, context) => {
