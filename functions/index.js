@@ -30,7 +30,7 @@ exports.removeNumMembers = functions.firestore
     const queueId = context.params.queueId;
     
     db.collection('location').doc(queueId).set({
-        numMembers: admin.firestore.FieldValue.decrement(1)
+        numMembers: admin.firestore.FieldValue.increment(-1)
     }, {merge: true})
     .then( () => {
         return;
