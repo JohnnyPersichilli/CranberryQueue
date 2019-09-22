@@ -65,6 +65,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         
         setupGestureRecognizers()
+        
+        watchNumMembers()
 
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
@@ -78,11 +80,24 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
     }
     
-    //these functions may have to be in the map view controller
-    func updateNumMembers(_ numMembers: Int) {
-        DispatchQueue.main.async {
-            self.numMembersLabel.text = String(numMembers)
-        }
+    func watchNumMembers() {
+        db = Firestore.firestore()
+        
+        db?.collection("location").document(queueId!)
+            .addSnapshotListener({ (snapshot, error) in
+                
+                
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                
+                let doc = snap.data()!
+                let numMembers = doc["numMembers"] as! Int
+                DispatchQueue.main.async {
+                    self.numMembersLabel.text = String(numMembers)
+                }
+            })
     }
     
     func setupGestureRecognizers() {
@@ -102,7 +117,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     @objc func leaveQueueTap() {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
         
-        self.queueId = ""
+        self.queueId = nil
         
         print("removing:", self.uid!)
         self.presentingViewController?.dismiss(animated: true, completion: {

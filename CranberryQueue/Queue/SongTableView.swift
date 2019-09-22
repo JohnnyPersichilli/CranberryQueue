@@ -11,7 +11,6 @@ import Firebase
 
 protocol SongTableDelegate: class {
     func updateNumSongs(_ numSongs: Int)
-    func updateNumMembers(_ numMembers: Int)
 }
 
 class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
@@ -68,23 +67,6 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
             self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
                 self.reloadData()
-            }
-        })
-    }
-    
-    func watchNumMembers() {
-        db = Firestore.firestore()
-        
-        db?.collection("contributor").document(queueId!).collection("members")
-            .addSnapshotListener({ (snapshot, error) in
-                
-                
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            DispatchQueue.main.async {
-                self.songDelegate?.updateNumMembers(snap.documents.count)
             }
         })
     }
