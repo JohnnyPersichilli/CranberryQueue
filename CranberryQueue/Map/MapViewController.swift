@@ -139,7 +139,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             "long" : coords?["long"] ?? 0,
             "city": cityLabel.text ?? "",
             "region": regionLabel.text ?? "",
-            "numMembers": 1,
+            "numMembers": 0,
             "currentSong": "",
             "name" : name
         ]) { (val) in
