@@ -13,7 +13,7 @@ protocol SongTableDelegate: class {
     func updateNumSongs(_ numSongs: Int)
 }
 
-class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, QueueCellDelegate {
+class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
     var songs = [Song]()
     var isHost = false {
@@ -31,11 +31,6 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     var db: Firestore? = nil
     
     weak var songDelegate: SongTableDelegate? = nil
-    
-    var upvotes = [Song]()
-    var downvotes = [Song]()
-    var pendingUpvotes = [Song]()
-    var pendingDownvotes = [Song]()
     
     func watchPlaylist() {
         db = Firestore.firestore()
@@ -68,35 +63,12 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     uri: song["uri"] as! String
                 )
                 self.songs.append(newSong)
-                
-                if self.pendingUpvotes.contains(where: {$0 == newSong && $0.votes != newSong.votes}) {
-                    self.pendingUpvotes.removeAll(where: {$0 == newSong})
-                }
-                if self.pendingDownvotes.contains(where: {$0 == newSong && $0.votes != newSong.votes}) {
-                    self.pendingDownvotes.removeAll(where: {$0 == newSong})
-                }
             }
             self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
                 self.reloadData()
             }
         })
-    }
-    
-    func voteTapped(isUpvote: Bool, song: Song) {
-        if isUpvote {
-            pendingUpvotes.append(song)
-            upvotes.append(song)
-            pendingDownvotes.removeAll(where: {$0 == song})
-            downvotes.removeAll(where: {$0 == song})
-        }
-        else {
-            pendingDownvotes.append(song)
-            downvotes.append(song)
-            pendingUpvotes.removeAll(where: {$0 == song})
-            upvotes.removeAll(where: {$0 == song})
-        }
-        reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -130,30 +102,10 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist
         cell.songId = song.docID
+        cell.uid = self.uid
         cell.voteLabel.text = String(song.votes)
         
-        cell.song = song // need to depreciate above
-        cell.delegate = self
-        cell.uid = self.uid
-        
-        if upvotes.contains(where: {$0 == song}) {
-            cell.upvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
-            cell.downvoteButtonImageView.backgroundColor = UIColor.clear
-        }
-        else if downvotes.contains(where: {$0 == song}) {
-            cell.downvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
-            cell.upvoteButtonImageView.backgroundColor = UIColor.clear
-        }
-        else {
-            cell.upvoteButtonImageView.backgroundColor = UIColor.clear
-            cell.downvoteButtonImageView.backgroundColor = UIColor.clear
-        }
-        if pendingUpvotes.contains(where: {$0 == song}) {
-            cell.voteLabel.text = String(song.votes + 1)
-        }
-        else if pendingDownvotes.contains(where: {$0 == song}) {
-            cell.voteLabel.text = String(song.votes - 1)
-        }
+        //cell.layer.borderWidth = 1
         
         let url = URL(string: songs[indexPath.section].imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
