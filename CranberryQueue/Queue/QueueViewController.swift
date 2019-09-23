@@ -140,6 +140,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         if(searchView.isHidden) {
             delegate?.searchTapped(shouldHideContents: false)
             searchView.isHidden = false
+            let closeSearchImage: UIImage = UIImage(named: "settingsIcon")!
+            searchIconImageView.image = closeSearchImage
             UIView.animate(withDuration: 0.4, animations: {
                 self.nextUpLabel.alpha = 0
                 self.songTableView.alpha = 0
@@ -152,6 +154,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             delegate?.searchTapped(shouldHideContents: true)
             self.nextUpLabel.isHidden = false
             self.songTableView.isHidden = false
+            let searchImage: UIImage = UIImage(named: "searchIcon")!
+            searchIconImageView.image = searchImage
             UIView.animate(withDuration: 0.4, animations: {
                 self.nextUpLabel.alpha = 1
                 self.songTableView.alpha = 1
@@ -165,6 +169,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     func addSongTapped(song: Song) {
         self.nextUpLabel.isHidden = false
         self.songTableView.isHidden = false
+        let searchImage: UIImage = UIImage(named: "searchIcon")!
+        searchIconImageView.image = searchImage
         UIView.animate(withDuration: 0.4, animations: {
             self.nextUpLabel.alpha = 1
             self.songTableView.alpha = 1
