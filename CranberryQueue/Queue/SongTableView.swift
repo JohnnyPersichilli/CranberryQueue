@@ -32,8 +32,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     
     weak var songDelegate: SongTableDelegate? = nil
     
-    var upvotes = [Song]()
-    var downvotes = [Song]()
+    var upvotes = [String]()
+    var downvotes = [String]()
     var pendingUpvotes = [Song]()
     var pendingDownvotes = [Song]()
     
@@ -82,15 +82,15 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func voteTapped(isUpvote: Bool, song: Song) {
         if isUpvote {
             pendingUpvotes.append(song)
-            upvotes.append(song)
+            upvotes.append(song.docID)
             pendingDownvotes.removeAll(where: {$0 == song})
-            downvotes.removeAll(where: {$0 == song})
+            downvotes.removeAll(where: {$0 == song.docID})
         }
         else {
             pendingDownvotes.append(song)
-            downvotes.append(song)
+            downvotes.append(song.docID)
             pendingUpvotes.removeAll(where: {$0 == song})
-            upvotes.removeAll(where: {$0 == song})
+            upvotes.removeAll(where: {$0 == song.docID})
         }
         reloadData()
     }
@@ -132,11 +132,11 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         cell.delegate = self
         cell.uid = self.uid
         
-        if upvotes.contains(where: {$0 == song}) {
+        if upvotes.contains(where: {$0 == song.docID}) {
             cell.upvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
             cell.downvoteButtonImageView.backgroundColor = UIColor.clear
         }
-        else if downvotes.contains(where: {$0 == song}) {
+        else if downvotes.contains(where: {$0 == song.docID}) {
             cell.downvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
             cell.upvoteButtonImageView.backgroundColor = UIColor.clear
         }
