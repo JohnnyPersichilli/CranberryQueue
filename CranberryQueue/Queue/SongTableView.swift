@@ -69,12 +69,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 )
                 self.songs.append(newSong)
                 
-                if self.pendingUpvotes.contains(where: {$0 == newSong && $0.votes != newSong.votes}) {
-                    self.pendingUpvotes.removeAll(where: {$0 == newSong})
-                }
-                if self.pendingDownvotes.contains(where: {$0 == newSong && $0.votes != newSong.votes}) {
-                    self.pendingDownvotes.removeAll(where: {$0 == newSong})
-                }
+                self.pendingUpvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
+                self.pendingDownvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
             }
             self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
