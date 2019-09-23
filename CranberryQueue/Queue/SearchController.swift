@@ -69,6 +69,10 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
+        if textField.text == nil || textField.text == "" {
+            return false
+        }
+        
         let searchString = (textField.text ?? "").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
         let url = URL(string: "https://api.spotify.com/v1/search?q=\(searchString)&type=track")!
         
@@ -101,7 +105,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                         artist: artistInfo[0]["name"] as! String,
                         imageURL: imageInfo[0]["url"] as! String,
                         docID: "f",
-                        votes: 0,
+                        votes: 1,
                         uri: x["uri"] as! String
                     )
                     self.songs.append(newSong)
@@ -195,7 +199,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         
         if let cell = self.searchTableView.cellForRow(at: indexPath) as? SearchTableViewCell
         {
-            delegate?.addSongTapped(song: cell.song)
             songs = []
             searchTextField.text = ""
             
@@ -209,6 +212,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 "queueId": self.queueId!
                 ], completion: { (val) in
                     newSong["docID"] = ref!.documentID
+                    self.delegate?.addSongTapped(song: self.JSONToSong(json: newSong))
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
                     })
@@ -225,6 +229,17 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             "votes": 0,
             "uri": song.uri
         ]
+    }
+    
+    func JSONToSong(json: [String:Any]) -> Song {
+        var song = Song()
+        song.artist = json["artist"] as! String
+        song.name = json["name"] as! String
+        song.imageURL = json["imageURL"] as! String
+        song.docID = json["docID"] as! String
+        song.votes = json["votes"] as! Int
+        song.uri = json["uri"] as! String
+        return song
     }
     
     /*
