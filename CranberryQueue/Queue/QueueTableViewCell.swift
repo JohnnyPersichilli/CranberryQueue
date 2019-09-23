@@ -9,6 +9,10 @@
 import UIKit
 import Firebase
 
+protocol QueueCellDelegate: class {
+    func voteTapped(isUpvote: Bool, song: Song)
+}
+
 class QueueTableViewCell: UITableViewCell {
 
     @IBOutlet weak var voteLabel: UILabel!
@@ -29,8 +33,11 @@ class QueueTableViewCell: UITableViewCell {
     var uid: String? = nil
     
     var songId: String? = nil
+    var song: Song? = nil
     
     var db: Firestore? = nil
+    
+    weak var delegate: QueueCellDelegate? = nil
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -58,19 +65,19 @@ class QueueTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
     @objc func upvoteTapped() {
          self.db?.collection("song").document(self.songId!).collection("upvoteUsers").document(self.uid!).setData(
             [:], completion: { (err) in
+                self.delegate?.voteTapped(isUpvote: true, song: self.song!)
          })
     }
     
     @objc func downvoteTapped() {
         self.db?.collection("song").document(self.songId!).collection("downvoteUsers").document(self.uid!).setData(
             [:], completion: { (err) in
+                self.delegate?.voteTapped(isUpvote: false, song: self.song!)
         })
     }
 
