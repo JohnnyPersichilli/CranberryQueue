@@ -96,6 +96,37 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         return 15
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        //should add if host but thats not getting set right
+        //if (editingStyle == .delete  && isHost)
+        if (editingStyle == .delete) {
+            let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+            let song = songs[indexPath.section]
+            cell.songId = song.docID
+            
+            self.db?.collection("song").document(song.docID).getDocument(completion: { (snapshot, error) in
+                if let err = error {
+                    print(err)
+                }
+                if let docQueueId = snapshot?.data()?["queueId"] as? String {
+                    if self.queueId == docQueueId {
+                        print("Delete song with id:",docQueueId )
+                        self.db?.collection("song").document(song.docID).delete(completion: { (err) in
+                            if let err = err{
+                                print(err)
+                            }
+                            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
+                            })
+                    }
+                }
+            })
+        }
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
         let song = songs[indexPath.section]
