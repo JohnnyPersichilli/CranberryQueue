@@ -13,7 +13,7 @@ protocol SongTableDelegate: class {
     func updateNumSongs(_ numSongs: Int)
 }
 
-class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
+class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, QueueCellDelegate {
     
     var songs = [Song]()
     var isHost = false {
@@ -31,6 +31,12 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     var db: Firestore? = nil
     
     weak var songDelegate: SongTableDelegate? = nil
+    
+    var upvotes = [String]()
+    var downvotes = [String]()
+    var pendingUpvotes = [Song]()
+    var pendingDownvotes = [Song]()
+    var superVotes = [String]()
     
     func watchPlaylist() {
         db = Firestore.firestore()
@@ -63,12 +69,45 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
                     uri: song["uri"] as! String
                 )
                 self.songs.append(newSong)
+                
+                self.pendingUpvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
+                self.pendingDownvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
+                self.superVotes.removeAll(where: {$0 == song.documentID})
             }
             self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
                 self.reloadData()
             }
         })
+    }
+    
+    func voteTapped(isUpvote: Bool, song: Song) {
+        if isUpvote {
+            pendingUpvotes.append(song)
+            upvotes.append(song.docID)
+            if pendingDownvotes.contains(where: {$0 == song}) || downvotes.contains(where: {$0 == song.docID}) {
+                superVotes.append(song.docID)
+            }
+            pendingDownvotes.removeAll(where: {$0 == song})
+            downvotes.removeAll(where: {$0 == song.docID})
+        }
+        else {
+            pendingDownvotes.append(song)
+            downvotes.append(song.docID)
+            if pendingUpvotes.contains(where: {$0 == song}) || upvotes.contains(where: {$0 == song.docID}) {
+                superVotes.append(song.docID)
+            }
+            pendingUpvotes.removeAll(where: {$0 == song})
+            upvotes.removeAll(where: {$0 == song.docID})
+        }
+        UserDefaults.standard.set(upvotes, forKey: "\(queueId!)/upvotes")
+        UserDefaults.standard.set(downvotes, forKey: "\(queueId!)/downvotes")
+        reloadData()
+    }
+    
+    func loadPreviousVotes() {
+        upvotes = UserDefaults.standard.array(forKey: "\(queueId!)/upvotes") as? [String] ?? []
+        downvotes = UserDefaults.standard.array(forKey: "\(queueId!)/downvotes") as? [String] ?? []
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -102,10 +141,51 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist
         cell.songId = song.docID
-        cell.uid = self.uid
         cell.voteLabel.text = String(song.votes)
         
-        //cell.layer.borderWidth = 1
+        cell.song = song // need to depreciate above
+        cell.delegate = self
+        cell.uid = self.uid
+        
+        if upvotes.contains(where: {$0 == song.docID}) {
+            cell.upvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
+            cell.downvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = false
+            cell.downvoteButtonImageView.isUserInteractionEnabled = true
+        }
+        else if downvotes.contains(where: {$0 == song.docID}) {
+            cell.downvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
+            cell.upvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = true
+            cell.downvoteButtonImageView.isUserInteractionEnabled = false
+        }
+        else {
+            cell.upvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.downvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = true
+            cell.downvoteButtonImageView.isUserInteractionEnabled = true
+        }
+        if pendingUpvotes.contains(where: {$0 == song}) {
+            if superVotes.contains(song.docID) {
+                cell.voteLabel.text = String(song.votes + 2)
+            }
+            else {
+                cell.voteLabel.text = String(song.votes + 1)
+            }
+            cell.isUserInteractionEnabled = false
+        }
+        else if pendingDownvotes.contains(where: {$0 == song}) {
+            if superVotes.contains(song.docID) {
+                cell.voteLabel.text = String(song.votes - 2)
+            }
+            else {
+                cell.voteLabel.text = String(song.votes - 1)
+            }
+            cell.isUserInteractionEnabled = false
+        }
+        else {
+            cell.isUserInteractionEnabled = true
+        }
         
         let url = URL(string: songs[indexPath.section].imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
