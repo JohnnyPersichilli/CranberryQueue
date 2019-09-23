@@ -60,6 +60,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         songTableView.queueId = queueId
         songTableView.uid = self.uid
+        songTableView.loadPreviousVotes()
         songTableView.watchPlaylist()
         songTableView.songDelegate = self
         

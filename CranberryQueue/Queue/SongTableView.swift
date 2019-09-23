@@ -36,6 +36,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     var downvotes = [String]()
     var pendingUpvotes = [Song]()
     var pendingDownvotes = [Song]()
+    var superVotes = [String]()
     
     func watchPlaylist() {
         db = Firestore.firestore()
@@ -71,6 +72,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 
                 self.pendingUpvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
                 self.pendingDownvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
+                self.superVotes.removeAll(where: {$0 == song.documentID})
             }
             self.songDelegate?.updateNumSongs(self.songs.count)
             DispatchQueue.main.async {
@@ -83,16 +85,29 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         if isUpvote {
             pendingUpvotes.append(song)
             upvotes.append(song.docID)
+            if pendingDownvotes.contains(where: {$0 == song}) || downvotes.contains(where: {$0 == song.docID}) {
+                superVotes.append(song.docID)
+            }
             pendingDownvotes.removeAll(where: {$0 == song})
             downvotes.removeAll(where: {$0 == song.docID})
         }
         else {
             pendingDownvotes.append(song)
             downvotes.append(song.docID)
+            if pendingUpvotes.contains(where: {$0 == song}) || upvotes.contains(where: {$0 == song.docID}) {
+                superVotes.append(song.docID)
+            }
             pendingUpvotes.removeAll(where: {$0 == song})
             upvotes.removeAll(where: {$0 == song.docID})
         }
+        UserDefaults.standard.set(upvotes, forKey: "\(queueId!)/upvotes")
+        UserDefaults.standard.set(downvotes, forKey: "\(queueId!)/downvotes")
         reloadData()
+    }
+    
+    func loadPreviousVotes() {
+        upvotes = UserDefaults.standard.array(forKey: "\(queueId!)/upvotes") as? [String] ?? []
+        downvotes = UserDefaults.standard.array(forKey: "\(queueId!)/downvotes") as? [String] ?? []
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -135,20 +150,36 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         if upvotes.contains(where: {$0 == song.docID}) {
             cell.upvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
             cell.downvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = false
+            cell.downvoteButtonImageView.isUserInteractionEnabled = true
         }
         else if downvotes.contains(where: {$0 == song.docID}) {
             cell.downvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
             cell.upvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = true
+            cell.downvoteButtonImageView.isUserInteractionEnabled = false
         }
         else {
             cell.upvoteButtonImageView.backgroundColor = UIColor.clear
             cell.downvoteButtonImageView.backgroundColor = UIColor.clear
+            cell.upvoteButtonImageView.isUserInteractionEnabled = true
+            cell.downvoteButtonImageView.isUserInteractionEnabled = true
         }
         if pendingUpvotes.contains(where: {$0 == song}) {
-            cell.voteLabel.text = String(song.votes + 1)
+            if superVotes.contains(song.docID) {
+                cell.voteLabel.text = String(song.votes + 2)
+            }
+            else {
+                cell.voteLabel.text = String(song.votes + 1)
+            }
         }
         else if pendingDownvotes.contains(where: {$0 == song}) {
-            cell.voteLabel.text = String(song.votes - 1)
+            if superVotes.contains(song.docID) {
+                cell.voteLabel.text = String(song.votes - 2)
+            }
+            else {
+                cell.voteLabel.text = String(song.votes - 1)
+            }
         }
         
         let url = URL(string: songs[indexPath.section].imageURL)
