@@ -172,6 +172,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             else {
                 cell.voteLabel.text = String(song.votes + 1)
             }
+            cell.isUserInteractionEnabled = false
         }
         else if pendingDownvotes.contains(where: {$0 == song}) {
             if superVotes.contains(song.docID) {
@@ -180,6 +181,10 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             else {
                 cell.voteLabel.text = String(song.votes - 1)
             }
+            cell.isUserInteractionEnabled = false
+        }
+        else {
+            cell.isUserInteractionEnabled = true
         }
         
         let url = URL(string: songs[indexPath.section].imageURL)
