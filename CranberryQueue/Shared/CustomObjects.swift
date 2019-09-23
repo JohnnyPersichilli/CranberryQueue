@@ -34,9 +34,3 @@ struct PlaybackInfo {
     var duration = Int()
     var isPaused = Bool()
 }
-
-extension Song: Equatable {
-    static func == (left: Song, right: Song) -> Bool {
-        return left.docID == right.docID
-    }
-}

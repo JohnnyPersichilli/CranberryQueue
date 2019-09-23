@@ -163,8 +163,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     func addSongTapped(song: Song) {
-        songTableView.voteTapped(isUpvote: true, song: song)
-        
         self.nextUpLabel.isHidden = false
         self.songTableView.isHidden = false
         UIView.animate(withDuration: 0.4, animations: {
