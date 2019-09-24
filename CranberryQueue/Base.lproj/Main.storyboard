@@ -158,9 +158,12 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c7x-u5-Qir">
-                                        <rect key="frame" x="153" y="65" width="104" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c7x-u5-Qir">
+                                        <rect key="frame" x="153" y="63.666666666666671" width="104" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="104" id="JWc-yW-0p8"/>
+                                            <constraint firstAttribute="height" constant="30" id="fS7-sv-zeX"/>
+                                        </constraints>
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
                                         <state key="normal" title="Leave Queue">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -171,9 +174,11 @@
                                 <constraints>
                                     <constraint firstItem="rlb-aE-c6W" firstAttribute="leading" secondItem="cxR-ff-UP1" secondAttribute="trailing" constant="1" id="1FH-LR-GXN"/>
                                     <constraint firstItem="UeZ-NH-hQu" firstAttribute="centerY" secondItem="cxR-ff-UP1" secondAttribute="centerY" id="6Lu-lc-Mtv"/>
+                                    <constraint firstItem="c7x-u5-Qir" firstAttribute="leading" secondItem="1By-Ce-MQF" secondAttribute="trailing" constant="4" id="7CP-tN-Xpj"/>
                                     <constraint firstItem="cxR-ff-UP1" firstAttribute="leading" secondItem="MZv-Sk-RfX" secondAttribute="leading" constant="21" id="9tK-lg-BoL"/>
                                     <constraint firstItem="1By-Ce-MQF" firstAttribute="centerY" secondItem="UeZ-NH-hQu" secondAttribute="centerY" id="GpI-Vt-hpH"/>
                                     <constraint firstAttribute="trailing" secondItem="QUe-8O-nZT" secondAttribute="trailing" constant="15" id="M9f-fe-khQ"/>
+                                    <constraint firstItem="c7x-u5-Qir" firstAttribute="bottom" secondItem="1By-Ce-MQF" secondAttribute="bottom" constant="4" id="NBg-uL-2XP"/>
                                     <constraint firstItem="QUe-8O-nZT" firstAttribute="top" secondItem="MZv-Sk-RfX" secondAttribute="top" constant="13" id="XzL-ef-N0L"/>
                                     <constraint firstAttribute="bottom" secondItem="cxR-ff-UP1" secondAttribute="bottom" constant="21" id="jTO-Ex-md2"/>
                                     <constraint firstItem="1By-Ce-MQF" firstAttribute="leading" secondItem="UeZ-NH-hQu" secondAttribute="trailing" constant="1" id="l1P-oK-SP3"/>
@@ -324,7 +329,7 @@
                                 </connections>
                             </containerView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="311" y="162" width="28" height="28"/>
+                                <rect key="frame" x="311" y="162" width="28.000000000000114" height="28.000000000000114"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
                                     <constraint firstAttribute="height" constant="28" id="srv-GA-83n"/>
