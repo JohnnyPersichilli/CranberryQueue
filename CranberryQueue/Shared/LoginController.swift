@@ -37,12 +37,11 @@ class LoginController: UIViewController, SessionDelegate {
         delegate.seshDelegate = self
         delegate.startSession()
     
-        print("spot label tap")
     }
 
     
     @objc func guestLabelTapped() {
-        print("guest label tap")
+        
     }
     
     func updateSessionStatus(connected: Bool) {
