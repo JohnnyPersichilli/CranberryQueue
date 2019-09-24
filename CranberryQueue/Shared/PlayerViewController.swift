@@ -164,8 +164,15 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
-        let trackId = state.track.imageIdentifier.split(separator: ":")[2]
-        let url = URL(string: "https://i.scdn.co/image/\(trackId)")
+        var url = URL(string: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg")
+        if(state.track.imageIdentifier.split(separator: ":").count >= 2){
+            let trackId = state.track.imageIdentifier.split(separator: ":")[2]
+            url = URL(string: "https://i.scdn.co/image/\(trackId)")
+        }else{
+            //may need to update default image even though its never being used?
+            print("no track image for:", state.track.name)
+        }
+        
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
                 print(error!)
@@ -257,7 +264,15 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         var playback = [String:Any]()
         playback["name"] = playerState.track.name
         playback["artist"] = playerState.track.artist.name
-        playback["imageURL"] = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
+        
+        if(playerState.track.imageIdentifier.split(separator: ":").count >= 2){
+            playback["imageURL"] = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
+        }else{
+            //may need to update default image even though its never being used?
+            print("no track image in JSON file for:", playerState.track.name)
+            playback["imageURL"] = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
+        }
+        
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
