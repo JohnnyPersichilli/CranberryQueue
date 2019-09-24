@@ -135,6 +135,19 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         return 15
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == .delete && isHost) {
+            let song = songs[indexPath.section]
+            
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
+            self.db?.collection("song").document(song.docID).delete()
+        }
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
         let song = songs[indexPath.section]
