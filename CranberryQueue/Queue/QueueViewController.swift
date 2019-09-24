@@ -69,6 +69,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         watchLocationDoc()
 
+        leaveQueueButton.alpha = 0.8
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
