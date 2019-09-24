@@ -37,6 +37,8 @@ class QueueTableViewCell: UITableViewCell {
     
     var db: Firestore? = nil
     
+    var shadowLayer = CALayer()
+    
     weak var delegate: QueueCellDelegate? = nil
     
     override func awakeFromNib() {
@@ -58,13 +60,66 @@ class QueueTableViewCell: UITableViewCell {
         downvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 90*3.1415926/180)
         upvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 270*3.1415926/180)
         
-        shadowView.layer.shadowRadius = 15
-        shadowView.layer.shadowColor = UIColor.black.cgColor
+        shadowView.clipsToBounds = false
+        self.contentView.clipsToBounds = false
         self.clipsToBounds = false
+        
+        addShadow()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+    }
+    
+    func addShadow() {
+        shadowLayer = CALayer()
+
+        let mutablePath = CGMutablePath()
+        let maskLayer = CAShapeLayer()
+
+        let usableBounds = CGRect(x: bounds.minX + 10, y: bounds.minY, width: bounds.width - 20, height: bounds.height)
+        let xOffset = CGFloat(4)
+        let yOffset = CGFloat(6)
+        let shadowOffset = CGSize(width: xOffset, height: yOffset)
+        let shadowOpacity = Float(0.3)
+        let shadowRadius = CGFloat(5)
+        let shadowPath = UIBezierPath(rect: usableBounds).cgPath
+        let shadowColor = UIColor.black
+        let shadowFrame = usableBounds.insetBy(dx: -2 * shadowRadius, dy: -2 * shadowRadius).offsetBy(dx: xOffset, dy: yOffset)
+        let shadowRect = CGRect(origin: .zero, size: shadowFrame.size)
+        let shadowTransform = CGAffineTransform(translationX: -usableBounds.origin.x - xOffset + 2 * shadowRadius, y: -usableBounds.origin.y - yOffset + 2 * shadowRadius)
+
+        shadowLayer.shadowOffset = shadowOffset
+        shadowLayer.shadowOpacity = shadowOpacity
+        shadowLayer.shadowRadius = shadowRadius
+        shadowLayer.shadowPath = shadowPath
+        shadowLayer.shadowColor = shadowColor.cgColor
+
+        mutablePath.addRect(shadowRect)
+        mutablePath.addPath(shadowLayer.shadowPath!, transform: shadowTransform)
+        mutablePath.closeSubpath()
+
+        maskLayer.frame = shadowFrame
+        maskLayer.fillRule = CAShapeLayerFillRule.evenOdd
+        maskLayer.path = mutablePath
+
+        shadowLayer.mask = maskLayer
+
+        layer.insertSublayer(shadowLayer, above: layer)
+        
+        //print(layer.superlayer ?? "fffff")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        shadowLayer.removeFromSuperlayer()
+        addShadow()
+//        shadowView.layer.shadowRadius = 10
+//        shadowView.layer.shadowColor = UIColor.black.cgColor
+//        shadowView.layer.shadowOpacity = 0.5
+//        shadowView.layer.shouldRasterize = true
+        
+        
     }
     
     @objc func upvoteTapped() {
