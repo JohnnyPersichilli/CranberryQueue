@@ -21,7 +21,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var isHost = false
     var shouldHideContents = false
     
-    @IBOutlet weak var leaveQueueImage: UIImageView!
+    @IBOutlet weak var leaveQueueButton: UIButton!
     
     @IBOutlet var songTableView: SongTableView!
     
@@ -110,9 +110,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         searchIconImageView.isUserInteractionEnabled = true
         
         let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTapped))
-        leaveQueueImage.addGestureRecognizer(leaveQueueTap)
-        leaveQueueImage.isUserInteractionEnabled = true
+        leaveQueueButton.addGestureRecognizer(leaveQueueTap)
+        leaveQueueButton.isUserInteractionEnabled = true
     }
+    
+    
     
     @objc func leaveQueueTapped() {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
