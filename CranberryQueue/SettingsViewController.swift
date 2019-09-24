@@ -84,6 +84,11 @@ class SettingsViewController: UIViewController {
                     }
                     
                     task.resume()
+                }else{
+                    DispatchQueue.main.async {
+                        let teamImage: UIImage = UIImage(named: "teamImage")!
+                        self.spotifyProfilePicture.image = teamImage
+                    }
                 }
 
             } catch {
