@@ -15,8 +15,8 @@ protocol mapControllerDelegate: class {
     func setUID(id: String)
 }
 
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
-    
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate {
+
     @IBOutlet var cityLabel: UILabel!
     
     @IBOutlet var regionLabel: UILabel!
@@ -27,6 +27,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
     
     @IBOutlet var settingsIconImageView: UIImageView!
     
+    @IBOutlet weak var loginContainer: UIView!
     
     
     var db : Firestore? = nil
@@ -115,6 +116,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
             //let vc = segue.destination as? PlayerViewController
             
         }
+        if segue.destination is LoginController {
+            let vc = segue.destination as? LoginController
+            vc?.delegate = self
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -128,6 +133,12 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
         createQueue(withName: createQueueForm.queueNameTextField.text ?? "")
         
         return true
+    }
+    
+    func dismissLoginContainer() {
+        DispatchQueue.main.async {
+            self.loginContainer.isHidden = true
+        }
     }
     
     func createQueue(withName name: String) {
@@ -148,6 +159,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate {
                 "host": self.uid
                 ])
             
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.startAppRemote()
             
             let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
             
