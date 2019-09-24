@@ -101,12 +101,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        //should add if host but thats not getting set right
-        //if (editingStyle == .delete  && isHost)
-        if (editingStyle == .delete) {
-            let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+        if (editingStyle == .delete && isHost) {
             let song = songs[indexPath.section]
-            cell.songId = song.docID
             
             self.db?.collection("song").document(song.docID).getDocument(completion: { (snapshot, error) in
                 if let err = error {

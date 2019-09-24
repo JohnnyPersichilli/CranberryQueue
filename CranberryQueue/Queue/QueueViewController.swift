@@ -60,6 +60,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         songTableView.queueId = queueId
         songTableView.uid = self.uid
+        songTableView.isHost = isHost
         songTableView.watchPlaylist()
         songTableView.songDelegate = self
         
@@ -140,7 +141,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         if(searchView.isHidden) {
             delegate?.searchTapped(shouldHideContents: false)
             searchView.isHidden = false
-            let closeSearchImage: UIImage = UIImage(named: "settingsIcon")!
+            let closeSearchImage: UIImage = UIImage(named: "xIcon")!
             searchIconImageView.image = closeSearchImage
             UIView.animate(withDuration: 0.4, animations: {
                 self.nextUpLabel.alpha = 0
