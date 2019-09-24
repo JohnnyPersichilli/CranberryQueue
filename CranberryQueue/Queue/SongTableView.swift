@@ -143,22 +143,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         if (editingStyle == .delete && isHost) {
             let song = songs[indexPath.section]
             
-            self.db?.collection("song").document(song.docID).getDocument(completion: { (snapshot, error) in
-                if let err = error {
-                    print(err)
-                }
-                if let docQueueId = snapshot?.data()?["queueId"] as? String {
-                    if self.queueId == docQueueId {
-                        print("Delete song with id:",docQueueId )
-                        self.db?.collection("song").document(song.docID).delete(completion: { (err) in
-                            if let err = err{
-                                print(err)
-                            }
-                            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
-                            })
-                    }
-                }
-            })
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
+            self.db?.collection("song").document(song.docID).delete()
         }
     }
     

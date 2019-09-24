@@ -139,6 +139,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
                         return
                     }
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
+                        self.db?.collection("song").document(nextSongJSON["docID"] as! String).delete()
                 })
             })
         }
