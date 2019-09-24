@@ -10,8 +10,12 @@ import UIKit
 import Firebase
 import GoogleMaps
 
-protocol mainDelegate : class {
+protocol mainDelegate: class {
     func updateConnectionStatus(connected: Bool)
+}
+
+protocol SessionDelegate: class {
+    func updateSessionStatus(connected: Bool)
 }
 
 @UIApplicationMain
@@ -19,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     var window: UIWindow?
     
     weak var delegate: mainDelegate?
+    weak var seshDelegate: SessionDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
     let SpotifyRedirectURL = URL(string: "CranberryQueue://spotify-login-callback")!
@@ -53,9 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
         GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
         //GMSPlacesClient.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
         // Insanely important 2 lines below
-        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState]
-        self.sessionManager.initiateSession(with: requestedScopes, options: .default)
-        
         return true
     }
     
@@ -68,16 +70,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
         token = session.accessToken
         
+        seshDelegate?.updateSessionStatus(connected: true)
+    }
+    
+    func startAppRemote() {
         DispatchQueue.main.async {
-            self.appRemote.connectionParameters.accessToken = session.accessToken
+            self.appRemote.connectionParameters.accessToken = self.token
             self.appRemote.delegate = self
             self.appRemote.connect()
         }
-        
-        
     }
     
     func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
+        seshDelegate?.updateSessionStatus(connected: false)
         print(error)
     }
     
@@ -131,6 +136,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
                 self.appRemote.connect()
             }
         }
+    }
+    
+    func startSession() {
+        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState]
+         self.sessionManager.initiateSession(with: requestedScopes, options: .default)
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
