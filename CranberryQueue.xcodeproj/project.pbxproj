@@ -114,7 +114,6 @@
 				4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */,
 				4CDB8461232BD2A2002559BB /* Info.plist */,
 				4C240F602332E492002111EB /* GoogleService-Info.plist */,
-				6E8F84F4233AEF4E005C23A9 /* Fonts */,
 				4CDB8467232BD592002559BB /* SpotifyiOS.framework */,
 			);
 			path = CranberryQueue;
@@ -153,13 +152,6 @@
 				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
 			);
 			path = Queue;
-			sourceTree = "<group>";
-		};
-		6E8F84F4233AEF4E005C23A9 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Fonts;
 			sourceTree = "<group>";
 		};
 		EEA6493014A3F051A5A326D1 /* Pods */ = {
@@ -494,7 +486,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HWJ5LKK599;
+				DEVELOPMENT_TEAM = UX7GPB828A;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CranberryQueue",
@@ -519,7 +511,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HWJ5LKK599;
+				DEVELOPMENT_TEAM = UX7GPB828A;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CranberryQueue",
