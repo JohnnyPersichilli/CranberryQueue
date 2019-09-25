@@ -13,6 +13,10 @@ protocol queueDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
+protocol QueuePlayerDelegate: class {
+    func updatePlayerWith(queueId: String?, isHost: Bool)
+}
+
 class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
 
     var queueName: String? = nil
@@ -40,6 +44,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     @IBOutlet var globeIcon: UIImageView!
     
     weak var delegate: queueDelegate? = nil
+    
+    weak var playerDelegate: QueuePlayerDelegate? = nil
     
     var db : Firestore? = nil
     
@@ -122,6 +128,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
         
         self.queueId = nil
+        playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
@@ -129,6 +136,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     @objc func globeTapped() {
+        playerDelegate?.updatePlayerWith(queueId: queueId, isHost: isHost)
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
