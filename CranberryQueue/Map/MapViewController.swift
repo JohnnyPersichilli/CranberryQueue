@@ -178,6 +178,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 class Colors {
     var gl:CAGradientLayer? = nil
     var gl1:CAGradientLayer? = nil
+    var themeDark: CGColor? = nil
+    var themeLight: CGColor? = nil
+    var themeBorderColor: CGColor? = nil
     
     init() {
         let colorTop = UIColor(red: 166.0 / 255.0, green: 166.0 / 255.0, blue: 166.0 / 255.0, alpha: 1.0).cgColor
@@ -190,5 +193,14 @@ class Colors {
         self.gl1 = CAGradientLayer()
         self.gl1?.colors = [colorBottom, colorTop]
         self.gl1?.locations = [0.0, 1.0]
+        
+        let colorDark = UIColor(red: 73.0 / 255.0, green: 71.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0).cgColor
+        let colorLight = UIColor(red: 48.0 / 255.0, green: 65.0 / 255.0, blue: 97.0 / 255.0, alpha: 1.0).cgColor
+        
+        let colorBorder = UIColor(red: 85.0 / 255.0, green: 85.0 / 255.0, blue: 85.0 / 255.0, alpha: 1.0).cgColor
+        
+        self.themeBorderColor = colorBorder
+        self.themeDark = colorDark
+        self.themeLight = colorLight
     }
 }
