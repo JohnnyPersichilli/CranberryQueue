@@ -7,6 +7,14 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Roboto-Regular.ttf">
+            <string>Roboto-Regular</string>
+        </array>
+        <array key="Roboto-Thin.ttf">
+            <string>Roboto-Thin</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Map View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -68,6 +76,7 @@
                             </view>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8sS-eE-mqA">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <viewLayoutGuide key="safeArea" id="cqI-AI-3su"/>
                                 <connections>
                                     <segue destination="cog-dq-OgH" kind="embed" id="Pth-Ca-zJp"/>
                                 </connections>
@@ -85,8 +94,6 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="7k1-xL-an5" secondAttribute="trailing" id="Ktm-Tt-Qsg"/>
                             <constraint firstItem="VLf-l2-j7u" firstAttribute="top" secondItem="6Yy-op-lK9" secondAttribute="bottom" constant="2" id="LHt-b4-1nb"/>
                             <constraint firstAttribute="bottom" secondItem="brN-wj-phu" secondAttribute="bottom" id="Thl-V3-9X6"/>
-                            <constraint firstItem="8sS-eE-mqA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="U1h-JN-2G6"/>
-                            <constraint firstItem="8sS-eE-mqA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="U7Q-FQ-Bjq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="1jc-lz-BMp" secondAttribute="trailing" constant="15" id="Use-Ba-vig"/>
                             <constraint firstItem="8sS-eE-mqA" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Vfb-hz-joa"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="top" secondItem="VLf-l2-j7u" secondAttribute="bottom" constant="10" id="WYH-xS-488"/>
@@ -97,6 +104,7 @@
                             <constraint firstItem="8sS-eE-mqA" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="nFm-3b-Osa"/>
                             <constraint firstItem="8sS-eE-mqA" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="paQ-SF-dhB"/>
                             <constraint firstItem="6Yy-op-lK9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="pca-3P-6lG"/>
+                            <constraint firstItem="8sS-eE-mqA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="rQG-O5-LpU"/>
                             <constraint firstItem="7k1-xL-an5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="uym-WD-FY3"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="brN-wj-phu" secondAttribute="trailing" id="v2v-Eu-uOo"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="k3h-bh-V8Z" secondAttribute="trailing" constant="10" id="zek-B4-7g4"/>
@@ -115,7 +123,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-190" y="116"/>
+            <point key="canvasLocation" x="-191.19999999999999" y="115.27093596059113"/>
         </scene>
         <!--Queue View Controller-->
         <scene sceneID="gze-0v-BnU">
@@ -702,29 +710,41 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XZr-FR-Pfk">
-                                <rect key="frame" x="101" y="91" width="85" height="43"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Guest" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HQP-Hw-msV">
-                                <rect key="frame" x="97" y="576" width="93" height="43"/>
+                                <rect key="frame" x="97" y="576" width="95" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
+                                <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="36"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Spotify" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mJy-lq-B5a">
-                                <rect key="frame" x="97" y="313" width="110" height="43"/>
+                                <rect key="frame" x="87" y="297" width="115" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
+                                <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="36"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose your Role" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XZr-FR-Pfk">
+                                <rect key="frame" x="16" y="86" width="282.66666666666669" height="42.333333333333343"/>
+                                <fontDescription key="fontDescription" name="Roboto-Regular" family="Roboto" pointSize="36"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="to get started" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KOQ-c4-fSN">
+                                <rect key="frame" x="20" y="131" width="132.33333333333334" height="27"/>
+                                <fontDescription key="fontDescription" name="Roboto-Thin" family="Roboto" pointSize="23"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" red="0.50196087359999997" green="0.50196081400000003" blue="0.50196081400000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <constraints>
+                            <constraint firstItem="XZr-FR-Pfk" firstAttribute="top" secondItem="Btq-kh-bWQ" secondAttribute="top" constant="42" id="jpr-yB-9C2"/>
+                            <constraint firstItem="KOQ-c4-fSN" firstAttribute="top" secondItem="XZr-FR-Pfk" secondAttribute="bottom" constant="2.6699999999999999" id="uU4-gI-fFf"/>
+                            <constraint firstItem="XZr-FR-Pfk" firstAttribute="leading" secondItem="Btq-kh-bWQ" secondAttribute="leading" constant="16" id="wCa-Lv-qcW"/>
+                            <constraint firstItem="KOQ-c4-fSN" firstAttribute="leading" secondItem="Btq-kh-bWQ" secondAttribute="leading" constant="20" id="zVs-WM-BYp"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Btq-kh-bWQ"/>
                     </view>
                     <connections>
                         <outlet property="guestLabel" destination="HQP-Hw-msV" id="bUg-gI-Z20"/>
@@ -733,7 +753,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FdB-jm-xeA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-356" y="818"/>
+            <point key="canvasLocation" x="-711" y="858"/>
         </scene>
     </scenes>
     <resources>
