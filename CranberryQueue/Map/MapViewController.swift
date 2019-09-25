@@ -189,6 +189,6 @@ class Colors {
         
         self.gl1 = CAGradientLayer()
         self.gl1?.colors = [colorBottom, colorTop]
-        self.gl1?.locations = [0.0, 1.0]
+        self.gl1?.locations = [0.3, 1.0]
     }
 }
