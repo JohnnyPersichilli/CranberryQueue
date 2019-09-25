@@ -181,7 +181,7 @@ class Colors {
     
     init() {
         let colorTop = UIColor(red: 166.0 / 255.0, green: 166.0 / 255.0, blue: 166.0 / 255.0, alpha: 1.0).cgColor
-        let colorBottom = UIColor(red: 146.0 / 255.0, green: 160.0 / 255.0, blue: 182.0 / 255.0, alpha: 1.0).cgColor
+        let colorBottom = UIColor(red: 103.0 / 255.0, green: 122.0 / 255.0, blue: 161.0 / 255.0, alpha: 1.0).cgColor
         
         self.gl = CAGradientLayer()
         self.gl?.colors = [colorTop, colorBottom]
@@ -189,6 +189,6 @@ class Colors {
         
         self.gl1 = CAGradientLayer()
         self.gl1?.colors = [colorBottom, colorTop]
-        self.gl1?.locations = [0.0, 1.0]
+        self.gl1?.locations = [0.3, 1.0]
     }
 }
