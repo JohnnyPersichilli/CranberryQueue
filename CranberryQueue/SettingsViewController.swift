@@ -84,6 +84,10 @@ class SettingsViewController: UIViewController {
                     }
                     
                     task.resume()
+                }else{
+                    DispatchQueue.main.async {
+                        self.spotifyProfilePicture.image = UIImage(named: "defaultPerson")!
+                    }
                 }
 
             } catch {

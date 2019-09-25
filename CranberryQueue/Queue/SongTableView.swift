@@ -128,15 +128,23 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     }
     
     func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
-        (view as! UITableViewHeaderFooterView).backgroundView?.backgroundColor = UIColor.clear
+        (view as! UITableViewHeaderFooterView).isHidden = true
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        (view as! UITableViewHeaderFooterView).isHidden = true
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 15
+        return 10
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 5
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
+        return isHost
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -149,7 +157,18 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+        var cell = QueueTableViewCell()
+        if indexPath.section == 0 {
+            cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+            cell.shadOpacity = 0.6
+            cell.addGradient()
+        }
+        else {
+            cell = self.dequeueReusableCell(withIdentifier: "CellHorizontal", for: indexPath) as! QueueTableViewCell
+            cell.shadOpacity = 0.3
+            cell.removeGradient()
+        }
+        
         let song = songs[indexPath.section]
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist
