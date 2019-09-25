@@ -14,22 +14,39 @@ protocol LoginDelegate: class {
 }
 
 class LoginController: UIViewController, SessionDelegate {
-    @IBOutlet weak var spotifyLabel: UILabel!
+    @IBOutlet weak var spotifyContinueModal: UIView!
+    @IBOutlet weak var guestContinueModal: UIView!
+    @IBOutlet weak var loginButton: UIView!
+    @IBOutlet weak var continueButton: UIView!
     
-    @IBOutlet weak var guestLabel: UILabel!
-        
     weak var delegate: LoginDelegate? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
     
         let spotifyLabelTap = UITapGestureRecognizer(target: self, action: #selector(spotifyLabelTapped))
-        spotifyLabel.addGestureRecognizer(spotifyLabelTap)
-        spotifyLabel.isUserInteractionEnabled = true
+        loginButton.addGestureRecognizer(spotifyLabelTap)
+        loginButton.isUserInteractionEnabled = true
         
         let guestLabelTap = UITapGestureRecognizer(target: self, action: #selector(guestLabelTapped))
-        guestLabel.addGestureRecognizer(guestLabelTap)
-        guestLabel.isUserInteractionEnabled = true
+        continueButton.addGestureRecognizer(guestLabelTap)
+        continueButton.isUserInteractionEnabled = true
+        
+        setupModalUI()
+    }
+    
+    func setupModalUI() {
+        let colors = Colors()
+        spotifyContinueModal.layer.cornerRadius = 13
+        spotifyContinueModal.layer.borderWidth = 1
+        spotifyContinueModal.layer.borderColor = colors.themeBorderColor
+        
+        guestContinueModal.layer.cornerRadius = 13
+        guestContinueModal.layer.borderWidth = 1
+        guestContinueModal.layer.borderColor = colors.themeBorderColor
+        
+        loginButton.layer.cornerRadius = 14
+        continueButton.layer.cornerRadius = 14
     }
     
     @objc func spotifyLabelTapped() {
