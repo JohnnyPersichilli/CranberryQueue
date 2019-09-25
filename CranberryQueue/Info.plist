@@ -39,11 +39,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>I&apos;m also doing this</string>
+	<string>I'm also doing this</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>I&apos;m using your location obviously</string>
+	<string>I'm using your location obviously</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>I&apos;m doing this</string>
+	<string>I'm doing this</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
