@@ -157,7 +157,18 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+        var cell = QueueTableViewCell()
+        if indexPath.section == 0 {
+            cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
+            cell.shadOpacity = 0.6
+            cell.addGradient()
+        }
+        else {
+            cell = self.dequeueReusableCell(withIdentifier: "CellHorizontal", for: indexPath) as! QueueTableViewCell
+            cell.shadOpacity = 0.3
+            cell.removeGradient()
+        }
+        
         let song = songs[indexPath.section]
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist

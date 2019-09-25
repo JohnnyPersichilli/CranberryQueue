@@ -38,6 +38,9 @@ class QueueTableViewCell: UITableViewCell {
     var db: Firestore? = nil
     
     var shadowLayer = CALayer()
+    var gradientLayer = CAGradientLayer()
+    
+    var shadOpacity: Float = 1
     
     weak var delegate: QueueCellDelegate? = nil
     
@@ -71,18 +74,29 @@ class QueueTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    func addGradient() {
+        gradientLayer.frame = CGRect(x: bounds.minX + 10, y: bounds.minY, width: bounds.width - 20, height: bounds.height)
+        gradientLayer.colors = [#colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5453749648).cgColor, #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.1754601281).cgColor, #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.5453749648).cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.5)
+        self.layer.insertSublayer(gradientLayer, at: 0)
+    }
+    
+    func removeGradient() {
+        gradientLayer.removeFromSuperlayer()
+    }
+    
     func addShadow() {
         shadowLayer = CALayer()
-
         let mutablePath = CGMutablePath()
         let maskLayer = CAShapeLayer()
 
         let usableBounds = CGRect(x: bounds.minX + 10, y: bounds.minY, width: bounds.width - 20, height: bounds.height)
-        let xOffset = CGFloat(4)
-        let yOffset = CGFloat(6)
+        let xOffset = CGFloat(2.3)
+        let yOffset = CGFloat(4)
         let shadowOffset = CGSize(width: xOffset, height: yOffset)
-        let shadowOpacity = Float(0.3)
-        let shadowRadius = CGFloat(5)
+        let shadowOpacity = shadOpacity
+        let shadowRadius = CGFloat(3)
         let shadowPath = UIBezierPath(rect: usableBounds).cgPath
         let shadowColor = UIColor.black
         let shadowFrame = usableBounds.insetBy(dx: -2 * shadowRadius, dy: -2 * shadowRadius).offsetBy(dx: xOffset, dy: yOffset)
