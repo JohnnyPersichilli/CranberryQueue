@@ -63,10 +63,6 @@ class QueueTableViewCell: UITableViewCell {
         downvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 90*3.1415926/180)
         upvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 270*3.1415926/180)
         
-        shadowView.clipsToBounds = false
-        self.contentView.clipsToBounds = false
-        self.clipsToBounds = false
-        
         addShadow()
     }
 
@@ -120,20 +116,12 @@ class QueueTableViewCell: UITableViewCell {
         shadowLayer.mask = maskLayer
 
         layer.insertSublayer(shadowLayer, above: layer)
-        
-        //print(layer.superlayer ?? "fffff")
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         shadowLayer.removeFromSuperlayer()
         addShadow()
-//        shadowView.layer.shadowRadius = 10
-//        shadowView.layer.shadowColor = UIColor.black.cgColor
-//        shadowView.layer.shadowOpacity = 0.5
-//        shadowView.layer.shouldRasterize = true
-        
-        
     }
     
     @objc func upvoteTapped() {

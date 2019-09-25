@@ -231,13 +231,13 @@
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OaG-1o-ghC">
-                                                    <rect key="frame" x="15" y="16" width="58" height="58"/>
+                                                    <rect key="frame" x="15" y="13" width="56" height="56"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="OaG-1o-ghC" secondAttribute="height" multiplier="1:1" id="uT6-Jg-acx"/>
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="More Life" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3hw-ji-co8">
-                                                    <rect key="frame" x="81" y="21" width="147" height="26"/>
+                                                    <rect key="frame" x="79" y="21" width="149" height="26"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="26" id="JBg-8P-xAJ"/>
                                                     </constraints>
@@ -246,7 +246,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Drake" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CNf-cN-eEv">
-                                                    <rect key="frame" x="81" y="46" width="127" height="18"/>
+                                                    <rect key="frame" x="79" y="46" width="129" height="18"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="18" id="3a1-ob-r31"/>
                                                     </constraints>
@@ -287,8 +287,8 @@
                                                 <constraint firstItem="IqF-NZ-WwG" firstAttribute="leading" secondItem="CNf-cN-eEv" secondAttribute="trailing" constant="50" id="Lbx-UE-cyi"/>
                                                 <constraint firstAttribute="trailing" secondItem="Tgv-c7-Tyv" secondAttribute="trailing" constant="8" id="ODf-gw-b26"/>
                                                 <constraint firstItem="3hw-ji-co8" firstAttribute="centerY" secondItem="89S-FW-mvZ" secondAttribute="centerY" constant="-6" id="Rcr-6C-UOt"/>
-                                                <constraint firstItem="OaG-1o-ghC" firstAttribute="top" secondItem="89S-FW-mvZ" secondAttribute="topMargin" constant="5" id="W0F-PA-rfN"/>
-                                                <constraint firstItem="OaG-1o-ghC" firstAttribute="bottom" secondItem="89S-FW-mvZ" secondAttribute="bottomMargin" constant="5" id="dXn-SU-8Vd"/>
+                                                <constraint firstItem="OaG-1o-ghC" firstAttribute="top" secondItem="89S-FW-mvZ" secondAttribute="topMargin" constant="2" id="W0F-PA-rfN"/>
+                                                <constraint firstItem="OaG-1o-ghC" firstAttribute="bottom" secondItem="89S-FW-mvZ" secondAttribute="bottomMargin" id="dXn-SU-8Vd"/>
                                                 <constraint firstItem="3hw-ji-co8" firstAttribute="leading" secondItem="OaG-1o-ghC" secondAttribute="trailing" constant="8" id="hrM-tw-Wm6"/>
                                                 <constraint firstItem="TTw-Az-ujP" firstAttribute="centerX" secondItem="IqF-NZ-WwG" secondAttribute="centerX" id="jat-e6-z1H"/>
                                                 <constraint firstItem="TTw-Az-ujP" firstAttribute="top" secondItem="IqF-NZ-WwG" secondAttribute="bottom" constant="2" id="kUh-2i-AOh"/>
@@ -324,7 +324,7 @@
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Vu6-tO-bin">
-                                                    <rect key="frame" x="15" y="16" width="58" height="58"/>
+                                                    <rect key="frame" x="15" y="11" width="58" height="58"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="Vu6-tO-bin" secondAttribute="height" multiplier="1:1" id="S1F-mw-JAi"/>
                                                     </constraints>
@@ -373,7 +373,7 @@
                                                 </imageView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="Vu6-tO-bin" firstAttribute="top" secondItem="vgh-FU-RCv" secondAttribute="topMargin" constant="5" id="4tv-i4-3a6"/>
+                                                <constraint firstItem="Vu6-tO-bin" firstAttribute="top" secondItem="vgh-FU-RCv" secondAttribute="topMargin" id="4tv-i4-3a6"/>
                                                 <constraint firstItem="eON-OA-BAC" firstAttribute="top" secondItem="vgh-FU-RCv" secondAttribute="top" id="7Hx-y4-Rnr"/>
                                                 <constraint firstItem="eON-OA-BAC" firstAttribute="leading" secondItem="vgh-FU-RCv" secondAttribute="leading" constant="8" id="7ch-fH-cYU"/>
                                                 <constraint firstAttribute="bottom" secondItem="eON-OA-BAC" secondAttribute="bottom" id="DfU-PC-WA8"/>
@@ -383,7 +383,7 @@
                                                 <constraint firstAttribute="trailing" secondItem="FMq-IJ-uxP" secondAttribute="trailing" constant="25" id="biv-Ty-AWK"/>
                                                 <constraint firstItem="CJ6-Mc-4Lf" firstAttribute="centerY" secondItem="vgh-FU-RCv" secondAttribute="centerY" id="dMI-eq-yLE"/>
                                                 <constraint firstItem="WiR-w0-xAP" firstAttribute="centerY" secondItem="vgh-FU-RCv" secondAttribute="centerY" constant="-6" id="dYe-n0-JLX"/>
-                                                <constraint firstItem="Vu6-tO-bin" firstAttribute="bottom" secondItem="vgh-FU-RCv" secondAttribute="bottomMargin" constant="5" id="mYc-cw-qlf"/>
+                                                <constraint firstItem="Vu6-tO-bin" firstAttribute="bottom" secondItem="vgh-FU-RCv" secondAttribute="bottomMargin" id="mYc-cw-qlf"/>
                                                 <constraint firstAttribute="trailing" secondItem="eON-OA-BAC" secondAttribute="trailing" constant="8" id="obW-EZ-WWf"/>
                                                 <constraint firstItem="lfm-4z-EAl" firstAttribute="leading" secondItem="CJ6-Mc-4Lf" secondAttribute="trailing" constant="-4" id="rZG-Qo-jnW"/>
                                                 <constraint firstItem="WiR-w0-xAP" firstAttribute="leading" secondItem="Vu6-tO-bin" secondAttribute="trailing" constant="8" id="sgL-MX-95g"/>
