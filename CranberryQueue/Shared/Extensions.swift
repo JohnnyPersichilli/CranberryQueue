@@ -21,13 +21,11 @@ extension UIView
     }
 }
 
-extension UIImageView
-{
+class UIRoundedImageView: UIImageView {
     override open func layoutSubviews() {
         super.layoutSubviews()
         
         let radius: CGFloat = self.bounds.size.width / 2.0
-        
         self.layer.cornerRadius = radius
     }
 }

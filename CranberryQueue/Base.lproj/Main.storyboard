@@ -230,7 +230,7 @@
                                                     <rect key="frame" x="8" y="0.0" width="303" height="80"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OaG-1o-ghC">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OaG-1o-ghC" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="15" y="13" width="56" height="56"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="OaG-1o-ghC" secondAttribute="height" multiplier="1:1" id="uT6-Jg-acx"/>
@@ -264,14 +264,14 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upChevronIcon" translatesAutoresizingMaskIntoConstraints="NO" id="YvW-jn-Cix">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upChevronIcon" translatesAutoresizingMaskIntoConstraints="NO" id="YvW-jn-Cix" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="267" y="4" width="24" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="24" id="4KC-ZS-0l3"/>
                                                         <constraint firstAttribute="height" constant="24" id="EUE-YI-ceq"/>
                                                     </constraints>
                                                 </imageView>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="downChevronIcon " translatesAutoresizingMaskIntoConstraints="NO" id="TTw-Az-ujP">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="downChevronIcon " translatesAutoresizingMaskIntoConstraints="NO" id="TTw-Az-ujP" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="267" y="52" width="24" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="24" id="F0M-cL-K1U"/>
@@ -323,7 +323,7 @@
                                                     <rect key="frame" x="8" y="0.0" width="303" height="80"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Vu6-tO-bin">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Vu6-tO-bin" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="15" y="11" width="58" height="58"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="Vu6-tO-bin" secondAttribute="height" multiplier="1:1" id="S1F-mw-JAi"/>
@@ -357,14 +357,14 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upChevronIcon" translatesAutoresizingMaskIntoConstraints="NO" id="CJ6-Mc-4Lf">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upChevronIcon" translatesAutoresizingMaskIntoConstraints="NO" id="CJ6-Mc-4Lf" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="217" y="28" width="24" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="24" id="6b7-Cf-q1H"/>
                                                         <constraint firstAttribute="width" constant="24" id="sTC-2L-GWV"/>
                                                     </constraints>
                                                 </imageView>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="downChevronIcon " translatesAutoresizingMaskIntoConstraints="NO" id="FMq-IJ-uxP">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="downChevronIcon " translatesAutoresizingMaskIntoConstraints="NO" id="FMq-IJ-uxP" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="270" y="28" width="24" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="24" id="XUY-dF-11f"/>
@@ -510,7 +510,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tHr-Q1-hpG">
                                 <rect key="frame" x="34" y="131" width="307" height="142"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YKb-ST-dBB">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YKb-ST-dBB" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="11" width="120" height="120"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="120" id="bzY-6e-8Dc"/>
@@ -634,7 +634,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="69"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HKz-pF-UoV">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HKz-pF-UoV" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                 <rect key="frame" x="19" y="10.666666666666664" width="42" height="42"/>
                                 <color key="backgroundColor" red="0.61416203199999997" green="0.91354785370000002" blue="0.87620854699999995" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
@@ -707,7 +707,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="319" height="68"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="L6Z-3h-yq8">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="L6Z-3h-yq8" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                                     <rect key="frame" x="15" y="5" width="58" height="58"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" secondItem="L6Z-3h-yq8" secondAttribute="height" multiplier="1:1" id="R0n-Yb-Yx0"/>
