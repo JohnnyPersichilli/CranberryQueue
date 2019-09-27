@@ -35,12 +35,14 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupLocation()
-        
         self.view.layer.borderWidth = 1
         
         db = Firestore.firestore()
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setupLocation()
     }
     
     func setUID(id: String) {
