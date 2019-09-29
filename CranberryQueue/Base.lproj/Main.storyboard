@@ -523,7 +523,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tHr-Q1-hpG">
                                 <rect key="frame" x="34" y="131" width="307" height="142"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YKb-ST-dBB" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="YKb-ST-dBB" customClass="UIRoundedImageView" customModule="CranberryQueue" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="11" width="120" height="120"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="120" id="bzY-6e-8Dc"/>
