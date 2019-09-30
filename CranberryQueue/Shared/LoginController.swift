@@ -52,8 +52,12 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     }
     
     @objc func spotifyLabelTapped() {
-        UIView.animate(withDuration : 1.0, animations: { self.spotifyContinueModal.alpha = 0; self.guestContinueModal.alpha = 0})
-        showActivityIndicator()
+        UIView.animate(withDuration: 1, animations: {
+            self.spotifyContinueModal.alpha = 0;
+            self.guestContinueModal.alpha = 0
+        }) { (Bool) in
+            self.showActivityIndicator()
+        }
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.seshDelegate = self
         delegate.startSession()
@@ -71,8 +75,12 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
             self.hideActivityIndicator()
         }
         else{
-            self.hideActivityIndicator()
-            UIView.animate(withDuration : 1.0, animations: { self.spotifyContinueModal.alpha = 1.0; self.guestContinueModal.alpha = 1.0})
+            UIView.animate(withDuration: 1, animations: {
+                self.spotifyContinueModal.alpha = 1;
+                self.guestContinueModal.alpha = 1
+            }) { (Bool) in
+                self.hideActivityIndicator()
+            }
         }
         print(connected)
     }
