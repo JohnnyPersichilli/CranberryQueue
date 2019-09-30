@@ -32,6 +32,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     var uid = String()
     
+    var queueId: String? = nil
+    var isHost: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -49,6 +52,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         uid = id
     }
     
+    func setQueueInfo(queueId: String, isHost: Bool){
+        self.queueId = queueId
+        self.isHost = isHost
+    }
+    
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         
@@ -59,6 +67,24 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         vc.uid = self.uid
         vc.isHost = false
         vc.playerDelegate = self
+        
+        if( (self.queueId) != nil && !isHost ){
+            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
+        }else if( (self.queueId) != nil && isHost){
+            self.db?.collection("contributor").document(self.queueId!).delete()
+            
+            self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId).getDocuments(completion: { (snapshot, err) in
+                guard let snap = snapshot else {
+                    return
+                }
+                for doc in snap.documents {
+                    doc.reference.delete()
+                }
+            })
+            self.db?.collection("playlist").document(self.queueId!).delete()
+            self.db?.collection("playback").document(self.queueId!).delete()
+            self.db?.collection("location").document(self.queueId!).delete()
+        }
         
         self.db?.collection("contributor").document(data!.queueId).collection("members").document(self.uid).setData([:
             ], completion: { (val) in

@@ -100,7 +100,9 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
                     return
                 }
                 
-                let doc = snap.data()!
+                guard let doc = snap.data() else {
+                    return
+                }
                 let numMembers = doc["numMembers"] as! Int
                 DispatchQueue.main.async {
                     self.numMembersLabel.text = String(numMembers)
