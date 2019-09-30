@@ -13,6 +13,7 @@ protocol mapControllerDelegate: class {
     func addTapped()
     func getCoords() -> ([String:Double])
     func setUID(id: String)
+    func setQueueInfo(queueId: String, isHost: Bool)
 }
 
 protocol MapPlayerDelegate: class {
@@ -37,11 +38,11 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     
     @IBOutlet var playerHelpLabel: UILabel!
     
-    
     var db : Firestore? = nil
 
     var uid = String()
     var isHost = false
+    var queueId: String? = nil
 
     weak var delegate: mapControllerDelegate?
     
@@ -108,6 +109,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             playerHelpLabel.isHidden = false
             return
         }
+        self.queueId = id
+        self.isHost = isHost
+        delegate?.setQueueInfo(queueId: id, isHost: isHost)
         playerDelegate?.setupPlayer(queueId: id, isHost: isHost)
         playerContainer.isHidden = false
         playerHelpLabel.isHidden = true
@@ -164,6 +168,24 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func createQueue(withName name: String) {
+        if( (self.queueId) != nil && !isHost ){
+            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
+        }else if( (self.queueId) != nil && isHost){
+            self.db?.collection("contributor").document(self.queueId!).delete()
+            
+            self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId).getDocuments(completion: { (snapshot, err) in
+                guard let snap = snapshot else {
+                    return
+                }
+                for doc in snap.documents {
+                    doc.reference.delete()
+                }
+            })
+            self.db?.collection("playlist").document(self.queueId!).delete()
+            self.db?.collection("playback").document(self.queueId!).delete()
+            self.db?.collection("location").document(self.queueId!).delete()
+        }
+        
         let coords = delegate?.getCoords()
 
         var ref : DocumentReference? = nil
