@@ -13,11 +13,13 @@ protocol LoginDelegate: class {
     func dismissLoginContainer()
 }
 
-class LoginController: UIViewController, SessionDelegate {
+class LoginController: UIViewController, SessionDelegate, activityIndicatorPresenter {
     @IBOutlet weak var spotifyContinueModal: UIView!
     @IBOutlet weak var guestContinueModal: UIView!
     @IBOutlet weak var loginButton: UIView!
     @IBOutlet weak var continueButton: UIView!
+    
+    var activityIndicator = UIActivityIndicatorView()
     
     weak var delegate: LoginDelegate? = nil
     
@@ -50,6 +52,7 @@ class LoginController: UIViewController, SessionDelegate {
     }
     
     @objc func spotifyLabelTapped() {
+        showActivityIndicator()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.seshDelegate = self
         delegate.startSession()
@@ -64,6 +67,7 @@ class LoginController: UIViewController, SessionDelegate {
     func updateSessionStatus(connected: Bool) {
         if(connected) {
             delegate?.dismissLoginContainer()
+            self.hideActivityIndicator()
         }
         print(connected)
     }
