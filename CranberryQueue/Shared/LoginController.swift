@@ -52,6 +52,7 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     }
     
     @objc func spotifyLabelTapped() {
+        UIView.animate(withDuration : 1.0, animations: { self.spotifyContinueModal.alpha = 0; self.guestContinueModal.alpha = 0})
         showActivityIndicator()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.seshDelegate = self
@@ -68,6 +69,10 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         if(connected) {
             delegate?.dismissLoginContainer()
             self.hideActivityIndicator()
+        }
+        else{
+            self.hideActivityIndicator()
+            UIView.animate(withDuration : 1.0, animations: { self.spotifyContinueModal.alpha = 1.0; self.guestContinueModal.alpha = 1.0})
         }
         print(connected)
     }
