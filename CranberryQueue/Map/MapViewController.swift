@@ -180,6 +180,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.db?.collection("contributor").document(id).setData([
                 "host": self.uid
                 ])
+            
+            self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
+                ], completion: { (val) in
+            })
 
             let delegate = UIApplication.shared.delegate as! AppDelegate
             delegate.startAppRemote()
