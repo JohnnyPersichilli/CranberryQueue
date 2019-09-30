@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, mainDelegate {
+class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, mainDelegate, MapPlayerDelegate {
     
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
@@ -68,6 +68,17 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
         forwardSwipe.direction = .left
         self.view.addGestureRecognizer(forwardSwipe)
+    }
+    
+    func setupPlayer(queueId: String, isHost: Bool) {
+        self.queueId = queueId
+        self.isHost = isHost
+        if isHost {
+            updateConnectionStatus(connected: true)
+        }
+        else {
+            setupGuestListeners()
+        }
     }
     
     @objc func swiped() {

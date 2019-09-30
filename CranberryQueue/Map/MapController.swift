@@ -12,9 +12,10 @@ import Firebase
 
 protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
+    func updatePlayerWith(queueId: String?, isHost: Bool)
 }
 
-class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate {
+class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate, QueuePlayerDelegate {
     
     weak var delegate: mapDelegate?
     
@@ -34,12 +35,14 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupLocation()
-        
         self.view.layer.borderWidth = 1
         
         db = Firestore.firestore()
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setupLocation()
     }
     
     func setUID(id: String) {
@@ -55,6 +58,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         vc.queueId = data?.queueId
         vc.uid = self.uid
         vc.isHost = false
+        vc.playerDelegate = self
         
         self.db?.collection("contributor").document(data!.queueId).collection("members").document(self.uid).setData([:
             ], completion: { (val) in
@@ -71,6 +75,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             }
             self.present(vc, animated:true, completion:nil)
         })
+    }
+    
+    func updatePlayerWith(queueId: String?, isHost: Bool) {
+        delegate?.updatePlayerWith(queueId: queueId, isHost: isHost)
     }
     
     func watchLocationQueues(city: String, region: String) {

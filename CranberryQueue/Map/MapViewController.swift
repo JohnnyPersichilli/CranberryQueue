@@ -15,7 +15,11 @@ protocol mapControllerDelegate: class {
     func setUID(id: String)
 }
 
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate {
+protocol MapPlayerDelegate: class {
+    func setupPlayer(queueId: String, isHost: Bool)
+}
+
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueuePlayerDelegate {
 
     @IBOutlet var cityLabel: UILabel!
 
@@ -29,12 +33,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     @IBOutlet weak var loginContainer: UIView!
 
-
+    @IBOutlet var playerContainer: UIView!
+    
+    @IBOutlet var playerHelpLabel: UILabel!
+    
+    
     var db : Firestore? = nil
 
     var uid = String()
+    var isHost = false
 
     weak var delegate: mapControllerDelegate?
+    
+    weak var playerDelegate: MapPlayerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,6 +101,17 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
         createQueueForm.queueNameTextField.becomeFirstResponder()
     }
+    
+    func updatePlayerWith(queueId: String?, isHost: Bool) {
+        guard let id = queueId else {
+            playerContainer.isHidden = true
+            playerHelpLabel.isHidden = false
+            return
+        }
+        playerDelegate?.setupPlayer(queueId: id, isHost: isHost)
+        playerContainer.isHidden = false
+        playerHelpLabel.isHidden = true
+    }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -113,8 +135,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             }
         }
         if segue.destination is PlayerViewController {
-            //let vc = segue.destination as? PlayerViewController
-
+            let vc = segue.destination as? PlayerViewController
+            self.playerDelegate = vc
         }
         if segue.destination is LoginController {
             let vc = segue.destination as? LoginController
@@ -173,6 +195,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.queueId = id
             vc.uid = self.uid
             vc.isHost = true
+            vc.playerDelegate = self
             self.present(vc, animated:true, completion:nil)
         }
     }
