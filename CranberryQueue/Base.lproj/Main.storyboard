@@ -807,14 +807,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" id="2gA-gE-Qtx" customClass="MPVolumeView">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <accessibility key="accessibilityConfiguration">
-                                    <accessibilityTraits key="traits" notEnabled="YES"/>
-                                </accessibility>
-                                <viewLayoutGuide key="safeArea" id="XeQ-Qq-EPb"/>
-                            </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="to get started" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KOQ-c4-fSN">
                                 <rect key="frame" x="19.000000000000007" y="109.66666666666667" width="124.66666666666669" height="27.000000000000014"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="23"/>
@@ -921,6 +913,12 @@
                                     <constraint firstItem="gKA-bS-v7s" firstAttribute="leading" secondItem="gpm-Er-KzX" secondAttribute="trailing" constant="23" id="u9h-3y-ud2"/>
                                     <constraint firstAttribute="bottom" secondItem="6al-Wn-Gqd" secondAttribute="bottom" constant="8" id="xYg-yP-5Ra"/>
                                 </constraints>
+                            </view>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" id="2gA-gE-Qtx" customClass="MPVolumeView">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <rect key="contentStretch" x="0.0" y="0.0" width="0.050000000000000003" height="0.050000000000000003"/>
+                                <viewLayoutGuide key="safeArea" id="XeQ-Qq-EPb"/>
                             </view>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eaR-Ra-6ig">
                                 <rect key="frame" x="16" y="162.66666666666663" width="382" height="306"/>
@@ -1040,8 +1038,8 @@
                         <outlet property="continueButton" destination="6al-Wn-Gqd" id="18I-W6-JU9"/>
                         <outlet property="guestContinueModal" destination="1Yo-1m-XZA" id="GYx-aU-IxH"/>
                         <outlet property="loginButton" destination="VYm-GT-9bt" id="qPS-TV-goV"/>
+                        <outlet property="mpVolumeView" destination="2gA-gE-Qtx" id="vaL-pA-UEi"/>
                         <outlet property="spotifyContinueModal" destination="eaR-Ra-6ig" id="Vxp-om-mD5"/>
-                        <outlet property="volumeSlider" destination="2gA-gE-Qtx" id="9id-eu-TIc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FdB-jm-xeA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

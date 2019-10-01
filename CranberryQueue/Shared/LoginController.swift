@@ -19,7 +19,8 @@ class LoginController: UIViewController, SessionDelegate {
     @IBOutlet weak var guestContinueModal: UIView!
     @IBOutlet weak var loginButton: UIView!
     @IBOutlet weak var continueButton: UIView!
-    @IBOutlet weak var volumeSlider: MPVolumeView!
+    @IBOutlet weak var mpVolumeView: MPVolumeView!
+    
     
     weak var delegate: LoginDelegate? = nil
     
@@ -33,7 +34,7 @@ class LoginController: UIViewController, SessionDelegate {
         let guestLabelTap = UITapGestureRecognizer(target: self, action: #selector(guestLabelTapped))
         continueButton.addGestureRecognizer(guestLabelTap)
         continueButton.isUserInteractionEnabled = true
-
+        
             setupUI()
     }
     
@@ -49,16 +50,11 @@ class LoginController: UIViewController, SessionDelegate {
         
         loginButton.layer.cornerRadius = 14
         continueButton.layer.cornerRadius = 14
-        
-        //hide volume slider
-        volumeSlider.showsRouteButton = false
-        volumeSlider.showsVolumeSlider = false
-        volumeSlider.isHidden = true
     }
     
     @objc func spotifyLabelTapped() {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        volumeSlider.volumeSlider.value = 0
+        self.mpVolumeView.volumeSlider.value = 0
         delegate.seshDelegate = self
         delegate.startSession()
     
@@ -78,14 +74,12 @@ class LoginController: UIViewController, SessionDelegate {
 
 extension MPVolumeView {
     var volumeSlider:UISlider {
-        self.showsRouteButton = false
-        self.showsVolumeSlider = false
-        self.isHidden = true
         var slider = UISlider()
         for subview in self.subviews {
             if subview is UISlider {
                 slider = subview as! UISlider
                 slider.isContinuous = false
+                slider.isHidden = true
                 (subview as! UISlider).value = AVAudioSession.sharedInstance().outputVolume
                 return slider
             }
