@@ -47,6 +47,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     weak var playerDelegate: QueuePlayerDelegate? = nil
     
+    var queueRef: ListenerRegistration? = nil
+    
     var db : Firestore? = nil
     
     
@@ -83,6 +85,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        queueRef?.remove()
+    }
+    
     func updateNumSongs(_ numSongs: Int) {
         DispatchQueue.main.async {
             self.numSongsLabel.text = String(numSongs)
@@ -92,7 +98,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     func watchLocationDoc() {
         db = Firestore.firestore()
         
-        db?.collection("location").document(queueId!)
+        queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
                 
                 guard let snap = snapshot else {

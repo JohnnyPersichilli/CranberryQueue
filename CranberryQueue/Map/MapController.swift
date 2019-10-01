@@ -20,7 +20,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     weak var delegate: mapDelegate?
     
     var db: Firestore? = nil
-    var ref: ListenerRegistration? = nil
+    var queuesInLocationRef: ListenerRegistration? = nil
     
     var locationManager : CLLocationManager!
     
@@ -48,6 +48,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         setupLocation()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        queuesInLocationRef?.remove()
+    }
+    
     func setUID(id: String) {
         uid = id
     }
@@ -68,27 +72,28 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         vc.isHost = false
         vc.playerDelegate = self
         
-        if( (self.queueId) != nil && !isHost ){
-            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
-        }else if( (self.queueId) != nil && isHost){
-            self.db?.collection("contributor").document(self.queueId!).delete()
-            
-            self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId).getDocuments(completion: { (snapshot, err) in
-                guard let snap = snapshot else {
-                    return
-                }
-                for doc in snap.documents {
-                    doc.reference.delete()
-                }
-            })
-            self.db?.collection("playlist").document(self.queueId!).delete()
-            self.db?.collection("playback").document(self.queueId!).delete()
-            self.db?.collection("location").document(self.queueId!).delete()
+        if(self.queueId != nil && self.queueId != vc.queueId){
+            if(!isHost){
+                self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
+            }else{
+                self.db?.collection("contributor").document(self.queueId!).delete()
+                
+                self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId).getDocuments(completion: { (snapshot, err) in
+                    guard let snap = snapshot else {
+                        return
+                    }
+                    for doc in snap.documents {
+                        doc.reference.delete()
+                    }
+                })
+                self.db?.collection("playlist").document(self.queueId!).delete()
+                self.db?.collection("playback").document(self.queueId!).delete()
+                self.db?.collection("location").document(self.queueId!).delete()
+            }
         }
-        
         self.db?.collection("contributor").document(data!.queueId).collection("members").document(self.uid).setData([:
             ], completion: { (val) in
-                })
+        })
         
         db?.collection("contributor").document(data!.queueId).getDocument(completion: { (snapshot, error) in
             if let err = error {
@@ -101,6 +106,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             }
             self.present(vc, animated:true, completion:nil)
         })
+
     }
     
     func updatePlayerWith(queueId: String?, isHost: Bool) {
@@ -108,7 +114,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func watchLocationQueues(city: String, region: String) {
-        ref = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
+        queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
