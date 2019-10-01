@@ -116,7 +116,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 return
             }
             self.map!.clear()
-            
+            self.markers = []
             self.queues = []
             for doc in snap.documents {
                 let newLoc = CQLocation(
