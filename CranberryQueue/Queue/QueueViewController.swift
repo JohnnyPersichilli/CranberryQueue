@@ -129,8 +129,16 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     func cleanup() {
-        playerDelegate?.updatePlayerWith(queueId: nil, isHost: false)
-
+        let alert = UIAlertController(title: "Queue no longer exists", message: "The host deleted the queue or there was a problem retrieving queue information.", preferredStyle: UIAlertController.Style.alert)
+        
+        alert.addAction(UIAlertAction(title: "Return to map", style: UIAlertAction.Style.default, handler: self.returnToMapFromAlert))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    func returnToMapFromAlert(alert: UIAlertAction!) {
+        self.playerDelegate?.updatePlayerWith(queueId: nil, isHost: false)
+        
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
@@ -138,8 +146,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.queueId = nil
         self.ref?.remove()
     }
-    
-    
     
     @objc func leaveQueueTapped() {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
