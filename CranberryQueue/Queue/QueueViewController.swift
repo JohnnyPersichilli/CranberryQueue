@@ -55,8 +55,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var db : Firestore? = nil
     
     var playerController: PlayerController?
-  
-    var queueRef: ListenerRegistration? = nil
     
     
     override func viewDidLoad() {
