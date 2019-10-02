@@ -146,7 +146,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     
     func returnToMapFromAlert(alert: UIAlertAction!) {
-        self.playerDelegate?.updatePlayerWith(queueId: nil, isHost: false)
+        playerController?.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
