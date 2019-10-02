@@ -16,11 +16,7 @@ protocol mapControllerDelegate: class {
     func setQueueInfo(queueId: String, isHost: Bool)
 }
 
-protocol MapPlayerDelegate: class {
-    func setupPlayer(queueId: String, isHost: Bool)
-}
-
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueuePlayerDelegate {
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
 
     @IBOutlet var cityLabel: UILabel!
 
@@ -33,21 +29,21 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet var settingsIconImageView: UIImageView!
 
     @IBOutlet weak var loginContainer: UIView!
-
-    @IBOutlet var playerContainer: UIView!
     
     @IBOutlet var playerHelpLabel: UILabel!
+    
+    @IBOutlet var playerView: PlayerView!
     
     var db : Firestore? = nil
 
     var uid = String()
     var isHost = false
     var queueId: String? = nil
+    
+    var playerController = PlayerController()
 
     weak var delegate: mapControllerDelegate?
     
-    weak var playerDelegate: MapPlayerDelegate?
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -59,6 +55,17 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         createQueueForm.queueNameTextField.delegate = self
 
         UIApplication.shared.isIdleTimerDisabled = true
+        
+        playerView.delegate = playerController
+        playerController.mapDelegate = playerView
+        
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.delegate = playerController
+    }
+    
+    func update(queueId: String?, isHost: Bool) {
+        self.queueId = queueId
+        self.isHost = isHost
     }
 
     func updateGeoCode(city: String, region: String) {
@@ -103,20 +110,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         createQueueForm.queueNameTextField.becomeFirstResponder()
     }
     
-    func updatePlayerWith(queueId: String?, isHost: Bool) {
-        guard let id = queueId else {
-            playerContainer.isHidden = true
-            playerHelpLabel.isHidden = false
-            return
-        }
-        self.queueId = id
-        self.isHost = isHost
-        delegate?.setQueueInfo(queueId: id, isHost: isHost)
-        playerDelegate?.setupPlayer(queueId: id, isHost: isHost)
-        playerContainer.isHidden = false
-        playerHelpLabel.isHidden = true
-    }
-
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -137,10 +130,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                     print( error! )
                 }
             }
-        }
-        if segue.destination is PlayerViewController {
-            let vc = segue.destination as? PlayerViewController
-            self.playerDelegate = vc
         }
         if segue.destination is LoginController {
             let vc = segue.destination as? LoginController
@@ -165,6 +154,53 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         DispatchQueue.main.async {
             self.loginContainer.isHidden = true
         }
+    }
+    
+    func joinQueue(data: CQLocation) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+        vc.queueName = data.name
+        vc.queueId = data.queueId
+        vc.uid = self.uid
+        vc.isHost = false
+        
+        vc.mapDelegate = self
+        vc.playerController = playerController
+        
+        
+        if( self.queueId != nil && !isHost ){
+            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
+        } else if( (self.queueId) != nil && isHost){
+            self.db?.collection("contributor").document(self.queueId!).delete()
+            
+            self.db?.collection("song").whereField("queueId", isEqualTo: queueId!).getDocuments(completion: { (snapshot, err) in
+                guard let snap = snapshot else {
+                    return
+                }
+                for doc in snap.documents {
+                    doc.reference.delete()
+                }
+            })
+            self.db?.collection("playlist").document(self.queueId!).delete()
+            self.db?.collection("playback").document(self.queueId!).delete()
+            self.db?.collection("location").document(self.queueId!).delete()
+        }
+        
+        self.db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
+            ], completion: { (val) in
+                })
+        
+        db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
+            if let err = error {
+                print(err)
+            }
+            if let host = snapshot?.data()?["host"] as? String {
+                if self.uid == host {
+                    vc.isHost = true
+                }
+            }
+            self.present(vc, animated:true, completion:nil)
+        })
     }
 
     func createQueue(withName name: String) {
@@ -217,11 +253,15 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.queueId = id
             vc.uid = self.uid
             vc.isHost = true
-            vc.playerDelegate = self
+            vc.mapDelegate = self
+            
+            vc.playerController = self.playerController
+            self.playerController.setupPlayer(queueId: id, isHost: true)
+            
             self.present(vc, animated:true, completion:nil)
         }
     }
-
+    
 }
 
 class Colors {
