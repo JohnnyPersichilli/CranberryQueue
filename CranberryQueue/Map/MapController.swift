@@ -30,6 +30,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     var queues = [CQLocation]()
     
+    var markers = [GMSMarker]()
+    
     var uid = String()
     
     var queueId: String? = nil
@@ -76,6 +78,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print(error!)
                 return
             }
+            self.map!.clear()
+            self.markers = []
             self.queues = []
             for doc in snap.documents {
                 let newLoc = CQLocation(
@@ -100,6 +104,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             marker.snippet = "Tap Here to Join"
             marker.map = map
             marker.userData = queue
+            self.markers.append(marker)
         }
         
     }
