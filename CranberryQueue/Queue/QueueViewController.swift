@@ -13,8 +13,8 @@ protocol queueDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
-protocol QueuePlayerDelegate: class {
-    func updatePlayerWith(queueId: String?, isHost: Bool)
+protocol QueueMapDelegate: class {
+    func update(queueId: String?, isHost: Bool)
 }
 
 class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
@@ -43,12 +43,17 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     @IBOutlet var globeIcon: UIImageView!
     
+    @IBOutlet var playerView: PlayerView!
+    
+    
     weak var delegate: queueDelegate? = nil
     
-    weak var playerDelegate: QueuePlayerDelegate? = nil
+    weak var mapDelegate: QueueMapDelegate? = nil
     
     var db : Firestore? = nil
     
+    var playerController: PlayerController?
+  
     var ref: ListenerRegistration? = nil
     
     
@@ -83,6 +88,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
         }
+        
+        playerView.delegate = playerController
+        playerController?.queueDelegate = playerView
+        playerController?.setupPlayer(queueId: queueId!, isHost: isHost)
     }
     
     func updateNumSongs(_ numSongs: Int) {
@@ -151,7 +160,9 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
         
         self.queueId = nil
-        playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
+        //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
+        mapDelegate?.update(queueId: nil, isHost: false)
+        playerController?.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
@@ -159,7 +170,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     @objc func globeTapped() {
-        playerDelegate?.updatePlayerWith(queueId: queueId, isHost: isHost)
+        mapDelegate?.update(queueId: queueId, isHost: isHost)
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
@@ -220,12 +231,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.destination is PlayerViewController
+        if false //segue.destination is PlayerViewController
         {
-            let vc = segue.destination as? PlayerViewController
-            vc?.queueId = queueId
-            vc?.isHost = isHost
-            vc?.updateConnectionStatus(connected: true)
+//            let vc = segue.destination as? PlayerViewController
+//            vc?.queueId = queueId
+//            vc?.isHost = isHost
+//            vc?.updateConnectionStatus(connected: true)
         }
         else if segue.destination is SearchController {
             let vc = segue.destination as? SearchController
