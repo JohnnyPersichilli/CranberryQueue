@@ -101,6 +101,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
                 }
                 
                 guard let doc = snap.data() else {
+                    self.cleanup()
                     return
                 }
                 let numMembers = doc["numMembers"] as! Int
@@ -122,6 +123,14 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTapped))
         leaveQueueButton.addGestureRecognizer(leaveQueueTap)
         leaveQueueButton.isUserInteractionEnabled = true
+    }
+    
+    func cleanup() {
+        self.presentingViewController?.dismiss(animated: true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
+        self.queueName = nil
+        self.queueId = nil
     }
     
     
