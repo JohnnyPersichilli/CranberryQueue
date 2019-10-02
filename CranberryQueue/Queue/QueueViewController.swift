@@ -91,6 +91,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         playerView.delegate = playerController
         playerController?.queueDelegate = playerView
+        playerController?.shouldControl = true
         playerController?.setupPlayer(queueId: queueId!, isHost: isHost)
     }
     

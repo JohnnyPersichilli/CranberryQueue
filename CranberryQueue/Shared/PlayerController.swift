@@ -27,6 +27,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         }
     }
     
+    var shouldControl = false
+    
     var queueId: String? = nil
     
     var isHost = false
@@ -122,6 +124,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func runTimer() {
+        if !shouldControl {
+            timer.invalidate()
+            return
+        }
         timer.invalidate()
         isTimerRunning = true
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
