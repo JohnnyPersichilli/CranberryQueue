@@ -32,6 +32,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     
     weak var songDelegate: SongTableDelegate? = nil
     
+    var songRef: ListenerRegistration? = nil
+    
     var upvotes = [String]()
     var downvotes = [String]()
     var pendingUpvotes = [Song]()
@@ -41,7 +43,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
             self.songs = []
             guard let snap = snapshot else {
                 print(error!)

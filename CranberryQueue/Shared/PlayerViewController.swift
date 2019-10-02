@@ -243,6 +243,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     }
     
     func setupGuestListeners() {
+        //dont think we want to remove this ref ever
         db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
                 print(err)
