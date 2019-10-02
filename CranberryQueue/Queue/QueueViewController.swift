@@ -138,7 +138,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     func cleanup() {
-        playerDelegate?.updatePlayerWith(queueId: nil, isHost: false)
+        //playerDelegate?.updatePlayerWith(queueId: nil, isHost: false)
 
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
