@@ -50,11 +50,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     weak var mapDelegate: QueueMapDelegate? = nil
     
+    var queueRef: ListenerRegistration? = nil
+    
     var db : Firestore? = nil
     
     var playerController: PlayerController?
-  
-    var ref: ListenerRegistration? = nil
     
     
     override func viewDidLoad() {
@@ -94,6 +94,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         playerController?.setupPlayer(queueId: queueId!, isHost: isHost)
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        queueRef?.remove()
+        songTableView.songRef?.remove()
+    }
+    
     func updateNumSongs(_ numSongs: Int) {
         DispatchQueue.main.async {
             self.numSongsLabel.text = String(numSongs)
@@ -103,7 +108,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     func watchLocationDoc() {
         db = Firestore.firestore()
         
-        ref = db?.collection("location").document(queueId!)
+        queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
                 
                 guard let snap = snapshot else {

@@ -20,7 +20,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     weak var delegate: mapDelegate?
     
     var db: Firestore? = nil
-    var ref: ListenerRegistration? = nil
+    var queuesInLocationRef: ListenerRegistration? = nil
     
     var locationManager : CLLocationManager!
     
@@ -55,6 +55,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        queuesInLocationRef?.remove()
+    }
+    
     func setUID(id: String) {
         uid = id
     }
@@ -73,7 +77,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
 //    }
     
     func watchLocationQueues(city: String, region: String) {
-        ref = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
+        queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
