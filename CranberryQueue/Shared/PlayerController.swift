@@ -9,7 +9,14 @@
 import UIKit
 import Firebase
 
-class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, mainDelegate, MapPlayerDelegate {
+protocol PlayerDelegate: class {
+    func updateSongUI(withInfo: PlaybackInfo)
+    func updateSongUI(withState: SPTAppRemotePlayerState)
+    func updateTimerUI(position: Int, duration: Int)
+    func clear()
+}
+
+class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
     
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
@@ -19,12 +26,6 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
             setupHostListeners()
         }
     }
-    
-    @IBOutlet var albumImageView: UIImageView!
-    
-    @IBOutlet var titleLabel: UILabel!
-    
-    @IBOutlet var timeLabel: UILabel!
     
     var queueId: String? = nil
     
@@ -42,46 +43,50 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     
     var token: String? = nil
     
+    var mapDelegate: PlayerDelegate?
+    var queueDelegate: PlayerDelegate?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        albumImageView.layer.cornerRadius = albumImageView.frame.height/2
-        albumImageView.clipsToBounds = true
+    var guestListener: ListenerRegistration? = nil
+    
+//    override func viewDidLoad() {
         
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.delegate = self
-        
-        db = Firestore.firestore()
-        
-        if !isHost && queueId != nil { // observing
-            setupGuestListeners()
+//
+//        db = Firestore.firestore()
+//
+//        if !isHost && queueId != nil { // observing
+//            setupGuestListeners()
+//        }
+//        else { // not in queue
+//            showHelpText()
+//        }
+//    }
+    
+    func setupPlayer(queueId: String?, isHost: Bool) {
+        if queueId != self.queueId || queueId == nil {
+            guestListener?.remove()
+            remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
+                
+            })
+            
         }
-        else { // not in queue
-            showHelpText()
+        if queueId == nil {
+            timer.invalidate()
+            position = 0
+            mapDelegate?.clear()
+            queueDelegate?.clear()
         }
-        
-        setupGestureRecognizers()
-        
-    }
-    
-    func setupGestureRecognizers() {
-        let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
-        forwardSwipe.direction = .left
-        self.view.addGestureRecognizer(forwardSwipe)
-    }
-    
-    func setupPlayer(queueId: String, isHost: Bool) {
         self.queueId = queueId
         self.isHost = isHost
+        db = Firestore.firestore()
         if isHost {
-            updateConnectionStatus(connected: true)
+            //updateConnectionStatus(connected: true)
         }
-        else {
+        if queueId != nil {
             setupGuestListeners()
         }
     }
     
-    @objc func swiped() {
+    func swiped() {
         if queueId != nil && isHost {
             db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
@@ -113,8 +118,6 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
                     })
                 })
             })
-            
-            
         }
     }
     
@@ -129,7 +132,8 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
             return
         }
         position += 1000
-        updateTimerUI()
+        mapDelegate?.updateTimerUI(position: position, duration: duration)
+        queueDelegate?.updateTimerUI(position: position, duration: duration)
         if Int(position/1000) == Int(duration/1000) {
             isTimerRunning = false
         }
@@ -156,63 +160,10 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         }
     }
     
-    func updateTimerUI() {
-        let posSeconds = (position/1000) % 60
-        let posMinutes = (position/1000)/60 % 60
-        let durSeconds = (duration/1000) % 60
-        let durMinutes = (duration/1000)/60 % 60
-        var stringPosSeconds = String((position/1000) % 60)
-        var stringDurSeconds = String((duration/1000) % 60)
-        if posSeconds < 10 {
-            stringPosSeconds = "0" + String((position/1000) % 60)
-        }
-        if durSeconds < 10 {
-            stringDurSeconds = "0" + String((duration/1000) % 60)
-        }
-        DispatchQueue.main.async {
-            self.timeLabel.text = "\(posMinutes):\(stringPosSeconds) | \(durMinutes):\(stringDurSeconds)"
-        }
-    }
-    
-    func updateSongUI(withState state: SPTAppRemotePlayerState) {
-        var url = URL(string: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg")
-        if(state.track.imageIdentifier.split(separator: ":").count >= 2){
-            let trackId = state.track.imageIdentifier.split(separator: ":")[2]
-            url = URL(string: "https://i.scdn.co/image/\(trackId)")
-        }else{
-            //may need to update default image even though its never being used?
-            print("no track image for:", state.track.name)
-        }
-        
-        let task = URLSession.shared.dataTask(with: url!) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error!)
-                return }
-            DispatchQueue.main.async() {
-                self.titleLabel.text = state.track.artist.name + " - " + state.track.name
-                self.albumImageView.image = UIImage(data: data)
-            }
-        }
-        task.resume()
-    }
-    
-    func updateSongUI(withInfo info: PlaybackInfo) {
-        let url = URL(string: info.imageURL)
-        let task = URLSession.shared.dataTask(with: url!) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error!)
-                return }
-            DispatchQueue.main.async() {
-                self.titleLabel.text = info.artist + " - " + info.name
-                self.albumImageView.image = UIImage(data: data)
-            }
-        }
-        task.resume()
-    }
-    
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         
-        updateSongUI(withState: playerState)
+        mapDelegate?.updateSongUI(withState: playerState)
+        queueDelegate?.updateSongUI(withState: playerState)
         
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
@@ -221,12 +172,12 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
         position = json["position"] as! Int
         if (json["isPaused"] as! Bool) {
             timer.invalidate()
-            updateTimerUI()
+            mapDelegate?.updateTimerUI(position: position, duration: duration)
+            queueDelegate?.updateTimerUI(position: position, duration: duration)
         }
         else {
             runTimer()
         }
-        
     }
     
     func setupHostListeners() {
@@ -243,7 +194,7 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
     }
     
     func setupGuestListeners() {
-        db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
+        guestListener = db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
                 print(err)
                 return
@@ -253,13 +204,15 @@ class PlayerViewController: UIViewController, SPTAppRemotePlayerStateDelegate, m
             }
             let info = self.playbackJsonToInfo(json: contents)
             
-            self.updateSongUI(withInfo: info)
+            self.mapDelegate?.updateSongUI(withInfo: info)
+            self.queueDelegate?.updateSongUI(withInfo: info)
             self.duration = info.duration
             self.position = info.position
             
             if (info.isPaused) {
                 self.timer.invalidate()
-                self.updateTimerUI()
+                self.mapDelegate?.updateTimerUI(position: self.position, duration: self.duration)
+                self.queueDelegate?.updateTimerUI(position: self.position, duration: self.duration)
             }
             else {
                 self.runTimer()

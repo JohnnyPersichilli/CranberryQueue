@@ -35,6 +35,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var queueId: String? = nil
     var isHost: Bool = false
     
+    var isFirstLoad = true
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -45,7 +47,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        setupLocation()
+        if isFirstLoad {
+            isFirstLoad = false
+            setupLocation()
+        }
     }
     
     func setUID(id: String) {
@@ -59,7 +64,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         delegate?.joinQueue(data: marker.userData as! CQLocation)
-        
     }
     
 //    func updatePlayerWith(queueId: String?, isHost: Bool) {
