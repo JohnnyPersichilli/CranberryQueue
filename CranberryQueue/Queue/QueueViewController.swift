@@ -85,6 +85,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
 
         leaveQueueButton.alpha = 0.8
         
+        if(isHost){
+            leaveQueueButton.setTitle("Delete Queue", for: .normal)
+            //leaveQueueButton.setTitleColor(.red, for: .normal)
+        }
+        
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
         }

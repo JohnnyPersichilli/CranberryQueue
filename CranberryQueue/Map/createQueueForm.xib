@@ -25,7 +25,7 @@
                     <rect key="frame" x="0.0" y="249.5" width="414" height="397"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ifz-8C-SwG">
-                            <rect key="frame" x="0.0" y="0.0" width="414" height="123"/>
+                            <rect key="frame" x="0.0" y="212" width="414" height="123"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Queue Name:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zch-5m-yKo">
                                     <rect key="frame" x="26" y="11" width="183" height="37"/>
@@ -70,9 +70,9 @@
                         </view>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="ifz-8C-SwG" firstAttribute="centerY" secondItem="4Xn-UD-YXg" secondAttribute="centerY" constant="75" id="FhA-H8-J7r"/>
                         <constraint firstAttribute="trailing" secondItem="ifz-8C-SwG" secondAttribute="trailing" id="K3k-hB-zMl"/>
                         <constraint firstAttribute="height" constant="397" id="Xnv-vt-V8E"/>
-                        <constraint firstItem="ifz-8C-SwG" firstAttribute="top" secondItem="4Xn-UD-YXg" secondAttribute="top" id="Yv3-89-Oc7"/>
                         <constraint firstItem="ifz-8C-SwG" firstAttribute="leading" secondItem="4Xn-UD-YXg" secondAttribute="leading" id="zti-6V-G75"/>
                     </constraints>
                 </view>
