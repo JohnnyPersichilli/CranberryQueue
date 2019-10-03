@@ -29,9 +29,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet var settingsIconImageView: UIImageView!
 
     @IBOutlet weak var loginContainer: UIView!
-    
-    @IBOutlet var playerHelpLabel: UILabel!
-    
+        
     @IBOutlet var playerView: PlayerView!
     
     var db : Firestore? = nil
