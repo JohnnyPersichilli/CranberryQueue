@@ -13,15 +13,10 @@ exports.deleteLocation = functions.firestore
     .document('location/{locationId}')
     .onDelete((snap, context) => {
 
-        const locationId = context.params.locationId
-
-        //delete the location doc
-        db.collection('location').doc(locationId).delete().then(() => {
-        //    console.log("location table: " + locationId + " successfully deleted")
-        })
+        const queueId = context.params.locationId
 
         //remove subcollection in contributor, so its not orphaned
-        db.collection('contributor').doc(locationId).collection('members').get().then((querySnapshot) => {
+        db.collection('contributor').doc(queueId).collection('members').get().then((querySnapshot) => {
             // this will actually trigger the other onDelete listener, so we need to set a global boolean to ignore that update
             querySnapshot.forEach((doc) => {
                 doc.ref.delete()
@@ -29,28 +24,28 @@ exports.deleteLocation = functions.firestore
         }).then(() => {
             //delete the contributor doc after
             // console.log("contributor table: " + locationId + " successfully deleted")
-            db.collection('contributor').doc(locationId).delete()
+            db.collection('contributor').doc(queueId).delete()
 
         })
 
         //delete the playback doc
-        db.collection('playback').doc(locationId).delete().then(() => {
-            // console.log("playback table: " + locationId + " successfully deleted")
+        db.collection('playback').doc(queueId).delete().then(() => {
+            // console.log("playback table: " + queueId + " successfully deleted")
         })
 
         //deleting songs from the playlist song table so not orphaned
-        db.collection('playlist').doc(locationId).collection('songs').get().then((querySnapshot) => {
+        db.collection('playlist').doc(queueId).collection('songs').get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 //now delete the song out of the 
                 doc.ref.delete()
             })
         }).then(() => {
-            // console.log("successfully deleted playlist " + locationId + " table")
-            db.collection('playlist').doc(locationId).delete()
+            // console.log("successfully deleted playlist " + queueId + " table")
+            db.collection('playlist').doc(queueId).delete()
         })
-        let incomingQueueId = locationId
+
         // delete songs from song table
-        db.collection('song').where("queueId", "==", incomingQueueId).get()
+        db.collection('song').where("queueId", "==", queueId).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 //in each song object, we need to remove all entries from upvote users and downvote userse
@@ -73,53 +68,47 @@ exports.deleteLocation = functions.firestore
 
     })
 
-exports.addNumMembers = functions.firestore
-    .document('contributor/{queueId}/members/{uid}')
-    .onCreate((snap, context) => {
-    
-    const queueId = context.params.queueId;
-    
-    db.collection('location').doc(queueId).update({
-        numMembers: admin.firestore.FieldValue.increment(1)
-    }, {merge: true})
-    .then( () => {
-        return;
-    })
-
-    });
-
 
 exports.removeFromMembers = functions.https.onRequest((request, response) => {
-    if(request.method !== 'DELETE') {
-        return res.status(403).send('Forbidden!');
+    if(request.method !== 'PUT') {
+        return response.status(403).send('Forbidden!');
     }
     let queueId = request.body.queueId
     let uid = request.body.uid
 
+    //delete the uid from contributor-members collection
+    db.collection('contributor').doc(queueId).collection('members').doc(uid).delete()
+
+    //decrement the numMembers from location collection
     db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(-1)
     }, {merge: true})
     .then( () => {
+        response.status(200).send('success');
         return;
     })
-});
+});  
 
-exports.removeNumMembers = functions.firestore
-    .document('contributor/{queueId}/members/{uid}')
-    .onDelete((snap, context) => {
+exports.addToMembers = functions.https.onRequest((request, response) => {
+    if(request.method !== 'PUT') {
+        return response.status(403).send('Forbidden!');
+    }
+    let queueId = request.body.queueId
+    let uid = request.body.uid
+    console.log("UID: ", uid)
 
-    const queueId = context.params.queueId;
-    
+    //add the uid to contributor-members collection
+    db.collection('contributor').doc(queueId).collection('members').doc(uid).set({})
+
+    //increment the numMembers from location collection
     db.collection('location').doc(queueId).update({
-        numMembers: admin.firestore.FieldValue.increment(-1)
+        numMembers: admin.firestore.FieldValue.increment(1)
     }, {merge: true})
     .then( () => {
+        response.status(200).send('success');
         return;
     })
-
-    });
-        
-        
+}); 
 
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
