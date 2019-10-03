@@ -201,18 +201,18 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
         
         self.db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
-            ], completion: { (val) in
-                })
         
         db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
             if let err = error {
                 print(err)
             }
+            //see if the users was previously in the queue, if they were numMembers does not change
             if let host = snapshot?.data()?["host"] as? String {
                 if self.uid == host {
                     vc.isHost = true
                 }
             }
+            
             self.present(vc, animated:true, completion:nil)
         })
     }
