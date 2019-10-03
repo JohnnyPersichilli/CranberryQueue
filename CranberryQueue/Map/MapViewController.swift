@@ -177,7 +177,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     
                 request.httpBody = try! JSONEncoder().encode(dictionary)
-                request.httpMethod = "DELETE"
+                request.httpMethod = "PUT"
                 request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")  // the request is JSON
                 
                 request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")        // the expected response is also JSON
@@ -201,6 +201,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
         
         self.db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
+             ], completion: { (val) in
+                 })
         
         db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
             if let err = error {

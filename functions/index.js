@@ -68,6 +68,20 @@ exports.deleteLocation = functions.firestore
 
     })
 
+exports.addNumMembers = functions.firestore
+    .document('contributor/{queueId}/members/{uid}')
+    .onCreate((snap, context) => {
+    
+    const queueId = context.params.queueId;
+    
+    db.collection('location').doc(queueId).update({
+        numMembers: admin.firestore.FieldValue.increment(1)
+    }, {merge: true})
+    .then( () => {
+        return;
+    })
+});
+
 
 exports.removeFromMembers = functions.https.onRequest((request, response) => {
     if(request.method !== 'PUT') {
@@ -88,27 +102,6 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
         return;
     })
 });  
-
-exports.addToMembers = functions.https.onRequest((request, response) => {
-    if(request.method !== 'PUT') {
-        return response.status(403).send('Forbidden!');
-    }
-    let queueId = request.body.queueId
-    let uid = request.body.uid
-    console.log("UID: ", uid)
-
-    //add the uid to contributor-members collection
-    db.collection('contributor').doc(queueId).collection('members').doc(uid).set({})
-
-    //increment the numMembers from location collection
-    db.collection('location').doc(queueId).update({
-        numMembers: admin.firestore.FieldValue.increment(1)
-    }, {merge: true})
-    .then( () => {
-        response.status(200).send('success');
-        return;
-    })
-}); 
 
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
