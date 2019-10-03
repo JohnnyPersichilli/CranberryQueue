@@ -54,9 +54,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     var db : Firestore? = nil
     
-    var playerController: PlayerController?
+    var playerController = PlayerController.sharedInstance
     
-    
+    var isRejoining = false
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -95,9 +96,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
         
         playerView.delegate = playerController
-        playerController?.queueDelegate = playerView
-        playerController?.shouldControl = true
-        playerController?.setupPlayer(queueId: queueId!, isHost: isHost)
+        playerController.queueDelegate = playerView
+        playerController.setupPlayer(queueId: queueId!, isHost: isHost)
+        
+        if isRejoining {
+            playerController.updateConnectionStatus(connected: true)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -157,7 +161,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     
     func returnToMapFromAlert(alert: UIAlertAction!) {
-        playerController?.setupPlayer(queueId: nil, isHost: false)
+        playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
@@ -179,7 +183,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.queueId = nil
         //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
         mapDelegate?.update(queueId: nil, isHost: false)
-        playerController?.setupPlayer(queueId: nil, isHost: false)
+        playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)

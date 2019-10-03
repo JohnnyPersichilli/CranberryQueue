@@ -29,9 +29,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet var settingsIconImageView: UIImageView!
 
     @IBOutlet weak var loginContainer: UIView!
-    
-    @IBOutlet var playerHelpLabel: UILabel!
-    
+        
     @IBOutlet var playerView: PlayerView!
     
     var db : Firestore? = nil
@@ -40,7 +38,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var isHost = false
     var queueId: String? = nil
     
-    var playerController = PlayerController()
+    var playerController = PlayerController.sharedInstance
 
     weak var delegate: mapControllerDelegate?
     
@@ -165,8 +163,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         vc.isHost = false
         
         vc.mapDelegate = self
-        vc.playerController = playerController
-        
         
         if(self.queueId != nil && self.queueId != vc.queueId){
             if(!isHost){
@@ -199,6 +195,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             if let host = snapshot?.data()?["host"] as? String {
                 if self.uid == host {
                     vc.isHost = true
+                    vc.isRejoining = true
                 }
             }
             self.present(vc, animated:true, completion:nil)
@@ -257,7 +254,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.isHost = true
             vc.mapDelegate = self
             
-            vc.playerController = self.playerController
             self.playerController.setupPlayer(queueId: id, isHost: true)
             
             self.present(vc, animated:true, completion:nil)

@@ -16,6 +16,8 @@ protocol PlayerDelegate: class {
     func clear()
 }
 
+let _PlayerSharedInstance = PlayerController()
+
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
     
     func updateConnectionStatus(connected: Bool) {
@@ -26,9 +28,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             setupHostListeners()
         }
     }
-    
-    var shouldControl = false
-    
+        
     var queueId: String? = nil
     
     var isHost = false
@@ -50,20 +50,12 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     var guestListener: ListenerRegistration? = nil
     
-//    override func viewDidLoad() {
-        
-//
-//        db = Firestore.firestore()
-//
-//        if !isHost && queueId != nil { // observing
-//            setupGuestListeners()
-//        }
-//        else { // not in queue
-//            showHelpText()
-//        }
-//    }
+    class var sharedInstance: PlayerController {
+        return _PlayerSharedInstance
+    }
     
     func setupPlayer(queueId: String?, isHost: Bool) {
+        print("my actual pos: \(position)")
         if queueId != self.queueId || queueId == nil {
             guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
@@ -83,7 +75,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         if isHost {
             //updateConnectionStatus(connected: true)
         }
-        if queueId != nil {
+        else if queueId != nil {
             setupGuestListeners()
         }
     }
@@ -124,10 +116,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func runTimer() {
-        if !shouldControl {
-            timer.invalidate()
-            return
-        }
+//        if !shouldControl {
+//            timer.invalidate()
+//            return
+//        }
         timer.invalidate()
         isTimerRunning = true
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
@@ -187,6 +179,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func setupHostListeners() {
+        print(remote!.isConnected)
         print(remote?.playerAPI)
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
