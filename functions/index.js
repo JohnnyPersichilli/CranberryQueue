@@ -45,7 +45,7 @@ exports.deleteLocation = functions.firestore
                 doc.ref.delete()
             })
         }).then(() => {
-            console.log("successfully deleted playlist " + locationId + " table")
+            // console.log("successfully deleted playlist " + locationId + " table")
             db.collection('playlist').doc(locationId).delete()
         })
         let incomingQueueId = locationId
@@ -87,6 +87,22 @@ exports.addNumMembers = functions.firestore
     })
 
     });
+
+
+exports.removeFromMembers = functions.https.onRequest((request, response) => {
+    if(request.method !== 'DELETE') {
+        return res.status(403).send('Forbidden!');
+    }
+    let queueId = request.body.queueId
+    let uid = request.body.uid
+
+    db.collection('location').doc(queueId).update({
+        numMembers: admin.firestore.FieldValue.increment(-1)
+    }, {merge: true})
+    .then( () => {
+        return;
+    })
+});
 
 exports.removeNumMembers = functions.firestore
     .document('contributor/{queueId}/members/{uid}')
