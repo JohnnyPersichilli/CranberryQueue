@@ -16,8 +16,6 @@ protocol PlayerDelegate: class {
     func clear()
 }
 
-let _PlayerSharedInstance = PlayerController()
-
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
     
     func updateConnectionStatus(connected: Bool) {
@@ -43,6 +41,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     var duration = 200
     var position = 0
     
+    var isEnqueuing = false
+    
     var token: String? = nil
     
     var mapDelegate: PlayerDelegate?
@@ -50,9 +50,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     var guestListener: ListenerRegistration? = nil
     
-    class var sharedInstance: PlayerController {
-        return _PlayerSharedInstance
-    }
+    static let sharedInstance = PlayerController()
     
     func setupPlayer(queueId: String?, isHost: Bool) {
         print("my actual pos: \(position)")
@@ -146,6 +144,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                 }
                 let nextSongJSON = snap.documents[0].data()
                 
+                self.isEnqueuing = true
                 self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
                     guard let res = response else {
                         print(error!)
@@ -159,6 +158,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        
+        if isEnqueuing {
+            isEnqueuing = false
+            return
+        }
         
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
