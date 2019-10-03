@@ -48,10 +48,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         super.viewDidLoad()
 
         db = Firestore.firestore()
-
         setupScreen()
         setupGestureRecognizers()
-
         createQueueForm.queueNameTextField.delegate = self
 
         UIApplication.shared.isIdleTimerDisabled = true
@@ -174,17 +172,12 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
                  var request = URLRequest(url: url)
                 let dictionary = ["queueId":self.queueId,"uid":self.uid]
-
-    
                 request.httpBody = try! JSONEncoder().encode(dictionary)
                 request.httpMethod = "PUT"
-                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")  // the request is JSON
-                
-                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")        // the expected response is also JSON
-
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
                 
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
-
                     if let res = response {
                         print(res)
                     }
@@ -273,7 +266,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             
             vc.playerController = self.playerController
             self.playerController.setupPlayer(queueId: id, isHost: true)
-            
             self.present(vc, animated:true, completion:nil)
         }
     }

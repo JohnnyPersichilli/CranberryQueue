@@ -78,9 +78,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         songTableView.watchPlaylist()
         songTableView.songDelegate = self
         
-        
         setupGestureRecognizers()
-        
         watchLocationDoc()
 
         leaveQueueButton.alpha = 0.8
@@ -108,7 +106,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func watchLocationDoc() {
         db = Firestore.firestore()
-        
         queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
                 
@@ -172,17 +169,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
              var request = URLRequest(url: url)
             let dictionary = ["queueId":self.queueId,"uid":self.uid]
-
-
             request.httpBody = try! JSONEncoder().encode(dictionary)
             request.httpMethod = "PUT"
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")  // the request is JSON
-            
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")        // the expected response is also JSON
-
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
-
                 if let res = response {
                     print(res)
                 }
