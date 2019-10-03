@@ -46,10 +46,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         super.viewDidLoad()
 
         db = Firestore.firestore()
-
         setupScreen()
         setupGestureRecognizers()
-
         createQueueForm.queueNameTextField.delegate = self
 
         UIApplication.shared.isIdleTimerDisabled = true
@@ -166,38 +164,47 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
         if(self.queueId != nil && self.queueId != vc.queueId){
             if(!isHost){
-                self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
-            }else{
-                self.db?.collection("contributor").document(self.queueId!).delete()
+                //delete from members now an endpoint
+                let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
+                 var request = URLRequest(url: url)
+                let dictionary = ["queueId":self.queueId,"uid":self.uid]
+                request.httpBody = try! JSONEncoder().encode(dictionary)
+                request.httpMethod = "PUT"
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
                 
-                self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId).getDocuments(completion: { (snapshot, err) in
-                    guard let snap = snapshot else {
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    if let res = response {
+                        print(res)
+                    }
+                    if let err = error {
+                        print(err)
                         return
                     }
-                    for doc in snap.documents {
-                        doc.reference.delete()
-                    }
-                })
-                self.db?.collection("playlist").document(self.queueId!).delete()
-                self.db?.collection("playback").document(self.queueId!).delete()
+                }
+                task.resume()
+
+            }else{
                 self.db?.collection("location").document(self.queueId!).delete()
             }
         }
         
         self.db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
-            ], completion: { (val) in
-                })
+             ], completion: { (val) in
+                 })
         
         db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
             if let err = error {
                 print(err)
             }
+            //see if the users was previously in the queue, if they were numMembers does not change
             if let host = snapshot?.data()?["host"] as? String {
                 if self.uid == host {
                     vc.isHost = true
                     vc.isRejoining = true
                 }
             }
+            
             self.present(vc, animated:true, completion:nil)
         })
     }
@@ -255,7 +262,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.mapDelegate = self
             
             self.playerController.setupPlayer(queueId: id, isHost: true)
-            
             self.present(vc, animated:true, completion:nil)
         }
     }
