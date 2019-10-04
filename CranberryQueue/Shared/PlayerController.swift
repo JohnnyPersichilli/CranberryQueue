@@ -148,6 +148,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                     self.remote?.playerAPI?.seek(toPosition: self.position-1000, callback: { (value, error) in
                         
                     })
+                    return
                 }
                 
                 self.isEnqueuing = true
