@@ -76,7 +76,7 @@ exports.addNumMembers = functions.firestore
     
     db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(1)
-    }, {merge: true})
+    })
     .then( () => {
         return;
     })
@@ -96,7 +96,7 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
     //decrement the numMembers from location collection
     db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(-1)
-    }, {merge: true})
+    })
     .then( () => {
         response.status(200).send('success');
         return;
@@ -118,7 +118,7 @@ exports.updateNetVotes = functions.firestore
             if (snapshot.empty) {
                 db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                     votes: admin.firestore.FieldValue.increment(1)
-                }, {merge: true})
+                })
                 .then( () => {
                     return;
                 })
@@ -134,7 +134,7 @@ exports.updateNetVotes = functions.firestore
                     db.collection('song').doc(songId).collection('downvoteUsers').doc(uid).delete()
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(2)
-                    }, {merge: true})
+                    })
                     .then( () => {
                         return;
                     })
@@ -142,7 +142,7 @@ exports.updateNetVotes = functions.firestore
                 else {
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(1)
-                    }, {merge: true})
+                    })
                     .then( () => {
                         return;
                     })
@@ -170,7 +170,7 @@ exports.updateDownvotes = functions.firestore
             if (snapshot.empty) {
                 db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                     votes: admin.firestore.FieldValue.increment(-1)
-                }, {merge: true})
+                })
                 .then( () => {
                     return;
                 })
@@ -186,7 +186,7 @@ exports.updateDownvotes = functions.firestore
                     db.collection('song').doc(songId).collection('upvoteUsers').doc(uid).delete()
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-2)
-                    }, {merge: true})
+                    })
                     .then( () => {
                         return;
                     })
@@ -194,7 +194,7 @@ exports.updateDownvotes = functions.firestore
                 else {
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-1)
-                    }, {merge: true})
+                    })
                     .then( () => {
                         return;
                     })
