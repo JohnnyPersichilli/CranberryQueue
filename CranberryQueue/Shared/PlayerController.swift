@@ -143,6 +143,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                     return
                 }
                 let nextSongJSON = snap.documents[0].data()
+                if nextSongJSON["name"] as? String == nil {
+                    snap.documents[0].reference.delete()
+                    self.remote?.playerAPI?.seek(toPosition: self.position-1000, callback: { (value, error) in
+                        
+                    })
+                    return
+                }
                 
                 self.isEnqueuing = true
                 self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
