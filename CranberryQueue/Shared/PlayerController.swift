@@ -26,9 +26,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             setupHostListeners()
         }
     }
-    
-    var shouldControl = false
-    
+        
     var queueId: String? = nil
     
     var isHost = false
@@ -43,6 +41,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     var duration = 200
     var position = 0
     
+    var isEnqueuing = false
+    
     var token: String? = nil
     
     var mapDelegate: PlayerDelegate?
@@ -50,20 +50,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     var guestListener: ListenerRegistration? = nil
     
-//    override func viewDidLoad() {
-        
-//
-//        db = Firestore.firestore()
-//
-//        if !isHost && queueId != nil { // observing
-//            setupGuestListeners()
-//        }
-//        else { // not in queue
-//            showHelpText()
-//        }
-//    }
+    static let sharedInstance = PlayerController()
     
     func setupPlayer(queueId: String?, isHost: Bool) {
+        print("my actual pos: \(position)")
         if queueId != self.queueId || queueId == nil {
             guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
@@ -83,7 +73,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         if isHost {
             //updateConnectionStatus(connected: true)
         }
-        if queueId != nil {
+        else if queueId != nil {
             setupGuestListeners()
         }
     }
@@ -124,10 +114,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func runTimer() {
-        if !shouldControl {
-            timer.invalidate()
-            return
-        }
+//        if !shouldControl {
+//            timer.invalidate()
+//            return
+//        }
         timer.invalidate()
         isTimerRunning = true
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
@@ -154,6 +144,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                 }
                 let nextSongJSON = snap.documents[0].data()
                 
+                self.isEnqueuing = true
                 self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
                     guard let res = response else {
                         print(error!)
@@ -167,6 +158,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        
+        if isEnqueuing {
+            isEnqueuing = false
+            return
+        }
         
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
@@ -187,6 +183,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func setupHostListeners() {
+        print(remote!.isConnected)
         print(remote?.playerAPI)
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in

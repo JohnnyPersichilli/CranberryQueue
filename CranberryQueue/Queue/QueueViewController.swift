@@ -54,9 +54,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     var db : Firestore? = nil
     
-    var playerController: PlayerController?
+    var playerController = PlayerController.sharedInstance
     
-    
+    var isRejoining = false
+            
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -78,9 +79,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         songTableView.watchPlaylist()
         songTableView.songDelegate = self
         
-        
         setupGestureRecognizers()
-        
         watchLocationDoc()
 
         leaveQueueButton.alpha = 0.8
@@ -95,9 +94,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
         
         playerView.delegate = playerController
-        playerController?.queueDelegate = playerView
-        playerController?.shouldControl = true
-        playerController?.setupPlayer(queueId: queueId!, isHost: isHost)
+        playerController.queueDelegate = playerView
+        playerController.setupPlayer(queueId: queueId!, isHost: isHost)
+        
+        if isRejoining {
+            playerController.updateConnectionStatus(connected: true)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -113,7 +115,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func watchLocationDoc() {
         db = Firestore.firestore()
-        
         queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
                 
@@ -157,7 +158,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     
     func returnToMapFromAlert(alert: UIAlertAction!) {
-        playerController?.setupPlayer(queueId: nil, isHost: false)
+        playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
@@ -173,13 +174,31 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             //firebase fn handles all garbage cleanup for this
             self.db?.collection("location").document(self.queueId!).delete()
         } else {
-            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid!).delete()
+            //delete from members now an endpoint
+            let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
+             var request = URLRequest(url: url)
+            let dictionary = ["queueId":self.queueId,"uid":self.uid]
+            request.httpBody = try! JSONEncoder().encode(dictionary)
+            request.httpMethod = "PUT"
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let res = response {
+                    print(res)
+                }
+                if let err = error {
+                    print(err)
+                    return
+                }
+            }
+            task.resume()
         }
         
         self.queueId = nil
         //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
         mapDelegate?.update(queueId: nil, isHost: false)
-        playerController?.setupPlayer(queueId: nil, isHost: false)
+        playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
