@@ -54,6 +54,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             }
             if snap.documents.count == 0 {
                 DispatchQueue.main.async {
+                    self.songDelegate?.updateNumSongs(0)
                     self.reloadData()
                 }
                 return
