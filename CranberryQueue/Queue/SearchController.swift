@@ -100,15 +100,27 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                     let artistInfo = x["artists"] as! [[String:Any]]
                     let albumInfo = x["album"] as! [String:Any]
                     let imageInfo = (albumInfo["images"] as? [[String:Any]]) ?? [["url":"https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33"]]
-                    let newSong = Song(
-                        name: x["name"] as! String,
-                        artist: artistInfo[0]["name"] as! String,
-                        imageURL: imageInfo[0]["url"] as! String,
-                        docID: "f",
-                        votes: 1,
-                        uri: x["uri"] as! String
-                    )
-                    self.songs.append(newSong)
+                    if(imageInfo.count > 0){
+                        let newSong = Song(
+                            name: x["name"] as! String,
+                            artist: artistInfo[0]["name"] as! String,
+                            imageURL: imageInfo[0]["url"] as! String,
+                            docID: "f",
+                            votes: 1,
+                            uri: x["uri"] as! String
+                        )
+                        self.songs.append(newSong)
+                    }else{
+                        let newSong = Song(
+                            name: x["name"] as! String,
+                            artist: artistInfo[0]["name"] as! String,
+                            imageURL: "https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33",
+                            docID: "f",
+                            votes: 1,
+                            uri: x["uri"] as! String
+                        )
+                        self.songs.append(newSong)
+                    }
                 }
                 DispatchQueue.main.async {
                     self.searchTableView.reloadData()
