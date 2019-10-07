@@ -13,6 +13,7 @@ import Firebase
 protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
     func joinQueue(data: CQLocation)
+    func setLocationEnabled(status: Bool)
 }
 
 class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate {
@@ -25,18 +26,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var locationManager : CLLocationManager!
     
     var map: GMSMapView? = nil
-    
-    var curCoords: CLLocationCoordinate2D? = nil
-    
+
     var queues = [CQLocation]()
-    
     var markers = [GMSMarker]()
     
-    var uid = String()
-    
-    var queueId: String? = nil
-    var isHost: Bool = false
-    
+    var curCoords: CLLocationCoordinate2D? = nil
     var isFirstLoad = true
     
     override func viewDidLoad() {
@@ -45,37 +39,34 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.view.layer.borderWidth = 1
         
         db = Firestore.firestore()
-        
+    }
+     
+    override func viewWillDisappear(_ animated: Bool) {
+        queuesInLocationRef?.remove()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         if isFirstLoad {
             isFirstLoad = false
-            setupLocation()
+            locationManager = CLLocationManager()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestAlwaysAuthorization()
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        queuesInLocationRef?.remove()
+    func enableLocation(){
+        
     }
     
-    func setUID(id: String) {
-        uid = id
-    }
-    
-    func setQueueInfo(queueId: String, isHost: Bool){
-        self.queueId = queueId
-        self.isHost = isHost
+    func disableLocation() {
+        
     }
     
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         delegate?.joinQueue(data: marker.userData as! CQLocation)
     }
-    
-//    func updatePlayerWith(queueId: String?, isHost: Bool) {
-//        delegate?.updatePlayerWith(queueId: queueId, isHost: isHost)
-//    }
-    
+
     func watchLocationQueues(city: String, region: String) {
         queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
@@ -112,17 +103,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
         
     }
-    
-    func setupLocation() {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager = CLLocationManager()
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.requestAlwaysAuthorization()
-            locationManager.startUpdatingLocation()
-        }
-    }
-    
+   
     func setupMap(withCoords coords: CLLocationCoordinate2D) {
         let camera = GMSCameraPosition.camera(withTarget: coords, zoom: 13.0)
         let mapView0 = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
@@ -147,10 +128,22 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
     
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        var isEnabled = Bool()
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager.startUpdatingLocation()
+            isEnabled = true
+        default:
+            isEnabled = false
+        }
+        delegate?.setLocationEnabled(status: isEnabled)
+        UserDefaults.standard.set(isEnabled, forKey: "isLocationEnabled")
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations.last
         let center = CLLocationCoordinate2D(latitude: (location?.coordinate.latitude)!, longitude: (location?.coordinate.longitude)!)
-        print(center)
         
         curCoords = center
         
@@ -170,7 +163,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             self.delegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
             self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
         }
-        
     }
     
     func getCoords() -> ([String : Double]) {
@@ -181,26 +173,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func addTapped() {
-        print("yes")
-        
         let marker = GMSMarker()
         marker.position = curCoords!
         marker.map = map
     }
     
-    func createQueue() {
-        
-    }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
