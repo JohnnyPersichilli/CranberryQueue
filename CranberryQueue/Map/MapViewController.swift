@@ -86,9 +86,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 self.present(alert, animated: true)
             }
         }
-        else {
-            return
-        }
     }
     
     deinit {
@@ -96,10 +93,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func setLocationEnabled(status: Bool) {
-        if status {
-            
-        }
-        else {
+        if !status {
             if let _ = UserDefaults.standard.object(forKey: "isLocationEnabled") as? Bool {}
             else {
                 return
