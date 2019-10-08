@@ -32,11 +32,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
     @IBOutlet var playerView: PlayerView!
     
+
+    @IBOutlet weak var queueDetailModal: UIView!
+    @IBOutlet weak var queueNameLabel: UILabel!
+    @IBOutlet weak var joinQueueButton: UIButton!
+    @IBOutlet weak var songNameLabel: UILabel!
+    @IBOutlet weak var artistLabel: UILabel!
+    
     var db : Firestore? = nil
 
     var uid = String()
     var isHost = false
     var queueId: String? = nil
+    var currMarkerData: CQLocation? = nil
     
     var playerController = PlayerController.sharedInstance
 
@@ -54,6 +62,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
         playerView.delegate = playerController
         playerController.mapDelegate = playerView
+        
+        //queueDetailModal.isHidden = true
+        //queueDetailModal.alpha = 0
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = playerController
@@ -89,6 +100,11 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
+        
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue))
+        joinQueueButton.addGestureRecognizer(joinQueueTap)
+        joinQueueButton.isUserInteractionEnabled = true
+        
     }
 
     @objc func settingsTapped() {
@@ -152,9 +168,32 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
-    func joinQueue(data: CQLocation) {
+    func openDetailModal(data: CQLocation) {
+        self.currMarkerData = data
+        self.db?.collection("playback").document(data.queueId).getDocument(completion: { (snapshot, error) in
+            if let err = error {
+                print(err)
+            }
+            
+            let currSong = snapshot?.data()?["name"] as? String
+            let currArtist = snapshot?.data()?["artist"] as? String
+
+            DispatchQueue.main.async {
+                self.queueDetailModal.isHidden = false
+                self.queueNameLabel.text = data.name
+                self.songNameLabel.text = currSong
+                self.artistLabel.text = currArtist
+            }
+        })
+
+    }
+    
+    @objc func joinQueue() {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+        
+        let data = currMarkerData as! CQLocation
+        
         vc.queueName = data.name
         vc.queueId = data.queueId
         vc.uid = self.uid

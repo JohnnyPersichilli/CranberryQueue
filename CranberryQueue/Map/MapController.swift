@@ -12,7 +12,8 @@ import Firebase
 
 protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
-    func joinQueue(data: CQLocation)
+    //func joinQueue(data: CQLocation)
+    func openDetailModal(data: CQLocation)
 }
 
 class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate {
@@ -68,8 +69,14 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.isHost = isHost
     }
     
-    func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
-        delegate?.joinQueue(data: marker.userData as! CQLocation)
+//    func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
+//        delegate?.joinQueue(data: marker.userData as! CQLocation)
+//    }
+    
+    func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        print("called did tap marker")
+        delegate?.openDetailModal(data: marker.userData as! CQLocation)
+        return true
     }
     
 //    func updatePlayerWith(queueId: String?, isHost: Bool) {
