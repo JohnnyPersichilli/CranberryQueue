@@ -12,8 +12,7 @@ import Firebase
 protocol mapControllerDelegate: class {
     func addTapped()
     func getCoords() -> ([String:Double])
-    func enableLocation()
-    func disableLocation()
+    func setLocationEnabled(_ val: Bool)
 }
 
 class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
@@ -109,6 +108,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func update(queueId: String?, isHost: Bool) {
         self.queueId = queueId
         self.isHost = isHost
+        self.delegate?.setLocationEnabled(true)
     }
 
     func updateGeoCode(city: String, region: String) {
@@ -224,7 +224,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                     vc.isRejoining = true
                 }
             }
-            
+            self.delegate?.setLocationEnabled(false)
             self.present(vc, animated:true, completion:nil)
         })
     }
@@ -282,6 +282,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.mapDelegate = self
             
             self.playerController.setupPlayer(queueId: id, isHost: true)
+            self.delegate?.setLocationEnabled(false)
             self.present(vc, animated:true, completion:nil)
         }
     }

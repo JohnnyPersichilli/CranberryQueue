@@ -55,12 +55,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
     
-    func enableLocation(){
-        
-    }
-    
-    func disableLocation() {
-        
+    func setLocationEnabled(_ val: Bool){
+        self.map?.isMyLocationEnabled = val
     }
     
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
