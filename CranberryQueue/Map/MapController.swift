@@ -29,9 +29,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
 
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
+    var circles = [GMSCircle]()
     
     var curCoords: CLLocationCoordinate2D? = nil
     var isFirstLoad = true
+    var queueId: String? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,6 +77,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             }
             self.map!.clear()
             self.markers = []
+            self.circles = []
             self.queues = []
             for doc in snap.documents {
                 let newLoc = CQLocation(
@@ -93,8 +96,20 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     func drawMarkers() {
         for queue in queues {
+            let circleCenter = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
+            let circle = GMSCircle(position: circleCenter, radius: 200)
+            let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
+            let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
+            circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
+            circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
+            circle.strokeWidth = 2
+            circle.zIndex = 0
+            circle.map = map
+            circles.append(circle)
+            
             let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
             let marker = GMSMarker(position: position)
+            marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
             marker.title = queue.name
             marker.snippet = "Tap Here to Join"
             marker.map = map
@@ -105,7 +120,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
    
     func setupMap(withCoords coords: CLLocationCoordinate2D) {
-        let camera = GMSCameraPosition.camera(withTarget: coords, zoom: 13.0)
+        let camera = GMSCameraPosition.camera(withTarget: coords, zoom: 15.0)
         let mapView0 = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
         
         do {
@@ -173,9 +188,33 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func addTapped() {
+        markers = []
+        circles = []
+        self.map?.clear()
+        
         let marker = GMSMarker()
+        marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
         marker.position = curCoords!
         marker.map = map
+        markers.append(marker)
+        
+        let circle = GMSCircle(position: curCoords!, radius: 200)
+        circle.fillColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
+        circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
+        circle.strokeWidth = 2
+        circle.zIndex = 0
+        circle.map = map
+        circles.append(circle)
+        
+        self.drawMarkers()
+    }
+    
+    func setQueue(_ queueId: String?) {
+        self.queueId = queueId
+        self.markers = []
+        self.circles = []
+        self.map?.clear()
+        self.drawMarkers()
     }
     
 }
