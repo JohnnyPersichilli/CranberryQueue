@@ -287,8 +287,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "80"
             endingLineNumber = "80"
-            landmarkName = "PlayerController"
-            landmarkType = "3">
+            landmarkName = "setupPlayer(queueId:isHost:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -319,7 +319,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "84"
             endingLineNumber = "84"
-            landmarkName = "swiped()"
+            landmarkName = "setupPlayer(queueId:isHost:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -335,7 +335,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "190"
             endingLineNumber = "190"
-            landmarkName = "playerStateDidChange(_:)"
+            landmarkName = "setupHostListeners()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -383,8 +383,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "191"
             endingLineNumber = "191"
-            landmarkName = "PlayerController"
-            landmarkType = "3">
+            landmarkName = "setupHostListeners()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -671,7 +671,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "203"
             endingLineNumber = "203"
-            landmarkName = "setupHostListeners()"
+            landmarkName = "setupGuestListeners()"
             landmarkType = "7">
             <Locations>
                <Location
@@ -733,8 +733,8 @@
             filePath = "CranberryQueue/Shared/PlayerView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
             landmarkName = "updateSongUI(withInfo:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -749,8 +749,8 @@
             filePath = "CranberryQueue/Shared/PlayerView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
             landmarkName = "updateSongUI(withState:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -783,7 +783,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "86"
             endingLineNumber = "86"
-            landmarkName = "swiped()"
+            landmarkName = "setupPlayer(queueId:isHost:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -797,9 +797,9 @@
             filePath = "CranberryQueue/Map/MapViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "174"
-            endingLineNumber = "174"
-            landmarkName = "dismissLoginContainer()"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
+            landmarkName = "joinQueue(data:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -813,8 +813,8 @@
             filePath = "CranberryQueue/Map/MapViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "206"
-            endingLineNumber = "206"
+            startingLineNumber = "200"
+            endingLineNumber = "200"
             landmarkName = "joinQueue(data:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -863,7 +863,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "87"
             endingLineNumber = "87"
-            landmarkName = "swiped()"
+            landmarkName = "setupPlayer(queueId:isHost:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -895,7 +895,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "129"
             endingLineNumber = "129"
-            landmarkName = "updateTimer()"
+            landmarkName = "runTimer()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
