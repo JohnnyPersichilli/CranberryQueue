@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 protocol LoginDelegate: class {
-    func dismissLoginContainer()
+    func dismissLoginContainer(isPremium: Bool)
 }
 
 class LoginController: UIViewController, SessionDelegate, activityIndicatorPresenter {
@@ -65,12 +65,12 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
 
     
     @objc func guestLabelTapped() {
-        
+        delegate?.dismissLoginContainer(isPremium: false)
     }
     
     func updateSessionStatus(connected: Bool) {
         if(connected) {
-            delegate?.dismissLoginContainer()
+            delegate?.dismissLoginContainer(isPremium: false)
             self.hideActivityIndicator()
         }
         else{
