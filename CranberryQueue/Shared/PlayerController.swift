@@ -38,6 +38,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     var timer = Timer()
     var isTimerRunning = false
     
+    var currentUri = String()
     var duration = 200
     var position = 0
     
@@ -51,7 +52,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     var guestListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
-    
+
     func setupPlayer(queueId: String?, isHost: Bool) {
         print("my actual pos: \(position)")
         if queueId != self.queueId || queueId == nil {
@@ -131,46 +132,46 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         position += 1000
         mapDelegate?.updateTimerUI(position: position, duration: duration)
         queueDelegate?.updateTimerUI(position: position, duration: duration)
-        if Int(position/1000) == Int(duration/1000) {
+        if Int(position/1000) >= Int(duration/1000) {
             isTimerRunning = false
         }
-        if Int(duration/1000) - Int(position/1000) == 4 {
-            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
-                guard let snap = snapshot else {
-                    print(error!)
-                    return
-                }
-                if snap.count == 0 {
-                    return
-                }
-                let nextSongJSON = snap.documents[0].data()
-                if nextSongJSON["name"] as? String == nil {
-                    snap.documents[0].reference.delete()
-                    self.remote?.playerAPI?.seek(toPosition: self.position-1000, callback: { (value, error) in
-                        
-                    })
-                    return
-                }
-                
-                self.isEnqueuing = true
-                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
-                    guard let res = response else {
-                        print(error!)
-                        return
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
-                        self.db?.collection("song").document(nextSongJSON["docID"] as! String).delete()
-                })
-            })
-        }
+//        if Int(duration/1000) - Int(position/1000) == 4 {
+//            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+//                guard let snap = snapshot else {
+//                    print(error!)
+//                    return
+//                }
+//                if snap.count == 0 {
+//                    return
+//                }
+//                let nextSongJSON = snap.documents[0].data()
+//                if nextSongJSON["name"] as? String == nil {
+//                    snap.documents[0].reference.delete()
+//                    self.remote?.playerAPI?.seek(toPosition: self.position-1000, callback: { (value, error) in
+//
+//                    })
+//                    return
+//                }
+//
+//                self.isEnqueuing = true
+//                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
+//                    guard let res = response else {
+//                        print(error!)
+//                        return
+//                    }
+//                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
+//                        self.db?.collection("song").document(nextSongJSON["docID"] as! String).delete()
+//                })
+//            })
+//        }
     }
     
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         
-        if isEnqueuing {
-            isEnqueuing = false
-            return
-        }
+//        if isEnqueuing {
+//            isEnqueuing = false
+//            return
+//        }
         
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
@@ -188,6 +189,51 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         else {
             runTimer()
         }
+        
+        let uri = json["uri"] as! String
+        if currentUri != uri {
+            currentUri = uri
+            removeSongsWith(uri)
+            enqueueNextSong()
+        }
+    }
+    
+    func enqueueNextSong() {
+        songTableWith(queueId!)?.order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count == 0 { return }
+            let doc = snap.documents[0]
+            var data = doc.data()
+            let ref = doc.reference
+            data["next"] = true
+            ref.setData(data, merge: true)
+            
+            self.remote?.playerAPI?.enqueueTrackUri(data["uri"] as! String, callback: { (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
+        })
+    }
+    
+    func removeSongsWith(_ uri: String) {
+        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            for doc in snap.documents {
+                doc.reference.delete()
+            }
+        })
+    }
+    
+    func songTableWith(_ queueId: String) -> CollectionReference? {
+        return db?.collection("playlist").document(queueId).collection("songs")
     }
     
     func setupHostListeners() {
