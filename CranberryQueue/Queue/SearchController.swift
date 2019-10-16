@@ -107,7 +107,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                             imageURL: imageInfo[0]["url"] as! String,
                             docID: "f",
                             votes: 1,
-                            uri: x["uri"] as! String
+                            uri: x["uri"] as! String,
+                            next: false
                         )
                         self.songs.append(newSong)
                     }else{
@@ -117,7 +118,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                             imageURL: "https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33",
                             docID: "f",
                             votes: 1,
-                            uri: x["uri"] as! String
+                            uri: x["uri"] as! String,
+                            next: false
                         )
                         self.songs.append(newSong)
                     }
@@ -233,8 +235,19 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 ], completion: { (val) in
                     newSong["docID"] = ref!.documentID
                     self.delegate?.addSongTapped(song: self.JSONToSong(json: newSong))
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+                    
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
+                        guard let snap = snapshot else {
+                            print(error!)
+                            return
+                        }
+                        if snap.documents.count == 0 {
+                            newSong["next"] = true
+                        }
+                        
+                        self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                            self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+                        })
                     })
             })
         }
@@ -247,7 +260,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
             "imageURL": song.imageURL,
             "docID": song.docID,
             "votes": 0,
-            "uri": song.uri
+            "uri": song.uri,
+            "next": song.next
         ]
     }
     
@@ -259,6 +273,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         song.docID = json["docID"] as! String
         song.votes = json["votes"] as! Int
         song.uri = json["uri"] as! String
+        song.next = json["next"] as! Bool
         return song
     }
     
