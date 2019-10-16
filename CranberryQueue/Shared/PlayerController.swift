@@ -136,6 +136,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func enqueueSongWith(_ uri: String) {
+        isEnqueuing = true
         self.remote?.playerAPI?.enqueueTrackUri(uri, callback: { (response, error) in
             if let err = error {
                 print(err)
@@ -145,6 +146,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        if isEnqueuing {
+            isEnqueuing = false
+            return
+        }
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
