@@ -13,8 +13,7 @@ protocol mapControllerDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
     func getCoords() -> ([String:Double])
-    func enableLocation()
-    func disableLocation()
+    func setLocationEnabled(_ val: Bool)
 }
 
 class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
@@ -111,6 +110,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         self.queueId = queueId
         self.isHost = isHost
         self.delegate?.setQueue(queueId)
+        self.delegate?.setLocationEnabled(true)
     }
 
     func updateGeoCode(city: String, region: String) {
@@ -230,7 +230,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                     vc.isRejoining = true
                 }
             }
-            
+            self.delegate?.setLocationEnabled(false)
             self.present(vc, animated:true, completion:nil)
         })
     }
@@ -280,6 +280,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc.mapDelegate = self
             
             self.playerController.setupPlayer(queueId: id, isHost: true)
+            self.delegate?.setLocationEnabled(false)
             self.present(vc, animated:true, completion:nil)
         }
     }
