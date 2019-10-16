@@ -34,6 +34,7 @@ struct PlaybackInfo {
     var position = Int()
     var duration = Int()
     var isPaused = Bool()
+    var timestamp = Int()
 }
 
 extension Song: Equatable {

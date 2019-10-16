@@ -79,6 +79,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     }
     
     func swiped() {
+        print(eventCodeFromTimestamp())
         if queueId != nil && isHost {
             db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
@@ -217,7 +218,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)
             self.duration = info.duration
-            self.position = info.position
+            self.position = info.position + (Int(Date().timeIntervalSince1970) - info.timestamp)*1000
             
             if (info.isPaused) {
                 self.timer.invalidate()
@@ -232,6 +233,20 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     func showHelpText() {
         
+    }
+    
+    func eventCodeFromTimestamp() -> String {
+        let possibleChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/")
+        var rixit = 0
+        var residual = Int(Double(Date().timeIntervalSince1970)*1000)
+        var result = ""
+        while(residual != 0) {
+            rixit = residual % 64
+            result = String(possibleChars[rixit]) + result;
+            residual = (residual / 64);
+        }
+        result.removeFirst(2)
+        return result;
     }
     
     func playbackStateToJson(_ playerState: SPTAppRemotePlayerState) -> [String:Any] {
@@ -250,6 +265,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
+        playback["timestamp"] = Date().timeIntervalSince1970
         return playback
     }
     
@@ -261,6 +277,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback.isPaused = json["isPaused"] as! Bool
         playback.position = json["position"] as! Int
         playback.duration = json["duration"] as! Int
+        playback.timestamp = json["timestamp"] as! Int
         return playback
     }
 
