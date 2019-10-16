@@ -51,9 +51,11 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func setupGestureRecognizers() {
-        let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
-        forwardSwipe.direction = .left
+//        let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
+//        forwardSwipe.direction = .left
+        let forwardSwipe = UITapGestureRecognizer(target: self, action: #selector(swiped))
         contentView.addGestureRecognizer(forwardSwipe)
+        contentView.isUserInteractionEnabled = true
     }
     
     @objc func swiped() {
