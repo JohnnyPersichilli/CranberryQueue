@@ -15,6 +15,7 @@ struct Song {
     var docID = String()
     var votes = 0
     var uri = String()
+    var next = false
 }
 
 struct CQLocation {
@@ -35,6 +36,7 @@ struct PlaybackInfo {
     var duration = Int()
     var isPaused = Bool()
     var timestamp = Int()
+    var uri = String()
 }
 
 extension Song: Equatable {

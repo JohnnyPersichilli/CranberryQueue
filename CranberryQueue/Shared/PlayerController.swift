@@ -26,24 +26,30 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             setupHostListeners()
         }
     }
+    
+    func swiped() {
+        print(eventCodeFromTimestamp())
+        if queueId != nil && isHost {
+            skipSong()
+        }
+    }
         
     var queueId: String? = nil
-    
     var isHost = false
     
     var remote: SPTAppRemote? = nil
+    var token: String? = nil
     
     var db: Firestore? = nil
     
     var timer = Timer()
     var isTimerRunning = false
     
+    var currentUri = String()
     var duration = 200
     var position = 0
     
     var isEnqueuing = false
-    
-    var token: String? = nil
     
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
@@ -51,15 +57,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     var guestListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
-    
+
     func setupPlayer(queueId: String?, isHost: Bool) {
         print("my actual pos: \(position)")
         if queueId != self.queueId || queueId == nil {
             guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
-                
             })
-            
         }
         if queueId == nil {
             timer.invalidate()
@@ -78,47 +82,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         }
     }
     
-    func swiped() {
-        print(eventCodeFromTimestamp())
-        if queueId != nil && isHost {
-            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
-                guard let snap = snapshot else {
-                    print(error!)
-                    return
-                }
-                if snap.count == 0 {
-                    self.remote?.playerAPI?.skip(toNext: { (_, error) in
-                        if let err = error {
-                            print(err)
-                            return
-                        }
-                    })
-                    return
-                }
-                let nextSongJSON = snap.documents[0].data()
-                
-                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
-                    guard let res = response else {
-                        print(error!)
-                        return
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
-                    self.remote?.playerAPI?.skip(toNext: { (_, error) in
-                        if let err = error {
-                            print(err)
-                            return
-                        }
-                    })
-                })
-            })
-        }
-    }
-    
     func runTimer() {
-//        if !shouldControl {
-//            timer.invalidate()
-//            return
-//        }
         timer.invalidate()
         isTimerRunning = true
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
@@ -131,47 +95,35 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         position += 1000
         mapDelegate?.updateTimerUI(position: position, duration: duration)
         queueDelegate?.updateTimerUI(position: position, duration: duration)
-        if Int(position/1000) == Int(duration/1000) {
+        if Int(position/1000) >= Int(duration/1000) {
             isTimerRunning = false
-        }
-        if Int(duration/1000) - Int(position/1000) == 4 {
-            db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
-                guard let snap = snapshot else {
-                    print(error!)
-                    return
-                }
-                if snap.count == 0 {
-                    return
-                }
-                let nextSongJSON = snap.documents[0].data()
-                if nextSongJSON["name"] as? String == nil {
-                    snap.documents[0].reference.delete()
-                    self.remote?.playerAPI?.seek(toPosition: self.position-1000, callback: { (value, error) in
-                        
-                    })
-                    return
-                }
-                
-                self.isEnqueuing = true
-                self.remote?.playerAPI?.enqueueTrackUri((nextSongJSON["uri"] as! String), callback: { (response, error) in
-                    guard let res = response else {
-                        print(error!)
-                        return
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(snap.documents[0].documentID).delete()
-                        self.db?.collection("song").document(nextSongJSON["docID"] as! String).delete()
-                })
-            })
         }
     }
     
+    func skipSong() {
+        self.remote?.playerAPI?.skip(toNext: { (_, error) in
+            if let err = error {
+                print(err)
+                return
+            }
+        })
+    }
+    
+    func enqueueSongWith(_ uri: String) {
+        isEnqueuing = true
+        self.remote?.playerAPI?.enqueueTrackUri(uri, callback: { (response, error) in
+            if let err = error {
+                print(err)
+                return
+            }
+        })
+    }
+    
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
-        
         if isEnqueuing {
             isEnqueuing = false
             return
         }
-        
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
@@ -188,6 +140,57 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         else {
             runTimer()
         }
+        
+        let uri = playerState.track.uri
+        if currentUri != uri {
+            currentUri = uri
+            removeSongWith(uri, completion: {
+                self.enqueueNextSong()
+            })
+        }
+    }
+    
+    func enqueueNextSong() {
+        songTableWith(queueId!)?.order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count == 0 { return }
+            let doc = snap.documents[0]
+            var data = doc.data()
+            let ref = doc.reference
+            data["next"] = true
+            ref.setData(data, merge: true)
+            
+            self.enqueueSongWith(data["uri"] as! String)
+        })
+    }
+    
+    func removeSongWith(_ uri: String, completion: @escaping ()-> Void) {
+        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            var docs = snap.documents
+            if docs.count == 0 {
+                completion()
+                return
+            }
+            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
+                doc.reference.delete()
+            }
+            else {
+                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
+                docs[0].reference.delete()
+            }
+            completion()
+        })
+    }
+    
+    func songTableWith(_ queueId: String) -> CollectionReference? {
+        return db?.collection("playlist").document(queueId).collection("songs")
     }
     
     func setupHostListeners() {
@@ -265,7 +268,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
-        playback["timestamp"] = Date().timeIntervalSince1970
+        playback["timestamp"] = Int(Date().timeIntervalSince1970)
+        playback["uri"] = playerState.track.uri
         return playback
     }
     
@@ -278,6 +282,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback.position = json["position"] as! Int
         playback.duration = json["duration"] as! Int
         playback.timestamp = json["timestamp"] as! Int
+        playback.uri = json["uri"] as! String
         return playback
     }
 

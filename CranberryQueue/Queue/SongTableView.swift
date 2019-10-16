@@ -43,7 +43,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
             self.songs = []
             guard let snap = snapshot else {
                 print(error!)
@@ -69,7 +69,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     imageURL: song["imageURL"] as! String,
                     docID: song["docID"] as! String,
                     votes: song["votes"] as! Int,
-                    uri: song["uri"] as! String
+                    uri: song["uri"] as! String,
+                    next: song["next"] as! Bool
                 )
                 self.songs.append(newSong)
                 
@@ -171,7 +172,9 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.shadOpacity = 0.3
             cell.removeGradient()
         }
-        
+        if indexPath.section >= songs.count {
+            return cell
+        }
         let song = songs[indexPath.section]
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist
