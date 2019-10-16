@@ -37,6 +37,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var uid = String()
     var isHost = false
     var queueId: String? = nil
+    var isPremium = false
     
     var playerController = PlayerController.sharedInstance
 
@@ -107,6 +108,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func update(queueId: String?, isHost: Bool) {
+            self.addIconImageView.isHidden = !isPremium
         self.queueId = queueId
         self.isHost = isHost
         self.delegate?.setQueue(queueId)
@@ -171,9 +173,11 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         return true
     }
 
-    func dismissLoginContainer() {
+    func dismissLoginContainer(isPremium: Bool) {
+        self.isPremium = isPremium
         DispatchQueue.main.async {
             self.loginContainer.isHidden = true
+            self.addIconImageView.isHidden = !self.isPremium
         }
     }
     
