@@ -11,6 +11,7 @@ import Firebase
 
 protocol mapControllerDelegate: class {
     func addTapped()
+    func setQueue(_ queueId: String?)
     func getCoords() -> ([String:Double])
     func setLocationEnabled(_ val: Bool)
 }
@@ -108,6 +109,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func update(queueId: String?, isHost: Bool) {
         self.queueId = queueId
         self.isHost = isHost
+        self.delegate?.setQueue(queueId)
         self.delegate?.setLocationEnabled(true)
     }
 
@@ -185,6 +187,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
         vc.mapDelegate = self
         
+        DispatchQueue.main.async {
+            self.delegate?.setQueue(data.queueId)
+        }
+        
         if(self.queueId != nil && self.queueId != vc.queueId){
             if(!isHost){
                 let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
@@ -230,40 +236,32 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func createQueue(withName name: String) {
-        if( (self.queueId) != nil && !isHost ){
-            self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
-        }else if( (self.queueId) != nil && isHost){
-            self.db?.collection("contributor").document(self.queueId!).delete()
-            
-            self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId!).getDocuments(completion: { (snapshot, err) in
-                guard let snap = snapshot else {
-                    return
-                }
-                for doc in snap.documents {
-                    doc.reference.delete()
-                }
-            })
-            self.db?.collection("playlist").document(self.queueId!).delete()
-            self.db?.collection("playback").document(self.queueId!).delete()
-            self.db?.collection("location").document(self.queueId!).delete()
-        }
+        
         
         let coords = delegate?.getCoords()
 
         var ref : DocumentReference? = nil
-        ref = db?.collection("location").addDocument(data: [
-            "lat" : coords?["lat"] ?? 0,
-            "long" : coords?["long"] ?? 0,
-            "city": cityLabel.text ?? "",
-            "region": regionLabel.text ?? "",
-            "numMembers": 0,
-            "currentSong": "",
-            "name" : name
+        ref = db?.collection("contributor").addDocument(data: [
+            "host": self.uid
         ]) { (val) in
             let id = ref!.documentID
-            self.db?.collection("contributor").document(id).setData([
-                "host": self.uid
+            self.delegate?.setQueue(id)
+            
+            self.db?.collection("location").document(id).setData([
+                "lat" : coords?["lat"] ?? 0,
+                "long" : coords?["long"] ?? 0,
+                "city": self.cityLabel.text ?? "",
+                "region": self.regionLabel.text ?? "",
+                "numMembers": 0,
+                "currentSong": "",
+                "name" : name
                 ])
+            
+            if( (self.queueId) != nil && !self.isHost ){
+                self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
+            }else if( (self.queueId) != nil && self.isHost){
+                self.db?.collection("location").document(self.queueId!).delete()
+            }
             
             self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
                 ], completion: { (val) in
