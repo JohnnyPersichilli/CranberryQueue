@@ -69,7 +69,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     imageURL: song["imageURL"] as! String,
                     docID: song["docID"] as! String,
                     votes: song["votes"] as! Int,
-                    uri: song["uri"] as! String
+                    uri: song["uri"] as! String,
+                    next: song["next"] as! Bool
                 )
                 self.songs.append(newSong)
                 
