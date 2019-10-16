@@ -218,7 +218,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)
             self.duration = info.duration
-            self.position = info.position
+            self.position = info.position + (Int(Date().timeIntervalSince1970) - info.timestamp)*1000
             
             if (info.isPaused) {
                 self.timer.invalidate()
@@ -265,6 +265,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
+        playback["timestamp"] = Date().timeIntervalSince1970
         return playback
     }
     
@@ -276,6 +277,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback.isPaused = json["isPaused"] as! Bool
         playback.position = json["position"] as! Int
         playback.duration = json["duration"] as! Int
+        playback.timestamp = json["timestamp"] as! Int
         return playback
     }
 
