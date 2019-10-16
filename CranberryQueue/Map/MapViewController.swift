@@ -205,9 +205,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
-    func openDetailModal(data: CQLocation) {
-        print("queue detail modal clicked with the model previously hidden:", queueDetailModal.isHidden)
-        
+    func openDetailModal(data: CQLocation) {        
         //if the window is open and click the same marker close the window
         if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
             queueDetailModal.isHidden = true
