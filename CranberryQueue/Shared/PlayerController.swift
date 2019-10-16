@@ -188,7 +188,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         })
     }
     
-    func removeSongsWith(_ uri: String, completion: ()-> Void) {
+    func removeSongsWith(_ uri: String, completion: @escaping ()-> Void) {
         songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
