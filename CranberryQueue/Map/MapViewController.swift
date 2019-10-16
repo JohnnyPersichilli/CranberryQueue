@@ -260,18 +260,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             if( (self.queueId) != nil && !self.isHost ){
                 self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
             }else if( (self.queueId) != nil && self.isHost){
-                self.db?.collection("contributor").document(self.queueId!).delete()
-                
-                self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId!).getDocuments(completion: { (snapshot, err) in
-                    guard let snap = snapshot else {
-                        return
-                    }
-                    for doc in snap.documents {
-                        doc.reference.delete()
-                    }
-                })
-                self.db?.collection("playlist").document(self.queueId!).delete()
-                self.db?.collection("playback").document(self.queueId!).delete()
                 self.db?.collection("location").document(self.queueId!).delete()
             }
             

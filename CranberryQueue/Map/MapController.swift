@@ -109,7 +109,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             
             let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
             let marker = GMSMarker(position: position)
-            marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
+            marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
             marker.title = queue.name
             marker.snippet = "Tap Here to Join"
             marker.map = map
