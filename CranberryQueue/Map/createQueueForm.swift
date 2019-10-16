@@ -35,5 +35,14 @@ class createQueueForm: UIView {
         queueNameTextField.borderStyle = .none
         queueNameTextField.returnKeyType = .join
     }
-
+    
+    @IBAction func switchChanged(_ sender: Any) {
+        if scopeSwitch.isOn {
+            scopeLabel.text = "Public"
+        }
+        else {
+            scopeLabel.text = "Private"
+        }
+    }
+    
 }

@@ -47,6 +47,9 @@
                                         </textField>
                                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AAj-9p-FKJ">
                                             <rect key="frame" x="353" y="13" width="51" height="31"/>
+                                            <connections>
+                                                <action selector="switchChanged:" destination="-1" eventType="valueChanged" id="7oj-41-xX6"/>
+                                            </connections>
                                         </switch>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Public" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="23F-Xh-qms">
                                             <rect key="frame" x="357.5" y="45" width="40" height="11"/>

@@ -441,14 +441,14 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func eventCodeFromTimestamp() -> String {
         let possibleChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/")
         var rixit = 0
-        var residual = Int(Double(Date().timeIntervalSince1970)*1000)
+        var residual = Int(Double(Date().timeIntervalSince1970)*1000) / 64
         var result = ""
         while(residual != 0) {
             rixit = residual % 64
             result = String(possibleChars[rixit]) + result;
             residual = (residual / 64);
         }
-        result.removeFirst(2)
+        result.removeFirst(1)
         return result;
     }
     
