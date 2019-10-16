@@ -24,6 +24,7 @@ struct CQLocation {
     var long = Double()
     var lat = Double()
     var queueId = String()
+    var numMembers = Int()
 }
 
 struct PlaybackInfo {

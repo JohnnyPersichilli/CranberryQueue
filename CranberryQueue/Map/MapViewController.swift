@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import CoreLocation
 
 protocol mapControllerDelegate: class {
     func addTapped()
@@ -38,6 +39,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet weak var joinQueueButton: UIButton!
     @IBOutlet weak var songNameLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var numMembersLabel: UILabel!
+    @IBOutlet weak var closeQueueDetailImage: UIImageView!
+    @IBOutlet weak var songImage: UIRoundedImageView!
     
     var db : Firestore? = nil
 
@@ -49,6 +53,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var playerController = PlayerController.sharedInstance
 
     weak var delegate: mapControllerDelegate?
+    let colors = Colors()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,8 +68,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         playerView.delegate = playerController
         playerController.mapDelegate = playerView
         
-        //queueDetailModal.isHidden = true
-        //queueDetailModal.alpha = 0
+        queueDetailModal.isHidden = true
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = playerController
@@ -151,7 +155,17 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         joinQueueButton.addGestureRecognizer(joinQueueTap)
         joinQueueButton.isUserInteractionEnabled = true
         
+        let closeModalTap = UITapGestureRecognizer(target: self, action: #selector(closeModalTapped))
+        closeQueueDetailImage.addGestureRecognizer(closeModalTap)
+        closeQueueDetailImage.isUserInteractionEnabled = true
+        
     }
+    
+    @objc func closeModalTapped() {
+        queueDetailModal.isHidden = true
+        self.currMarkerData = nil
+    }
+    
 
     @objc func settingsTapped() {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
@@ -192,23 +206,68 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func openDetailModal(data: CQLocation) {
-        self.currMarkerData = data
-        self.db?.collection("playback").document(data.queueId).getDocument(completion: { (snapshot, error) in
-            if let err = error {
-                print(err)
-            }
+        print("queue detail modal clicked with the model previously hidden:", queueDetailModal.isHidden)
+        
+        //if the window is open and click the same marker close the window
+        if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
+            queueDetailModal.isHidden = true
+            print("window closed")
+        //click a different window while its open, dont close just rerender the data
+        }else{
+            queueDetailModal.isHidden = false
+            let myCoords = delegate?.getCoords()
+            let myLocation = CLLocation(latitude: myCoords?["lat"] ?? 0, longitude: myCoords?["long"] ?? 0)
+            let queueLocation = CLLocation(latitude: data.lat, longitude: data.long)
+            let distance = myLocation.distance(from: queueLocation)
             
-            let currSong = snapshot?.data()?["name"] as? String
-            let currArtist = snapshot?.data()?["artist"] as? String
-
-            DispatchQueue.main.async {
-                self.queueDetailModal.isHidden = false
-                self.queueNameLabel.text = data.name
-                self.songNameLabel.text = currSong
-                self.artistLabel.text = currArtist
+            //can set this as the radius if we are letting users do that or an arbitrary number like 500m
+            let maxDistance = 500.0
+            if(distance > maxDistance){
+                joinQueueButton.isEnabled = false
+                joinQueueButton.layer.cornerRadius = 10
+                joinQueueButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
+                joinQueueButton.isOpaque = true
+            }else{
+                joinQueueButton.isEnabled = true
+                joinQueueButton.layer.cornerRadius = 10
+                joinQueueButton.backgroundColor = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
+                joinQueueButton.isOpaque = false
             }
-        })
-
+            self.currMarkerData = data
+            self.db?.collection("playback").document(data.queueId).getDocument(completion: { (snapshot, error) in
+                if let err = error {
+                    print(err)
+                }
+                
+                let currSong = snapshot?.data()?["name"] as? String ?? ""
+                let currArtist = snapshot?.data()?["artist"] as? String ?? ""
+                let songImage = snapshot?.data()?["imageURL"] as? String ?? ""
+                
+                if(songImage != ""){
+                    let url = URL(string: songImage)
+                    let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
+                        guard let data2 = dataBack else {
+                            print("no data")
+                            return }
+                        DispatchQueue.main.async {
+                            self.songImage.image = UIImage(data: data2)
+                            self.queueNameLabel.text = data.name
+                            self.songNameLabel.text = currSong + " - " + currArtist
+                            self.numMembersLabel.text = String(data.numMembers)
+                        }
+                    }
+                    
+                    task.resume()
+                }else{
+                    DispatchQueue.main.async {
+                        self.numMembersLabel.text = String(data.numMembers)
+                        self.queueNameLabel.text = data.name
+                        self.songImage.image = UIImage(named: "defaultPerson")!
+                        self.songNameLabel.text = "No song currently playing"
+                    }
+                }
+            })
+        }
     }
     
     @objc func joinQueue() {

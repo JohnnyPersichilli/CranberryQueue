@@ -14,7 +14,7 @@ protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
     //func joinQueue(data: CQLocation)
     func openDetailModal(data: CQLocation)
-    func joinQueue(data: CQLocation)
+    //func joinQueue()
     func setLocationEnabled(status: Bool)
 }
 
@@ -91,7 +91,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     region: doc.data()["region"] as! String,
                     long: doc.data()["long"] as! Double,
                     lat: doc.data()["lat"] as! Double,
-                    queueId: doc.documentID)
+                    queueId: doc.documentID,
+                    numMembers: doc.data()["numMembers"] as! Int
+                )
+                    
                 self.queues.append(newLoc)
             }
             self.drawMarkers()
