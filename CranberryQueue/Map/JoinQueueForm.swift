@@ -1,22 +1,20 @@
 //
-//  createQueueForm.swift
+//  JoinQueueForm.swift
 //  CranberryQueue
 //
-//  Created by Rolf Locher on 9/13/19.
+//  Created by Rolf Locher on 10/16/19.
 //  Copyright © 2019 Rolf Locher. All rights reserved.
 //
 
 import UIKit
 
-class createQueueForm: UIView {
+class JoinQueueForm: UIView {
 
     @IBOutlet var contentView: UIView!
     
-    @IBOutlet var queueNameTextField: UITextField!
+    @IBOutlet var eventCodeTextField: UITextField!
     
-    @IBOutlet var scopeSwitch: UISwitch!
-    
-    @IBOutlet var scopeLabel: UILabel!
+    @IBOutlet var cancelIconImageView: UIImageView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,11 +27,10 @@ class createQueueForm: UIView {
     }
     
     func commonInit() {
-        Bundle.main.loadNibNamed("createQueueForm", owner: self, options: nil)
+        Bundle.main.loadNibNamed("JoinQueueForm", owner: self, options: nil)
         contentView.fixInView(self)
         
-        queueNameTextField.borderStyle = .none
-        queueNameTextField.returnKeyType = .join
+        eventCodeTextField.returnKeyType = .join
     }
 
 }
