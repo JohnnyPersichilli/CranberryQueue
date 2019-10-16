@@ -172,7 +172,9 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.shadOpacity = 0.3
             cell.removeGradient()
         }
-        
+        if indexPath.section >= songs.count {
+            return cell
+        }
         let song = songs[indexPath.section]
         cell.songLabel.text = song.name
         cell.artistLabel.text = song.artist
