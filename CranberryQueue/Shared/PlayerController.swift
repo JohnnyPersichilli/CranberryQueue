@@ -177,7 +177,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
-            removeSongsWith(uri, completion: {
+            removeSongWith(uri, completion: {
                 self.enqueueNextSong()
             })
         }
@@ -200,14 +200,23 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         })
     }
     
-    func removeSongsWith(_ uri: String, completion: @escaping ()-> Void) {
+    func removeSongWith(_ uri: String, completion: @escaping ()-> Void) {
         songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            for doc in snap.documents {
+            var docs = snap.documents
+            if docs.count == 0 {
+                completion()
+                return
+            }
+            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
                 doc.reference.delete()
+            }
+            else {
+                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
+                docs[0].reference.delete()
             }
             completion()
         })
