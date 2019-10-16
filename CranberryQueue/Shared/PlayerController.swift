@@ -312,6 +312,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
         playback["timestamp"] = Date().timeIntervalSince1970
+        playback["uri"] = playerState.track.uri
         return playback
     }
     
@@ -324,6 +325,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         playback.position = json["position"] as! Int
         playback.duration = json["duration"] as! Int
         playback.timestamp = json["timestamp"] as! Int
+        playback.uri = json["uri"] as! String
         return playback
     }
 
