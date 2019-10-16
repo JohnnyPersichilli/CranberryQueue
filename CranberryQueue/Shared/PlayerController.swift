@@ -166,6 +166,15 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
 //        }
     }
     
+    func enqueueSongWith(_ uri: String) {
+        self.remote?.playerAPI?.enqueueTrackUri(uri, callback: { (response, error) in
+            if let err = error {
+                print(err)
+                return
+            }
+        })
+    }
+    
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         
 //        if isEnqueuing {
@@ -190,7 +199,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             runTimer()
         }
         
-        let uri = json["uri"] as! String
+        let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
             removeSongsWith(uri)
@@ -211,12 +220,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             data["next"] = true
             ref.setData(data, merge: true)
             
-            self.remote?.playerAPI?.enqueueTrackUri(data["uri"] as! String, callback: { (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-            })
+            self.enqueueSongWith(data["uri"] as! String)
         })
     }
     

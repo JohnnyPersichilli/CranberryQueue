@@ -15,6 +15,7 @@ struct Song {
     var docID = String()
     var votes = 0
     var uri = String()
+    var next = false
 }
 
 struct CQLocation {
