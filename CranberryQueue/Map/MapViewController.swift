@@ -48,7 +48,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var uid = String()
     var isHost = false
     var queueId: String? = nil
-    var currMarkerData: CQLocation? = nil
     var code: String? = nil
     
     var playerController = PlayerController.sharedInstance
@@ -279,7 +278,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     
     func openDetailModal(data: CQLocation) {
         // Setup modal in child, animate from parent
-        if(!queueDetailModal.isHidden && self.currMarkerData?.queueId == data.queueId){
+        if(!queueDetailModal.isHidden && queueDetailModal.currentQueue?.queueId == data.queueId){
             UIView.animate(withDuration: 0.3, animations: {
                 self.topDetailModalConstraint.constant = 0
                 self.queueDetailModal.alpha = 0
@@ -289,7 +288,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             }
         }
         else { // clicked a different window while its open, dont close just rerender the data
-            self.currMarkerData = data
             let distance = delegate?.getDistanceFrom(data)
             queueDetailModal.distance = distance ?? 0
             queueDetailModal.db = db
@@ -356,7 +354,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
         
-        let data = currMarkerData as! CQLocation
+        let data = queueDetailModal.currentQueue!
         
         vc.queueName = data.name
         vc.queueId = data.queueId

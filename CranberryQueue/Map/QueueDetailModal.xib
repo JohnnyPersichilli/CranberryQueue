@@ -103,7 +103,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view alpha="0.80000001192092896" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dYm-fO-hjp">
-                    <rect key="frame" x="15" y="-3" width="384" height="2"/>
+                    <rect key="frame" x="15" y="-5" width="384" height="2"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="2" id="Kcf-3n-SE0"/>
@@ -139,12 +139,12 @@
                 <constraint firstItem="ZXX-cx-cFa" firstAttribute="leading" secondItem="Gg8-zc-902" secondAttribute="trailing" constant="8" id="a1Q-qK-cbF"/>
                 <constraint firstItem="m1e-Jm-PDr" firstAttribute="leading" secondItem="jju-ge-DfO" secondAttribute="trailing" constant="20" id="aDw-lO-8pl"/>
                 <constraint firstItem="ZXX-cx-cFa" firstAttribute="top" secondItem="uay-jM-iGW" secondAttribute="bottom" constant="3" id="csg-h0-4pQ"/>
-                <constraint firstItem="dYm-fO-hjp" firstAttribute="bottom" secondItem="uay-jM-iGW" secondAttribute="top" constant="-2" id="fQ1-Te-Uuw"/>
                 <constraint firstItem="tBM-6e-Eol" firstAttribute="top" secondItem="Kq4-wq-9HX" secondAttribute="bottom" constant="8" id="fXa-Wf-Nxw"/>
                 <constraint firstItem="tBM-6e-Eol" firstAttribute="top" secondItem="m1e-Jm-PDr" secondAttribute="bottom" constant="8" id="ijF-ka-GfG"/>
                 <constraint firstItem="tFm-20-yah" firstAttribute="leading" secondItem="mXR-58-Vf2" secondAttribute="trailing" constant="8" id="kbd-u0-COV"/>
                 <constraint firstItem="mXR-58-Vf2" firstAttribute="leading" secondItem="uay-jM-iGW" secondAttribute="trailing" constant="20" id="lD5-ZT-c6n"/>
                 <constraint firstItem="tBM-6e-Eol" firstAttribute="top" secondItem="m1e-Jm-PDr" secondAttribute="bottom" constant="8" id="lG8-gW-0fm"/>
+                <constraint firstItem="uay-jM-iGW" firstAttribute="top" secondItem="dYm-fO-hjp" secondAttribute="bottom" constant="4" id="ln8-5I-0Ae"/>
                 <constraint firstAttribute="trailing" secondItem="dYm-fO-hjp" secondAttribute="trailing" constant="15" id="n0z-CH-rUk"/>
                 <constraint firstItem="Gg8-zc-902" firstAttribute="top" secondItem="uay-jM-iGW" secondAttribute="bottom" constant="1" id="nlc-m1-bdC"/>
                 <constraint firstItem="tBM-6e-Eol" firstAttribute="top" secondItem="mXR-58-Vf2" secondAttribute="bottom" constant="70" id="rWA-b9-v4L"/>
