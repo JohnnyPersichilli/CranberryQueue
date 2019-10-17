@@ -70,7 +70,7 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     
     func updateSessionStatus(connected: Bool) {
         if(connected) {
-            delegate?.dismissLoginContainer(isPremium: false)
+            delegate?.dismissLoginContainer(isPremium: true)
             self.hideActivityIndicator()
         }
         else{
