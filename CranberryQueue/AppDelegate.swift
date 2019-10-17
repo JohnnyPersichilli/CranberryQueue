@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     var window: UIWindow?
     
     weak var delegate: mainDelegate?
+    weak var appMapDelegate: mainDelegate?
     weak var seshDelegate: SessionDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
@@ -92,15 +93,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("connected")
-        
         delegate?.updateConnectionStatus(connected: true)
-        
-        // Want to play a new track?
-        // self.appRemote.playerAPI?.play("spotify:track:13WO20hoD72L0J13WTQWlT", callback: { (result, error) in
-        //     if let error = error {
-        //         print(error.localizedDescription)
-        //     }
-        // })
+        appMapDelegate?.updateConnectionStatus(connected: true)
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
@@ -109,6 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("failed")
+        appMapDelegate?.updateConnectionStatus(connected: false)
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
