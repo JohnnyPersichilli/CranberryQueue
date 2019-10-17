@@ -14,7 +14,7 @@ protocol queueDelegate: class {
 }
 
 protocol QueueMapDelegate: class {
-    func update(queueId: String?, isHost: Bool)
+    func update(queueId: String?, isHost: Bool, privateCode: String?)
 }
 
 class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
@@ -24,6 +24,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var uid: String? = nil
     var isHost = false
     var shouldHideContents = false
+    var isPrivate = false
     
     @IBOutlet weak var leaveQueueButton: UIButton!
     
@@ -166,6 +167,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.queueName = nil
         self.queueId = nil
         self.queueRef?.remove()
+        self.mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
     }
     
     @objc func leaveQueueTapped() {
@@ -197,7 +199,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         self.queueId = nil
         //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
-        mapDelegate?.update(queueId: nil, isHost: false)
+        mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.presentingViewController?.dismiss(animated: true, completion: {
@@ -206,7 +208,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     @objc func globeTapped() {
-        mapDelegate?.update(queueId: queueId, isHost: isHost)
+        mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil)
         self.presentingViewController?.dismiss(animated: true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
