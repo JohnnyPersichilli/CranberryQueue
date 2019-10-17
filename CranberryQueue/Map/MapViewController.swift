@@ -298,7 +298,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             
             self.queueDetailModal.isHidden = false
             UIView.animate(withDuration: 0.3, animations: {
-                self.topDetailModalConstraint.constant = -170
+                self.topDetailModalConstraint.constant = -127
                 self.queueDetailModal.alpha = 1
                 self.view.layoutIfNeeded()
             }) { (_) in }
