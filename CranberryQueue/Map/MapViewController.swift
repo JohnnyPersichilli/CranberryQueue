@@ -167,8 +167,12 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     @objc func closeModalTapped() {
-        queueDetailModal.isHidden = true
-        self.currMarkerData = nil
+        UIView.animate(withDuration: 0.3, animations: {
+            self.topDetailModalConstraint.constant = 0
+        }) { (_) in
+            self.queueDetailModal.isHidden = true
+            self.currMarkerData = nil
+        }
     }
     
 
@@ -237,23 +241,23 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             if(distance/1609 < 0.75){
                 let distanceInFeet = (distance*3.28083985)
                 let roundedFeetString = String(format: "%.2f", distanceInFeet)
-                distanceFromQueueLabel.text = roundedFeetString + " ft"
+                distanceFromQueueLabel.text = roundedFeetString + "ft"
             }else{
                 let distanceInMiles = (distance/1609)
                 let roundedMileString = String(format: "%.1f", distanceInMiles)
-                distanceFromQueueLabel.text =  roundedMileString + " mi"
+                distanceFromQueueLabel.text =  roundedMileString + "mi"
             }
             
             //can set this as the radius if we are letting users do that or an arbitrary number like 500m
             let maxDistance = 500.0
             if(distance > maxDistance){
                 joinQueueButton.isEnabled = false
-                joinQueueButton.layer.cornerRadius = 10
+                //joinQueueButton.layer.cornerRadius = 10
                 joinQueueButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
                 joinQueueButton.isOpaque = true
             }else{
                 joinQueueButton.isEnabled = true
-                joinQueueButton.layer.cornerRadius = 10
+                //joinQueueButton.layer.cornerRadius = 10
                 joinQueueButton.backgroundColor = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
                 joinQueueButton.isOpaque = false
             }
