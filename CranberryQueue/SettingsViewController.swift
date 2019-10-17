@@ -41,10 +41,27 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupGestureRecognizers()
-        self.getUserSpotifyInfo()
+        if token == "" {
+            setDefaultInfo()
+        }
+        else {
+            self.getUserSpotifyInfo()
+        }
     }
     
-    func getUserSpotifyInfo()-> Bool {
+    func setDefaultInfo() {
+        setDefaultImage()
+        nameLabel.text = "Guest"
+        spotifyUsernameLabel.text = "--"
+    }
+    
+    func setDefaultImage() {
+        DispatchQueue.main.async {
+            self.spotifyProfilePicture.image = UIImage(named: "defaultPerson")!
+        }
+    }
+    
+    func getUserSpotifyInfo() {
 
         let url = URL(string: "https://api.spotify.com/v1/me")!
 
@@ -65,13 +82,12 @@ class SettingsViewController: UIViewController {
             }
             do {
                 let jsonRes = try JSONSerialization.jsonObject(with: data0, options: []) as? [String: Any]
-                print(jsonRes)
                 DispatchQueue.main.async {
                     self.nameLabel.text = jsonRes?["display_name"] as? String
                     self.spotifyUsernameLabel.text = jsonRes?["id"] as? String
                 }
                 
-                var imageRes = (jsonRes?["images"] as! [[String:Any]])
+                let imageRes = (jsonRes?["images"] as! [[String:Any]])
                 if(imageRes.count != 0){
                     let url = URL(string: imageRes[0]["url"] as! String)!
                     let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
@@ -85,9 +101,7 @@ class SettingsViewController: UIViewController {
                     
                     task.resume()
                 }else{
-                    DispatchQueue.main.async {
-                        self.spotifyProfilePicture.image = UIImage(named: "defaultPerson")!
-                    }
+                    self.setDefaultImage()
                 }
 
             } catch {
@@ -95,8 +109,6 @@ class SettingsViewController: UIViewController {
             }
         }
         task.resume()
-
-        return true
     }
     
 }
