@@ -42,6 +42,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet weak var numMembersLabel: UILabel!
     @IBOutlet weak var closeQueueDetailImage: UIImageView!
     @IBOutlet weak var songImage: UIRoundedImageView!
+    @IBOutlet weak var distanceFromQueueLabel: UILabel!
     
     var db : Firestore? = nil
 
@@ -219,6 +220,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             let myLocation = CLLocation(latitude: myCoords?["lat"] ?? 0, longitude: myCoords?["long"] ?? 0)
             let queueLocation = CLLocation(latitude: data.lat, longitude: data.long)
             let distance = myLocation.distance(from: queueLocation)
+            
+            //if distance is less than .75 miles use feet else use miles
+            if(distance/1609 < 0.75){
+                let distanceInFeet = (distance*3.28083985)
+                let roundedFeetString = String(format: "%.2f", distanceInFeet)
+                distanceFromQueueLabel.text = roundedFeetString + " ft"
+            }else{
+                let distanceInMiles = (distance/1609)
+                let roundedMileString = String(format: "%.1f", distanceInMiles)
+                distanceFromQueueLabel.text =  roundedMileString + " mi"
+            }
+            
+            
             
             //can set this as the radius if we are letting users do that or an arbitrary number like 500m
             let maxDistance = 500.0
