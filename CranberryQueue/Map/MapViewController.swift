@@ -44,6 +44,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet weak var songImage: UIRoundedImageView!
     @IBOutlet weak var distanceFromQueueLabel: UILabel!
     
+    @IBOutlet weak var topQueueDetailConstraint: NSLayoutConstraint!
+    
     var db : Firestore? = nil
 
     var uid = String()
@@ -211,11 +213,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func openDetailModal(data: CQLocation) {        
         //if the window is open and click the same marker close the window
         if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
+            UIView.animate(withDuration: 0.3) {
+                self.topQueueDetailConstraint.constant = 0
+            }
             queueDetailModal.isHidden = true
             print("window closed")
         //click a different window while its open, dont close just rerender the data
         }else{
+            UIView.animate(withDuration: 0.3) {
+                self.topQueueDetailConstraint.constant = -127
+                self.queueDetailModal.alpha = 1
+            }
             queueDetailModal.isHidden = false
+            
             let myCoords = delegate?.getCoords()
             let myLocation = CLLocation(latitude: myCoords?["lat"] ?? 0, longitude: myCoords?["long"] ?? 0)
             let queueLocation = CLLocation(latitude: data.lat, longitude: data.long)
@@ -231,8 +241,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 let roundedMileString = String(format: "%.1f", distanceInMiles)
                 distanceFromQueueLabel.text =  roundedMileString + " mi"
             }
-            
-            
             
             //can set this as the radius if we are letting users do that or an arbitrary number like 500m
             let maxDistance = 500.0
