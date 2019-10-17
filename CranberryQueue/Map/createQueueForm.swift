@@ -14,6 +14,10 @@ class createQueueForm: UIView {
     
     @IBOutlet var queueNameTextField: UITextField!
     
+    @IBOutlet var scopeSwitch: UISwitch!
+    
+    @IBOutlet var scopeLabel: UILabel!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
@@ -31,5 +35,14 @@ class createQueueForm: UIView {
         queueNameTextField.borderStyle = .none
         queueNameTextField.returnKeyType = .join
     }
-
+    
+    @IBAction func switchChanged(_ sender: Any) {
+        if scopeSwitch.isOn {
+            scopeLabel.text = "Public"
+        }
+        else {
+            scopeLabel.text = "Private"
+        }
+    }
+    
 }
