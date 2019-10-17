@@ -44,7 +44,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet weak var songImage: UIRoundedImageView!
     @IBOutlet weak var distanceFromQueueLabel: UILabel!
     
-    @IBOutlet weak var topQueueDetailConstraint: NSLayoutConstraint!
+    @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
     
     var db : Firestore? = nil
 
@@ -214,14 +214,14 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         //if the window is open and click the same marker close the window
         if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
             UIView.animate(withDuration: 0.3) {
-                self.topQueueDetailConstraint.constant = 0
+                self.topDetailModalConstraint.constant = 0
             }
             queueDetailModal.isHidden = true
             print("window closed")
         //click a different window while its open, dont close just rerender the data
         }else{
             UIView.animate(withDuration: 0.3) {
-                self.topQueueDetailConstraint.constant = -127
+                self.topDetailModalConstraint.constant = -127
                 self.queueDetailModal.alpha = 1
             }
             queueDetailModal.isHidden = false
