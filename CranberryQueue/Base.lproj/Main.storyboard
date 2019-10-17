@@ -73,8 +73,8 @@
                                     <segue destination="cog-dq-OgH" kind="embed" id="Pth-Ca-zJp"/>
                                 </connections>
                             </containerView>
-                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LyX-Sf-sNH">
-                                <rect key="frame" x="10" y="812" width="355" height="127"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LyX-Sf-sNH">
+                                <rect key="frame" x="0.0" y="812" width="375" height="127"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Song Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b4s-sa-dAI">
                                         <rect key="frame" x="46" y="69" width="236" height="21"/>
@@ -142,8 +142,10 @@
                         <constraints>
                             <constraint firstItem="7k1-xL-an5" firstAttribute="height" secondItem="k3h-bh-V8Z" secondAttribute="height" id="1zj-wH-N9x"/>
                             <constraint firstItem="VLf-l2-j7u" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="2Fi-OW-no7"/>
+                            <constraint firstAttribute="trailing" secondItem="LyX-Sf-sNH" secondAttribute="trailing" id="4KP-zd-u5Q"/>
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="EuK-Dd-aRw"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="FKM-if-PYx"/>
+                            <constraint firstItem="LyX-Sf-sNH" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="HR6-jc-E6r"/>
                             <constraint firstItem="J8Y-2d-cDx" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="12" id="HY2-BU-LKg"/>
                             <constraint firstItem="LyX-Sf-sNH" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="KNE-Be-YIo"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="7k1-xL-an5" secondAttribute="trailing" id="Ktm-Tt-Qsg"/>

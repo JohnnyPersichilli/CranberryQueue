@@ -213,18 +213,20 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func openDetailModal(data: CQLocation) {        
         //if the window is open and click the same marker close the window
         if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
-            UIView.animate(withDuration: 0.3) {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.topDetailModalConstraint.constant = 0
+            }) { (_) in
+                self.queueDetailModal.isHidden = true
             }
-            queueDetailModal.isHidden = true
-            print("window closed")
         //click a different window while its open, dont close just rerender the data
         }else{
-            UIView.animate(withDuration: 0.3) {
+            UIView.animate(withDuration: 0.3, animations: {
                 self.topDetailModalConstraint.constant = -127
                 self.queueDetailModal.alpha = 1
+            }) { (_) in
+                self.queueDetailModal.isHidden = false
             }
-            queueDetailModal.isHidden = false
+            
             
             let myCoords = delegate?.getCoords()
             let myLocation = CLLocation(latitude: myCoords?["lat"] ?? 0, longitude: myCoords?["long"] ?? 0)
