@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol SettingsMapDelegate: class {
+    func logoutTapped()
+}
+
 class SettingsViewController: UIViewController {
     
     @IBOutlet weak var mapIcon: UIImageView!
@@ -20,6 +24,10 @@ class SettingsViewController: UIViewController {
     
     @IBOutlet weak var spotifyUsernameLabel: UILabel!
     
+    @IBOutlet var logoutImageView: UIImageView!
+    
+    weak var mapDelegate: SettingsMapDelegate? = nil
+    
     var token: String {
         get {
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -31,6 +39,17 @@ class SettingsViewController: UIViewController {
         let addTap = UITapGestureRecognizer(target: self, action: #selector(globeTapped))
         mapIcon.addGestureRecognizer(addTap)
         mapIcon.isUserInteractionEnabled = true
+        
+        let logoutTap = UITapGestureRecognizer(target: self, action: #selector(logoutTapped))
+        logoutImageView.addGestureRecognizer(logoutTap)
+        logoutImageView.isUserInteractionEnabled = true
+    }
+    
+    @objc func logoutTapped() {
+        mapDelegate?.logoutTapped()
+        self.presentingViewController?.dismiss(animated:true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
     }
     
     @objc func globeTapped() {

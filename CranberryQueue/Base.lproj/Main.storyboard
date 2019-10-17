@@ -633,6 +633,7 @@
                         <viewLayoutGuide key="safeArea" id="bK2-cz-Gpq"/>
                     </view>
                     <connections>
+                        <outlet property="logoutImageView" destination="btv-c4-Y1k" id="tKp-eK-ndo"/>
                         <outlet property="mapIcon" destination="FL6-VI-iR2" id="h9t-qT-peP"/>
                         <outlet property="nameLabel" destination="DsN-8f-haO" id="HNh-Ip-mfE"/>
                         <outlet property="spotifyProfilePicture" destination="YKb-ST-dBB" id="hPu-KA-LhM"/>

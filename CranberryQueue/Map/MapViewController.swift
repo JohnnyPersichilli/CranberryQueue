@@ -17,7 +17,7 @@ protocol mapControllerDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate, mainDelegate {
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate, mainDelegate, SettingsMapDelegate {
 
     @IBOutlet var cityLabel: UILabel!
 
@@ -108,6 +108,11 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     deinit {
        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func logoutTapped() {
+        loginContainer.isHidden = false
+        isPremium = false
     }
     
     func updateConnectionStatus(connected: Bool) {
@@ -237,6 +242,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         self.closeDetailModalTapped()
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
+        vc.mapDelegate = self
         self.present(vc, animated:true, completion:nil)
     }
 
