@@ -42,7 +42,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet var queueDetailModal: QueueDetailModal!
     
     @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
-
+    
+    @IBOutlet var bottomDetailModalConstraint: NSLayoutConstraint!
+    
     var db : Firestore? = nil
 
     var uid = String()
@@ -222,7 +224,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     
     @objc func closeDetailModalTapped() {
        UIView.animate(withDuration: 0.3, animations: {
-            self.topDetailModalConstraint.constant = 0
+            self.topDetailModalConstraint.isActive = true
+            self.bottomDetailModalConstraint.isActive = false
             self.queueDetailModal.alpha = 0
             self.view.layoutIfNeeded()
         }) { (_) in
@@ -298,7 +301,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         // Setup modal in child, animate from parent
         if(!queueDetailModal.isHidden && queueDetailModal.currentQueue?.queueId == data.queueId){
             UIView.animate(withDuration: 0.3, animations: {
-                self.topDetailModalConstraint.constant = 0
+                self.topDetailModalConstraint.isActive = true
+                self.bottomDetailModalConstraint.isActive = false
                 self.queueDetailModal.alpha = 0
                 self.view.layoutIfNeeded()
             }) { (_) in
@@ -314,7 +318,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             
             self.queueDetailModal.isHidden = false
             UIView.animate(withDuration: 0.3, animations: {
-                self.topDetailModalConstraint.constant = -170
+                self.topDetailModalConstraint.isActive = false
+                self.bottomDetailModalConstraint.isActive = true
                 self.queueDetailModal.alpha = 1
                 self.view.layoutIfNeeded()
             }) { (_) in }
