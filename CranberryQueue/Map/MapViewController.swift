@@ -120,6 +120,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         else {
             let alert = UIAlertController(title: "Spotify could not connect", message: "Please close the Spotify App and try again.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
+            alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
+                let del = UIApplication.shared.delegate as? AppDelegate
+                del?.startAppRemote()
+            }))
             self.present(alert, animated: true)
         }
     }
