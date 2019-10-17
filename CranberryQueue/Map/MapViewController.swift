@@ -17,7 +17,7 @@ protocol mapControllerDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate, mainDelegate {
 
     @IBOutlet var cityLabel: UILabel!
 
@@ -73,6 +73,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = playerController
+        delegate.appMapDelegate = self
 
         Auth.auth().signInAnonymously { (result, error) in
             if let data = result {
@@ -97,7 +98,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 let alert = UIAlertController(title: "Location Services disabled", message: "Enable location to continue.", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { action in
                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
-
                 }))
                 self.present(alert, animated: true)
             }
@@ -106,6 +106,26 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     deinit {
        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func updateConnectionStatus(connected: Bool) {
+        if connected {
+            delegate?.addTapped()
+            createQueueForm.isHidden = false
+            UIView.animate(withDuration: 0.3) {
+                self.createQueueForm.alpha = 1
+            }
+            createQueueForm.queueNameTextField.becomeFirstResponder()
+        }
+        else {
+            let alert = UIAlertController(title: "Spotify could not connect", message: "Please close the Spotify App and try again.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
+            alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
+                let del = UIApplication.shared.delegate as? AppDelegate
+                del?.startAppRemote()
+            }))
+            self.present(alert, animated: true)
+        }
     }
 
     func setLocationEnabled(status: Bool) {
@@ -228,12 +248,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     @objc func addTapped() {
         self.closeDetailModalTapped()
-        delegate?.addTapped()
-        createQueueForm.isHidden = false
-        UIView.animate(withDuration: 0.3) {
-            self.createQueueForm.alpha = 1
-        }
-        createQueueForm.queueNameTextField.becomeFirstResponder()
+        let del = UIApplication.shared.delegate as! AppDelegate
+        del.startAppRemote()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -414,9 +430,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 ], completion: { (val) in
             })
 
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.startAppRemote()
-
             let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
 
             let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
@@ -461,9 +474,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
                 ], completion: { (val) in
             })
-
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            delegate.startAppRemote()
 
             let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
 

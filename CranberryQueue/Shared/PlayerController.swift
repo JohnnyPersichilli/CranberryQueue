@@ -59,7 +59,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     static let sharedInstance = PlayerController()
 
     func setupPlayer(queueId: String?, isHost: Bool) {
-        print("my actual pos: \(position)")
         if queueId != self.queueId || queueId == nil {
             guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
