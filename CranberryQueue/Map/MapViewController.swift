@@ -8,7 +8,6 @@
 
 import UIKit
 import Firebase
-import CoreLocation
 
 protocol mapControllerDelegate: class {
     func addTapped()
