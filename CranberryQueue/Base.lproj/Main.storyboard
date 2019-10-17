@@ -107,6 +107,7 @@
                         <constraints>
                             <constraint firstItem="VLf-l2-j7u" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="2Fi-OW-no7"/>
                             <constraint firstAttribute="trailing" secondItem="LyX-Sf-sNH" secondAttribute="trailing" id="4KP-zd-u5Q"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="LyX-Sf-sNH" secondAttribute="bottom" id="4mx-OM-ud7"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="centerY" secondItem="7k1-xL-an5" secondAttribute="centerY" id="BMP-Ev-hlF"/>
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="EuK-Dd-aRw"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="FKM-if-PYx"/>
@@ -141,10 +142,16 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="k3h-bh-V8Z" secondAttribute="trailing" constant="10" id="zek-B4-7g4"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="4mx-OM-ud7"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="gX6-xc-I67"/>
                     <connections>
                         <outlet property="addIconImageView" destination="1jc-lz-BMp" id="bjz-ZG-5cE"/>
+                        <outlet property="bottomDetailModalConstraint" destination="4mx-OM-ud7" id="UBE-iG-hYt"/>
                         <outlet property="cityLabel" destination="6Yy-op-lK9" id="J16-zb-Ghw"/>
                         <outlet property="createQueueForm" destination="7k1-xL-an5" id="3X1-ZT-gNj"/>
                         <outlet property="homeIconImageView" destination="zsP-i3-49x" id="LtI-4Q-2xp"/>
