@@ -26,7 +26,7 @@
                         <constraint firstAttribute="height" constant="25" id="YQb-GA-1Qw"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <nil key="textColor"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Event Code" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6oG-SE-46P">
@@ -45,7 +45,7 @@
                     </constraints>
                 </imageView>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" white="0.71000932573198194" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="6oG-SE-46P" secondAttribute="bottom" constant="20" id="0V9-99-omY"/>
                 <constraint firstItem="xaz-aP-ay2" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="15" id="Dgm-Ar-3cj"/>

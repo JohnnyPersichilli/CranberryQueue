@@ -248,6 +248,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     @objc func searchTapped() {
         self.closeDetailModalTapped()
+        joinQueueForm.eventCodeTextField.text = ""
         joinQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
             self.joinQueueForm.alpha = 1
@@ -256,6 +257,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     @objc func addTapped() {
+        createQueueForm.queueNameTextField.text = ""
         self.closeDetailModalTapped()
         let del = UIApplication.shared.delegate as! AppDelegate
         del.startAppRemote()
@@ -275,6 +277,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 self.createQueueForm.alpha = 0
             }) { (val) in
                 self.createQueueForm.isHidden = true
+                self.createQueueForm.scopeSwitch.isOn = true
             }
             if createQueueForm.scopeSwitch.isOn {
                 createQueue(withName: createQueueForm.queueNameTextField.text ?? "")

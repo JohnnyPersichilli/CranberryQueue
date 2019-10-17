@@ -77,7 +77,7 @@
                                     </constraints>
                                 </view>
                             </subviews>
-                            <color key="backgroundColor" red="0.8391448682" green="0.8391448682" blue="0.8391448682" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            <color key="backgroundColor" white="0.74364983337419532" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="iqm-3W-uP0" secondAttribute="trailing" id="3vS-Y8-wOh"/>
                                 <constraint firstItem="iqm-3W-uP0" firstAttribute="top" secondItem="Zch-5m-yKo" secondAttribute="bottom" constant="1" id="5Yw-LG-PuY"/>
@@ -90,7 +90,7 @@
                         </view>
                     </subviews>
                     <constraints>
-                        <constraint firstItem="ifz-8C-SwG" firstAttribute="centerY" secondItem="4Xn-UD-YXg" secondAttribute="centerY" id="FhA-H8-J7r"/>
+                        <constraint firstItem="ifz-8C-SwG" firstAttribute="centerY" secondItem="4Xn-UD-YXg" secondAttribute="centerY" constant="-130" id="FhA-H8-J7r"/>
                         <constraint firstAttribute="trailing" secondItem="ifz-8C-SwG" secondAttribute="trailing" id="K3k-hB-zMl"/>
                         <constraint firstAttribute="height" constant="397" id="Xnv-vt-V8E"/>
                         <constraint firstItem="ifz-8C-SwG" firstAttribute="leading" secondItem="4Xn-UD-YXg" secondAttribute="leading" id="zti-6V-G75"/>
