@@ -194,6 +194,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         cell.addIconImageView.addGestureRecognizer(addTap)
         cell.addIconImageView.isUserInteractionEnabled = true
         
+        cell.albumImageView.image = nil
         let url = URL(string: songs[indexPath.section].imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
@@ -201,7 +202,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 return }
             
             DispatchQueue.main.async() {
-                cell.albumImageView.image = UIImage(data: data)
+                let updatingCell = self.searchTableView.cellForRow(at: indexPath) as? SearchTableViewCell
+                updatingCell?.albumImageView.image = UIImage(data: data)
             }
         }
         

@@ -225,14 +225,15 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.isUserInteractionEnabled = true
         }
         
+        cell.albumImageView.image = nil
         let url = URL(string: songs[indexPath.section].imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
                 print(error!)
                 return }
-            
             DispatchQueue.main.async() {
-                cell.albumImageView.image = UIImage(data: data)
+                let updatingCell = self.cellForRow(at: indexPath) as? QueueTableViewCell
+                updatingCell?.albumImageView.image = UIImage(data: data)
             }
         }
         
