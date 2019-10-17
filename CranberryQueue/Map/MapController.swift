@@ -224,4 +224,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.drawMarkers()
     }
     
+    func getDistanceFrom(_ queue: CQLocation) -> Double {
+        let myCoords = getCoords()
+        let myLocation = CLLocation(latitude: myCoords["lat"] ?? 0, longitude: myCoords["long"] ?? 0)
+        let queueLocation = CLLocation(latitude: queue.lat, longitude: queue.long)
+        return myLocation.distance(from: queueLocation)
+    }
+        
 }

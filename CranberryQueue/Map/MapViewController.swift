@@ -15,6 +15,7 @@ protocol mapControllerDelegate: class {
     func setQueue(_ queueId: String?)
     func getCoords() -> ([String:Double])
     func setLocationEnabled(_ val: Bool)
+    func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
 class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
@@ -39,16 +40,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         
     @IBOutlet var playerView: PlayerView!
     
-
-    @IBOutlet weak var queueDetailModal: UIView!
-    @IBOutlet weak var queueNameLabel: UILabel!
-    @IBOutlet weak var joinQueueButton: UIButton!
-    @IBOutlet weak var songNameLabel: UILabel!
-    @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var numMembersLabel: UILabel!
-    @IBOutlet weak var closeQueueDetailImage: UIImageView!
-    @IBOutlet weak var songImage: UIRoundedImageView!
-    @IBOutlet weak var distanceFromQueueLabel: UILabel!
+    @IBOutlet var queueDetailModal: QueueDetailModal!
     
     @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
     
@@ -177,12 +169,12 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         settingsIconImageView.isUserInteractionEnabled = true
         
         let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
-        joinQueueButton.addGestureRecognizer(joinQueueTap)
-        joinQueueButton.isUserInteractionEnabled = true
+        queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
+        queueDetailModal.joinButton.isUserInteractionEnabled = true
         
-        let closeModalTap = UITapGestureRecognizer(target: self, action: #selector(closeModalTapped))
-        closeQueueDetailImage.addGestureRecognizer(closeModalTap)
-        closeQueueDetailImage.isUserInteractionEnabled = true
+        let closeModalTap = UITapGestureRecognizer(target: self, action: #selector(closeDetailModalTapped))
+        queueDetailModal.closeIconImageView.addGestureRecognizer(closeModalTap)
+        queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
         
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
         searchIconImageView.addGestureRecognizer(searchTap)
@@ -210,23 +202,25 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
-    @objc func closeModalTapped() {
-        UIView.animate(withDuration: 0.3, animations: {
+    @objc func closeDetailModalTapped() {
+       UIView.animate(withDuration: 0.3, animations: {
             self.topDetailModalConstraint.constant = 0
+            self.queueDetailModal.alpha = 0
+            self.view.layoutIfNeeded()
         }) { (_) in
             self.queueDetailModal.isHidden = true
-            self.currMarkerData = nil
         }
     }
-    
 
     @objc func settingsTapped() {
+        self.closeDetailModalTapped()
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
         self.present(vc, animated:true, completion:nil)
     }
     
     @objc func searchTapped() {
+        self.closeDetailModalTapped()
         joinQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
             self.joinQueueForm.alpha = 1
@@ -235,6 +229,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     @objc func addTapped() {
+        self.closeDetailModalTapped()
         delegate?.addTapped()
         createQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
@@ -283,88 +278,33 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
-    func openDetailModal(data: CQLocation) {        
-        //if the window is open and click the same marker close the window
-        if(!queueDetailModal.isHidden && self.currMarkerData?.queueId==data.queueId){
+    func openDetailModal(data: CQLocation) {
+        // Setup modal in child, animate from parent
+        if(!queueDetailModal.isHidden && self.currMarkerData?.queueId == data.queueId){
             UIView.animate(withDuration: 0.3, animations: {
                 self.topDetailModalConstraint.constant = 0
+                self.queueDetailModal.alpha = 0
+                self.view.layoutIfNeeded()
             }) { (_) in
                 self.queueDetailModal.isHidden = true
             }
-        //click a different window while its open, dont close just rerender the data
-        }else{
-            UIView.animate(withDuration: 0.3, animations: {
-                self.topDetailModalConstraint.constant = -127
-                self.queueDetailModal.alpha = 1
-            }) { (_) in
-                self.queueDetailModal.isHidden = false
-            }
-            
-            
-            let myCoords = delegate?.getCoords()
-            let myLocation = CLLocation(latitude: myCoords?["lat"] ?? 0, longitude: myCoords?["long"] ?? 0)
-            let queueLocation = CLLocation(latitude: data.lat, longitude: data.long)
-            let distance = myLocation.distance(from: queueLocation)
-            
-            //if distance is less than .75 miles use feet else use miles
-            if(distance/1609 < 0.75){
-                let distanceInFeet = (distance*3.28083985)
-                let roundedFeetString = String(format: "%.2f", distanceInFeet)
-                distanceFromQueueLabel.text = roundedFeetString + "ft"
-            }else{
-                let distanceInMiles = (distance/1609)
-                let roundedMileString = String(format: "%.1f", distanceInMiles)
-                distanceFromQueueLabel.text =  roundedMileString + "mi"
-            }
-            
-            //can set this as the radius if we are letting users do that or an arbitrary number like 500m
-            let maxDistance = 500.0
-            if(distance > maxDistance){
-                joinQueueButton.isEnabled = false
-                //joinQueueButton.layer.cornerRadius = 10
-                joinQueueButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
-                joinQueueButton.isOpaque = true
-            }else{
-                joinQueueButton.isEnabled = true
-                //joinQueueButton.layer.cornerRadius = 10
-                joinQueueButton.backgroundColor = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
-                joinQueueButton.isOpaque = false
-            }
-            self.currMarkerData = data
-            self.db?.collection("playback").document(data.queueId).getDocument(completion: { (snapshot, error) in
-                if let err = error {
-                    print(err)
-                }
-                
-                let currSong = snapshot?.data()?["name"] as? String ?? ""
-                let currArtist = snapshot?.data()?["artist"] as? String ?? ""
-                let songImage = snapshot?.data()?["imageURL"] as? String ?? ""
-                
-                if(songImage != ""){
-                    let url = URL(string: songImage)
-                    let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
-                        guard let data2 = dataBack else {
-                            print("no data")
-                            return }
-                        DispatchQueue.main.async {
-                            self.songImage.image = UIImage(data: data2)
-                            self.queueNameLabel.text = data.name
-                            self.songNameLabel.text = currSong + " - " + currArtist
-                            self.numMembersLabel.text = String(data.numMembers)
-                        }
-                    }
-                    
-                    task.resume()
-                }else{
-                    DispatchQueue.main.async {
-                        self.numMembersLabel.text = String(data.numMembers)
-                        self.queueNameLabel.text = data.name
-                        self.songImage.image = UIImage(named: "defaultPerson")!
-                        self.songNameLabel.text = "No song currently playing"
-                    }
-                }
-            })
         }
+        else { // clicked a different window while its open, dont close just rerender the data
+            self.currMarkerData = data
+            let distance = delegate?.getDistanceFrom(data)
+            queueDetailModal.distance = distance ?? 0
+            queueDetailModal.db = db
+            queueDetailModal.currentQueue = data
+            queueDetailModal.fetchSongInfo()
+            
+            self.queueDetailModal.isHidden = false
+            UIView.animate(withDuration: 0.3, animations: {
+                self.topDetailModalConstraint.constant = -170
+                self.queueDetailModal.alpha = 1
+                self.view.layoutIfNeeded()
+            }) { (_) in }
+        }
+        
     }
     
     
@@ -413,6 +353,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     @objc func joinQueue() {
+        self.closeDetailModalTapped()
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
         
@@ -454,6 +395,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func createQueue(withCode code: String) {
+        self.closeDetailModalTapped()
         var ref : DocumentReference? = nil
         ref = db?.collection("contributor").addDocument(data: [
             "host": self.uid
@@ -494,7 +436,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func createQueue(withName name: String) {
-        
+        self.closeDetailModalTapped()
         let coords = delegate?.getCoords()
 
         var ref : DocumentReference? = nil
@@ -583,7 +525,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc?.delegate = self
             self.delegate = vc
         }
-        if segue.destination is LoginController {
+        else if segue.destination is LoginController {
             let vc = segue.destination as? LoginController
             vc?.delegate = self
         }
