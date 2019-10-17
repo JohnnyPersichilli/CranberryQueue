@@ -54,7 +54,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var playerController = PlayerController.sharedInstance
 
     weak var delegate: mapControllerDelegate?
-    let colors = Colors()
     
     override func viewDidLoad() {
         super.viewDidLoad()
