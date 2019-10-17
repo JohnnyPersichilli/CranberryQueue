@@ -12,7 +12,7 @@ import Firebase
 
 protocol mapDelegate: class {
     func updateGeoCode(city: String, region: String)
-    func joinQueue(data: CQLocation)
+    func openDetailModal(data: CQLocation)
     func setLocationEnabled(status: Bool)
 }
 
@@ -60,9 +60,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func setLocationEnabled(_ val: Bool){
         self.map?.isMyLocationEnabled = val
     }
-    
-    func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
-        delegate?.joinQueue(data: marker.userData as! CQLocation)
+
+    func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        delegate?.openDetailModal(data: marker.userData as! CQLocation)
+        return true
     }
 
     func watchLocationQueues(city: String, region: String) {
@@ -82,7 +83,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     region: doc.data()["region"] as! String,
                     long: doc.data()["long"] as! Double,
                     lat: doc.data()["lat"] as! Double,
-                    queueId: doc.documentID)
+                    queueId: doc.documentID,
+                    numMembers: doc.data()["numMembers"] as! Int
+                )
+                    
                 self.queues.append(newLoc)
             }
             self.drawMarkers()
@@ -213,4 +217,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.drawMarkers()
     }
     
+    func getDistanceFrom(_ queue: CQLocation) -> Double {
+        let myCoords = getCoords()
+        let myLocation = CLLocation(latitude: myCoords["lat"] ?? 0, longitude: myCoords["long"] ?? 0)
+        let queueLocation = CLLocation(latitude: queue.lat, longitude: queue.long)
+        return myLocation.distance(from: queueLocation)
+    }
+        
 }

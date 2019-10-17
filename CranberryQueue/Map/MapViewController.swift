@@ -14,6 +14,7 @@ protocol mapControllerDelegate: class {
     func setQueue(_ queueId: String?)
     func getCoords() -> ([String:Double])
     func setLocationEnabled(_ val: Bool)
+    func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
 class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate {
@@ -37,6 +38,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet weak var loginContainer: UIView!
 
     @IBOutlet var playerView: PlayerView!
+    
+    @IBOutlet var queueDetailModal: QueueDetailModal!
+    
+    @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
 
     var db : Firestore? = nil
 
@@ -49,7 +54,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var playerController = PlayerController.sharedInstance
 
     weak var delegate: mapControllerDelegate?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -63,7 +68,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
         playerView.delegate = playerController
         playerController.mapDelegate = playerView
-
+        
+        queueDetailModal.isHidden = true
+        
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.delegate = playerController
 
@@ -158,7 +165,15 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
-
+        
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
+        queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
+        queueDetailModal.joinButton.isUserInteractionEnabled = true
+        
+        let closeModalTap = UITapGestureRecognizer(target: self, action: #selector(closeDetailModalTapped))
+        queueDetailModal.closeIconImageView.addGestureRecognizer(closeModalTap)
+        queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
+        
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
         searchIconImageView.addGestureRecognizer(searchTap)
         searchIconImageView.isUserInteractionEnabled = true
@@ -184,14 +199,26 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.joinQueueForm.isHidden = true
         }
     }
+    
+    @objc func closeDetailModalTapped() {
+       UIView.animate(withDuration: 0.3, animations: {
+            self.topDetailModalConstraint.constant = 0
+            self.queueDetailModal.alpha = 0
+            self.view.layoutIfNeeded()
+        }) { (_) in
+            self.queueDetailModal.isHidden = true
+        }
+    }
 
     @objc func settingsTapped() {
+        self.closeDetailModalTapped()
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
         self.present(vc, animated:true, completion:nil)
     }
 
     @objc func searchTapped() {
+        self.closeDetailModalTapped()
         joinQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
             self.joinQueueForm.alpha = 1
@@ -200,6 +227,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     @objc func addTapped() {
+        self.closeDetailModalTapped()
         delegate?.addTapped()
         createQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
@@ -249,7 +277,35 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.addIconImageView.isHidden = !self.isPremium
         }
     }
-
+    
+    func openDetailModal(data: CQLocation) {
+        // Setup modal in child, animate from parent
+        if(!queueDetailModal.isHidden && queueDetailModal.currentQueue?.queueId == data.queueId){
+            UIView.animate(withDuration: 0.3, animations: {
+                self.topDetailModalConstraint.constant = 0
+                self.queueDetailModal.alpha = 0
+                self.view.layoutIfNeeded()
+            }) { (_) in
+                self.queueDetailModal.isHidden = true
+            }
+        }
+        else { // clicked a different window while its open, dont close just rerender the data
+            let distance = delegate?.getDistanceFrom(data)
+            queueDetailModal.distance = distance ?? 0
+            queueDetailModal.db = db
+            queueDetailModal.currentQueue = data
+            queueDetailModal.fetchSongInfo()
+            
+            self.queueDetailModal.isHidden = false
+            UIView.animate(withDuration: 0.3, animations: {
+                self.topDetailModalConstraint.constant = -170
+                self.queueDetailModal.alpha = 1
+                self.view.layoutIfNeeded()
+            }) { (_) in }
+        }
+        
+    }
+    
     func joinQueue(code: String) {
         db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
@@ -293,10 +349,15 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         })
 
     }
+    
+    @objc func joinQueue() {
+        self.closeDetailModalTapped()
 
-    func joinQueue(data: CQLocation) {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+        
+        let data = queueDetailModal.currentQueue!
+        
         vc.queueName = data.name
         vc.queueId = data.queueId
         vc.uid = self.uid
@@ -333,6 +394,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func createQueue(withCode code: String) {
+        self.closeDetailModalTapped()
         var ref : DocumentReference? = nil
         ref = db?.collection("contributor").addDocument(data: [
             "host": self.uid
@@ -373,6 +435,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func createQueue(withName name: String) {
+        self.closeDetailModalTapped()
 
         let coords = delegate?.getCoords()
 
@@ -462,7 +525,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             vc?.delegate = self
             self.delegate = vc
         }
-        if segue.destination is LoginController {
+        else if segue.destination is LoginController {
             let vc = segue.destination as? LoginController
             vc?.delegate = self
         }
