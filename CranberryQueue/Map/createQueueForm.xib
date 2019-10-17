@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,7 +27,7 @@
                     <rect key="frame" x="0.0" y="249.5" width="414" height="397"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ifz-8C-SwG">
-                            <rect key="frame" x="0.0" y="212" width="414" height="123"/>
+                            <rect key="frame" x="0.0" y="137" width="414" height="123"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Queue Name:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zch-5m-yKo">
                                     <rect key="frame" x="26" y="11" width="183" height="37"/>
@@ -41,7 +43,7 @@
                                     <rect key="frame" x="0.0" y="49" width="414" height="57"/>
                                     <subviews>
                                         <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8bY-8F-kEY">
-                                            <rect key="frame" x="20.5" y="11.5" width="316.5" height="34"/>
+                                            <rect key="frame" x="20.5" y="13.5" width="316.5" height="30"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits"/>
                                         </textField>
@@ -88,7 +90,7 @@
                         </view>
                     </subviews>
                     <constraints>
-                        <constraint firstItem="ifz-8C-SwG" firstAttribute="centerY" secondItem="4Xn-UD-YXg" secondAttribute="centerY" constant="75" id="FhA-H8-J7r"/>
+                        <constraint firstItem="ifz-8C-SwG" firstAttribute="centerY" secondItem="4Xn-UD-YXg" secondAttribute="centerY" id="FhA-H8-J7r"/>
                         <constraint firstAttribute="trailing" secondItem="ifz-8C-SwG" secondAttribute="trailing" id="K3k-hB-zMl"/>
                         <constraint firstAttribute="height" constant="397" id="Xnv-vt-V8E"/>
                         <constraint firstItem="ifz-8C-SwG" firstAttribute="leading" secondItem="4Xn-UD-YXg" secondAttribute="leading" id="zti-6V-G75"/>
