@@ -62,6 +62,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
 
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        if let curLoc = map?.myLocation {
+            curCoords = curLoc.coordinate
+        }
         delegate?.openDetailModal(data: marker.userData as! CQLocation)
         return true
     }
@@ -181,6 +184,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func getCoords() -> ([String : Double]) {
+        if let curLoc = map?.myLocation {
+            curCoords = curLoc.coordinate
+        }
         return [
             "long": curCoords?.longitude ?? 0,
             "lat": curCoords?.latitude ?? 0
