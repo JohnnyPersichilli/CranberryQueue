@@ -71,9 +71,13 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     func updateSessionStatus(connected: Bool) {
         if(connected) {
             delegate?.dismissLoginContainer(isPremium: true)
-            self.hideActivityIndicator()
+            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                self.spotifyContinueModal.alpha = 1
+                self.guestContinueModal.alpha = 1
+                self.hideActivityIndicator()
+            }
         }
-        else{
+        else {
             UIView.animate(withDuration: 1, animations: {
                 self.spotifyContinueModal.alpha = 1;
                 self.guestContinueModal.alpha = 1
@@ -81,7 +85,6 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
                 self.hideActivityIndicator()
             }
         }
-        print(connected)
     }
 }
 
