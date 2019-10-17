@@ -24,8 +24,14 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @IBOutlet var regionLabel: UILabel!
 
     @IBOutlet var addIconImageView: UIImageView!
-
+    
+    @IBOutlet var searchIconImageView: UIImageView!
+    
+    @IBOutlet var homeIconImageView: UIImageView!
+    
     @IBOutlet var createQueueForm: createQueueForm!
+    
+    @IBOutlet var joinQueueForm: JoinQueueForm!
 
     @IBOutlet var settingsIconImageView: UIImageView!
 
@@ -52,6 +58,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var isHost = false
     var queueId: String? = nil
     var currMarkerData: CQLocation? = nil
+    var code: String? = nil
     
     var playerController = PlayerController.sharedInstance
 
@@ -65,6 +72,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         setupScreen()
         setupGestureRecognizers()
         createQueueForm.queueNameTextField.delegate = self
+        joinQueueForm.eventCodeTextField.delegate = self
 
         UIApplication.shared.isIdleTimerDisabled = true
         
@@ -124,7 +132,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
-    func update(queueId: String?, isHost: Bool) {
+    func update(queueId: String?, isHost: Bool, privateCode: String?) {
+        self.code = privateCode
+        if privateCode != nil {
+            self.addIconImageView.isHidden = true
+            self.searchIconImageView.isHidden = true
+            self.homeIconImageView.isHidden = false
+        }
+        else {
+            self.addIconImageView.isHidden = false
+            self.searchIconImageView.isHidden = false
+            self.homeIconImageView.isHidden = true
+        }
+        
         self.queueId = queueId
         self.isHost = isHost
         self.delegate?.setQueue(queueId)
@@ -156,7 +176,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
         joinQueueButton.addGestureRecognizer(joinQueueTap)
         joinQueueButton.isUserInteractionEnabled = true
         
@@ -164,6 +184,30 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         closeQueueDetailImage.addGestureRecognizer(closeModalTap)
         closeQueueDetailImage.isUserInteractionEnabled = true
         
+        let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
+        searchIconImageView.addGestureRecognizer(searchTap)
+        searchIconImageView.isUserInteractionEnabled = true
+        
+        let joinCancelTap = UITapGestureRecognizer(target: self, action: #selector(joinFormCancelTapped))
+        joinQueueForm.cancelIconImageView.addGestureRecognizer(joinCancelTap)
+        joinQueueForm.cancelIconImageView.isUserInteractionEnabled = true
+        
+        let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
+        homeIconImageView.addGestureRecognizer(homeTap)
+        homeIconImageView.isUserInteractionEnabled = true
+    }
+    
+    @objc func homeTapped() {
+        joinQueue(code: code!)
+    }
+    
+    @objc func joinFormCancelTapped() {
+        joinQueueForm.eventCodeTextField.resignFirstResponder()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.joinQueueForm.alpha = 0
+        }) { (val) in
+            self.joinQueueForm.isHidden = true
+        }
     }
     
     @objc func closeModalTapped() {
@@ -181,6 +225,14 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
         self.present(vc, animated:true, completion:nil)
     }
+    
+    @objc func searchTapped() {
+        joinQueueForm.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+            self.joinQueueForm.alpha = 1
+            self.joinQueueForm.eventCodeTextField.becomeFirstResponder()
+        }
+    }
 
     @objc func addTapped() {
         delegate?.addTapped()
@@ -196,15 +248,32 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        createQueueForm.queueNameTextField.resignFirstResponder()
-        UIView.animate(withDuration: 0.3, animations: {
-            self.createQueueForm.alpha = 0
-        }) { (val) in
-            self.createQueueForm.isHidden = true
+        if textField.text == nil || textField.text == "" {
+            return false
         }
-
-        createQueue(withName: createQueueForm.queueNameTextField.text ?? "")
-
+        if textField == createQueueForm.queueNameTextField {
+            createQueueForm.queueNameTextField.resignFirstResponder()
+            UIView.animate(withDuration: 0.3, animations: {
+                self.createQueueForm.alpha = 0
+            }) { (val) in
+                self.createQueueForm.isHidden = true
+            }
+            if createQueueForm.scopeSwitch.isOn {
+                createQueue(withName: createQueueForm.queueNameTextField.text ?? "")
+            }
+            else {
+                createQueue(withCode: eventCodeFromTimestamp())
+            }
+        }
+        else if textField == joinQueueForm.eventCodeTextField {
+            joinQueueForm.eventCodeTextField.resignFirstResponder()
+            UIView.animate(withDuration: 0.3, animations: {
+                self.joinQueueForm.alpha = 0
+            }) { (val) in
+                self.joinQueueForm.isHidden = true
+            }
+            joinQueue(code: textField.text!)
+        }
         return true
     }
 
@@ -298,6 +367,51 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         }
     }
     
+    
+    func joinQueue(code: String) {
+        db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count == 0 { return }
+            let id = snap.documents[0].documentID
+            
+            let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+            vc.queueName = code
+            vc.queueId = id
+            vc.uid = self.uid
+            vc.isPrivate = true
+            
+            vc.mapDelegate = self
+            
+            if self.queueId != vc.queueId {
+                self.leaveCurrentQueue()
+            }
+            
+            self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
+                 ], completion: { (val) in
+                     })
+            
+            self.db?.collection("contributor").document(id).getDocument(completion: { (snapshot, error) in
+                if let err = error {
+                    print(err)
+                }
+                //see if the users was previously in the queue, if they were numMembers does not change
+                if let host = snapshot?.data()?["host"] as? String {
+                    if self.uid == host {
+                        vc.isHost = true
+                        vc.isRejoining = true
+                    }
+                }
+                self.delegate?.setLocationEnabled(false)
+                self.present(vc, animated:true, completion:nil)
+            })
+        })
+        
+    }
+    
     @objc func joinQueue() {
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
@@ -315,28 +429,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.delegate?.setQueue(data.queueId)
         }
         
-        if(self.queueId != nil && self.queueId != vc.queueId){
-            if(!isHost){
-                let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
-                var request = URLRequest(url: url)
-                let dictionary = ["queueId":self.queueId,"uid":self.uid]
-                request.httpBody = try! JSONEncoder().encode(dictionary)
-                request.httpMethod = "PUT"
-                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
-                
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                    //if let res = response { }
-                    if let err = error {
-                        print(err)
-                        return
-                    }
-                }
-                task.resume()
-
-            }else{
-                self.db?.collection("location").document(self.queueId!).delete()
-            }
+        if self.queueId != vc.queueId {
+            leaveCurrentQueue()
         }
         
         db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
@@ -358,9 +452,48 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.present(vc, animated:true, completion:nil)
         })
     }
+    
+    func createQueue(withCode code: String) {
+        var ref : DocumentReference? = nil
+        ref = db?.collection("contributor").addDocument(data: [
+            "host": self.uid
+        ]) { (val) in
+            let id = ref!.documentID
+            self.delegate?.setQueue(id)
+            
+            self.db?.collection("location").document(id).setData([
+                "numMembers": 0,
+                "currentSong": "",
+                "code" : code
+                ])
+            
+            self.leaveCurrentQueue()
+            
+            self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
+                ], completion: { (val) in
+            })
+
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            delegate.startAppRemote()
+
+            let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+
+            let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+            vc.queueName = code
+            vc.queueId = id
+            vc.uid = self.uid
+            vc.isHost = true
+            vc.isPrivate = true
+            vc.mapDelegate = self
+            
+            self.playerController.setupPlayer(queueId: id, isHost: true)
+            self.delegate?.setLocationEnabled(false)
+            self.present(vc, animated:true, completion:nil)
+        }
+            
+    }
 
     func createQueue(withName name: String) {
-        
         
         let coords = delegate?.getCoords()
 
@@ -381,11 +514,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
                 "name" : name
                 ])
             
-            if( (self.queueId) != nil && !self.isHost ){
-                self.db?.collection("contributor").document(self.queueId!).collection("members").document(self.uid).delete()
-            }else if( (self.queueId) != nil && self.isHost){
-                self.db?.collection("location").document(self.queueId!).delete()
-            }
+            self.leaveCurrentQueue()
             
             self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
                 ], completion: { (val) in
@@ -407,6 +536,44 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.delegate?.setLocationEnabled(false)
             self.present(vc, animated:true, completion:nil)
         }
+    }
+    
+    func leaveCurrentQueue() {
+        if(self.queueId != nil){
+            if(!isHost){
+                let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
+                var request = URLRequest(url: url)
+                let dictionary = ["queueId":self.queueId,"uid":self.uid]
+                request.httpBody = try! JSONEncoder().encode(dictionary)
+                request.httpMethod = "PUT"
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+                request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
+                
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    if let err = error {
+                        print(err)
+                        return
+                    }
+                }
+                task.resume()
+            }else{
+                self.db?.collection("location").document(self.queueId!).delete()
+            }
+        }
+    }
+    
+    func eventCodeFromTimestamp() -> String {
+        let possibleChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/")
+        var rixit = 0
+        var residual = Int(Double(Date().timeIntervalSince1970)*1000) / 64
+        var result = ""
+        while(residual != 0) {
+            rixit = residual % 64
+            result = String(possibleChars[rixit]) + result;
+            residual = (residual / 64);
+        }
+        result.removeFirst(1)
+        return result;
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
