@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>685728591383-r8m4i15q0i064dfhfbiglqnauvgg0m44.apps.googleusercontent.com</string>
+	<string>685728591383-bepudfbnvfvo6t2qr161lnodncjfupn3.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.685728591383-r8m4i15q0i064dfhfbiglqnauvgg0m44</string>
+	<string>com.googleusercontent.apps.685728591383-bepudfbnvfvo6t2qr161lnodncjfupn3</string>
 	<key>API_KEY</key>
 	<string>AIzaSyASK4mqN6Ir6pJz-uPq8qwD_LLEe-eE_7s</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.CranberryQueue</string>
+	<string>com.CloudQueues.Cranberry</string>
 	<key>PROJECT_ID</key>
 	<string>cranberryqueue</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:685728591383:ios:466890f87dfd55702a7652</string>
+	<string>1:685728591383:ios:dc4b188b6abfe0e42a7652</string>
 	<key>DATABASE_URL</key>
 	<string>https://cranberryqueue.firebaseio.com</string>
 </dict>
