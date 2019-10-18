@@ -12,7 +12,6 @@ const db = admin.firestore();
 exports.deleteLocation = functions.firestore
     .document('location/{locationId}')
     .onDelete((snap, context) => {
-
         const queueId = context.params.locationId
 
         //remove subcollection in contributor, so its not orphaned
@@ -36,7 +35,7 @@ exports.deleteLocation = functions.firestore
         //deleting songs from the playlist song table so not orphaned
         db.collection('playlist').doc(queueId).collection('songs').get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                //now delete the song out of the 
+                //now delete the song out of the
                 doc.ref.delete()
             })
         }).then(() => {
@@ -65,15 +64,15 @@ exports.deleteLocation = functions.firestore
                 })
             })
         })
-
+      return null
     })
 
 exports.addNumMembers = functions.firestore
     .document('contributor/{queueId}/members/{uid}')
     .onCreate((snap, context) => {
-    
+
     const queueId = context.params.queueId;
-    
+
     db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(1)
     })
@@ -101,7 +100,23 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
         response.status(200).send('success');
         return;
     })
-});  
+});
+
+//will run the job every day
+exports.scheduledPurgeOldPlayback = functions.pubsub.schedule('every 24 hours').onRun((context) => {
+  //will delete all locations with playback that is an hour old
+  let epochTimeSeconds = Math.trunc(Date.now()/1000)-3600
+
+  // get every playback that is old and purge it
+  db.collection('playback').where("timestamp", "<", epochTimeSeconds).get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        // this will trigger the location onDelete and remove all associated docs
+        db.collection('location').doc(doc.id).delete()
+      })
+    })
+  return null;
+});
 
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
@@ -146,10 +161,10 @@ exports.updateNetVotes = functions.firestore
                     .then( () => {
                         return;
                     })
-                    
+
                 }
             }
-            
+
         })
     })
 
@@ -198,10 +213,8 @@ exports.updateDownvotes = functions.firestore
                     .then( () => {
                         return;
                     })
-                    
                 }
             }
-            
         })
     })
 
