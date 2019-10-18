@@ -47,5 +47,5 @@ DerivedData/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.gitignore.io/api/xcode,cocoapods
-CranberryQueue/GoogleService-Info.plist
+##CranberryQueue/GoogleService-Info.plist
 *.xcbkptlist
