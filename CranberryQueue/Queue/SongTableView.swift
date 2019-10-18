@@ -166,6 +166,9 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell = self.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! QueueTableViewCell
             cell.shadOpacity = 0.6
             cell.addGradient()
+            cell.voteLabel.isHidden = true
+            cell.downvoteButtonImageView.isHidden = true
+            cell.upvoteButtonImageView.isHidden = true
         }
         else {
             cell = self.dequeueReusableCell(withIdentifier: "CellHorizontal", for: indexPath) as! QueueTableViewCell
