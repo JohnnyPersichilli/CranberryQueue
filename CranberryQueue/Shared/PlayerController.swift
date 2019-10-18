@@ -74,7 +74,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         self.isHost = isHost
         db = Firestore.firestore()
         if isHost {
-            //updateConnectionStatus(connected: true)
+            updateConnectionStatus(connected: true)
         }
         else if queueId != nil {
             setupGuestListeners()

@@ -261,7 +261,6 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         self.closeDetailModalTapped()
         let del = UIApplication.shared.delegate as! AppDelegate
         del.startAppRemote()
-        playerController.isHost = true
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
