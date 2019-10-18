@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C240F612332E492002111EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C240F602332E492002111EB /* GoogleService-Info.plist */; };
 		4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */; };
 		4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */; };
 		4C4CD3D5232C556F00F17BB8 /* style.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C4CD3D4232C556F00F17BB8 /* style.json */; };
@@ -33,6 +32,7 @@
 		4CDB845D232BD2A2002559BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845C232BD2A2002559BB /* Assets.xcassets */; };
 		4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */; };
 		4CDB8468232BD592002559BB /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CDB8467232BD592002559BB /* SpotifyiOS.framework */; };
+		4CFD140623594471008F0A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4CFD140523594471008F0A4E /* GoogleService-Info.plist */; };
 		6E8F84F32339C443005C23A9 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8F84F22339C443005C23A9 /* LoginController.swift */; };
 		95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */; };
 		BA4DA89423426D7700DCE8E3 /* activityIndicatorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */; };
@@ -40,7 +40,6 @@
 
 /* Begin PBXFileReference section */
 		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C240F602332E492002111EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDetailModal.swift; sourceTree = "<group>"; };
 		4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QueueDetailModal.xib; sourceTree = "<group>"; };
 		4C4CD3D4232C556F00F17BB8 /* style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = style.json; sourceTree = "<group>"; };
@@ -69,6 +68,7 @@
 		4CDB8461232BD2A2002559BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4CDB8467232BD592002559BB /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		4CDB8469232BD7A6002559BB /* CranberryQueue-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CranberryQueue-Bridging-Header.h"; sourceTree = "<group>"; };
+		4CFD140523594471008F0A4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6E8F84F22339C443005C23A9 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = activityIndicatorPresenter.swift; sourceTree = "<group>"; };
 		C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.release.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.release.xcconfig"; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 				4CDB845C232BD2A2002559BB /* Assets.xcassets */,
 				4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */,
 				4CDB8461232BD2A2002559BB /* Info.plist */,
-				4C240F602332E492002111EB /* GoogleService-Info.plist */,
+				4CFD140523594471008F0A4E /* GoogleService-Info.plist */,
 				4CDB8467232BD592002559BB /* SpotifyiOS.framework */,
 			);
 			path = CranberryQueue;
@@ -252,8 +252,8 @@
 				4CDB845D232BD2A2002559BB /* Assets.xcassets in Resources */,
 				4C4CD3D5232C556F00F17BB8 /* style.json in Resources */,
 				4CDB845B232BD2A1002559BB /* Main.storyboard in Resources */,
+				4CFD140623594471008F0A4E /* GoogleService-Info.plist in Resources */,
 				4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */,
-				4C240F612332E492002111EB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
