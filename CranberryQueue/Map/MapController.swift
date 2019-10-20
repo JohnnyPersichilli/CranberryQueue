@@ -152,6 +152,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         case .authorizedWhenInUse, .authorizedAlways:
             locationManager.startUpdatingLocation()
             isEnabled = true
+        case .notDetermined:
+            return
         default:
             isEnabled = false
         }
