@@ -38,13 +38,13 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     var downvotes = [String]()
     var pendingUpvotes = [Song]()
     var pendingDownvotes = [Song]()
-    var superVotes = [String]()
     
     func watchPlaylist() {
         db = Firestore.firestore()
         
         songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
-            self.songs = []
+            var newSongs = [Song]()
+            let oldSongs = self.songs
             guard let snap = snapshot else {
                 print(error!)
                 DispatchQueue.main.async {
@@ -55,10 +55,14 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             if snap.documents.count == 0 {
                 DispatchQueue.main.async {
                     self.songDelegate?.updateNumSongs(0)
+                    self.songs = []
                     self.reloadData()
                 }
                 return
             }
+            var sectionsToReload = [Int]()
+            var sectionsToReloadSilently = [Int]()
+            var index = 0
             for song in snap.documents {
                 if (song["name"] as? String) == nil {
                     continue
@@ -72,25 +76,54 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     uri: song["uri"] as! String,
                     next: song["next"] as! Bool
                 )
-                self.songs.append(newSong)
+                newSongs.append(newSong)
+                
+                if self.songs.count <= index { }
+                else if self.songs[index].docID != newSongs[index].docID {
+                    sectionsToReload.append(index)
+                }
+                else if self.songs[index].votes != newSongs[index].votes {
+                    sectionsToReloadSilently.append(index)
+                }
                 
                 self.pendingUpvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
                 self.pendingDownvotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
-                self.superVotes.removeAll(where: {$0 == song.documentID})
+                
+                index += 1
             }
+            if oldSongs.count == 0 && newSongs.count == 1 {
+                (UIApplication.shared.delegate as? AppDelegate)?.appRemote.playerAPI?.enqueueTrackUri(newSongs.first!.uri, callback: { (value, error) in
+                    if let err = error {
+                        print(err)
+                        return
+                    }
+                })
+            }
+            self.songs = newSongs
+            self.performBatchUpdates({
+                if newSongs.count < oldSongs.count {
+                    self.deleteSections(IndexSet(newSongs.count..<oldSongs.count), with: .fade)
+                }
+                else {
+                    self.insertSections(IndexSet(oldSongs.count..<newSongs.count), with: .fade)
+                }
+                self.reloadSections(IndexSet(sectionsToReload), with: .fade)
+                self.reloadSections(IndexSet(sectionsToReloadSilently), with: .none)
+            }) { (_) in
+                
+            }
+            
             self.songDelegate?.updateNumSongs(self.songs.count)
-            DispatchQueue.main.async {
-                self.reloadData()
-            }
         })
     }
     
     func voteTapped(isUpvote: Bool, song: Song) {
+        var weight = isUpvote ? 1 : -1
         if isUpvote {
             pendingUpvotes.append(song)
             upvotes.append(song.docID)
             if pendingDownvotes.contains(where: {$0 == song}) || downvotes.contains(where: {$0 == song.docID}) {
-                superVotes.append(song.docID)
+                weight += 1
             }
             pendingDownvotes.removeAll(where: {$0 == song})
             downvotes.removeAll(where: {$0 == song.docID})
@@ -99,14 +132,18 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             pendingDownvotes.append(song)
             downvotes.append(song.docID)
             if pendingUpvotes.contains(where: {$0 == song}) || upvotes.contains(where: {$0 == song.docID}) {
-                superVotes.append(song.docID)
+                weight -= 1
             }
             pendingUpvotes.removeAll(where: {$0 == song})
             upvotes.removeAll(where: {$0 == song.docID})
         }
         UserDefaults.standard.set(upvotes, forKey: "\(queueId!)/upvotes")
         UserDefaults.standard.set(downvotes, forKey: "\(queueId!)/downvotes")
-        reloadData()
+        if let cell = visibleCells.first(where: {($0 as! QueueTableViewCell).song == song}) as? QueueTableViewCell {
+            cell.voteLabel.text = String(song.votes + weight)
+            (isUpvote ? cell.upvoteButtonImageView : cell.downvoteButtonImageView)?.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
+            (!isUpvote ? cell.upvoteButtonImageView : cell.downvoteButtonImageView)?.backgroundColor = UIColor.clear
+        }
     }
     
     func loadPreviousVotes() {
@@ -175,6 +212,17 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.shadOpacity = 0.3
             cell.removeGradient()
         }
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            cell.alpha = 0
+        }) { (val) in
+            cell.contentView.layoutIfNeeded()
+            cell.addShadow()
+            UIView.animate(withDuration: 0.5) {
+                cell.alpha = 1
+            }
+        }
+        
         if indexPath.section >= songs.count {
             return cell
         }
@@ -206,22 +254,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.upvoteButtonImageView.isUserInteractionEnabled = true
             cell.downvoteButtonImageView.isUserInteractionEnabled = true
         }
-        if pendingUpvotes.contains(where: {$0 == song}) {
-            if superVotes.contains(song.docID) {
-                cell.voteLabel.text = String(song.votes + 2)
-            }
-            else {
-                cell.voteLabel.text = String(song.votes + 1)
-            }
-            cell.isUserInteractionEnabled = false
-        }
-        else if pendingDownvotes.contains(where: {$0 == song}) {
-            if superVotes.contains(song.docID) {
-                cell.voteLabel.text = String(song.votes - 2)
-            }
-            else {
-                cell.voteLabel.text = String(song.votes - 1)
-            }
+        if pendingUpvotes.contains(where: {$0 == song}) || pendingDownvotes.contains(where: {$0 == song}) {
             cell.isUserInteractionEnabled = false
         }
         else {
@@ -241,11 +274,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         }
         
         task.resume()
-        
-        if indexPath.section == 0 {
-            
-        }
-        
+
         return cell
     }
     
