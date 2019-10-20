@@ -45,6 +45,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     
     @IBOutlet var bottomDetailModalConstraint: NSLayoutConstraint!
     
+    weak var playbackRef: ListenerRegistration? = nil
+    
     var db : Firestore? = nil
 
     var uid = String()
@@ -235,6 +237,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             self.view.layoutIfNeeded()
         }) { (_) in
             self.queueDetailModal.isHidden = true
+            self.playbackRef?.remove()
+            self.playbackRef = nil
         }
     }
 
@@ -321,9 +325,21 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         else { // clicked a different window while its open, dont close just rerender the data
             let distance = delegate?.getDistanceFrom(data)
             queueDetailModal.distance = distance ?? 0
-            queueDetailModal.db = db
             queueDetailModal.currentQueue = data
-            queueDetailModal.fetchSongInfo()
+            playbackRef = db?.collection("playback").document(data.queueId).addSnapshotListener({ (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!) // check if snap returns nil or empty dic for deleted doc
+                    return
+                }
+                if let doc = snap.data() {
+                    self.queueDetailModal.updateWithPlaybackDoc(doc: doc)
+                }
+                else {
+                    self.closeDetailModalTapped()
+                    return
+                }
+                
+            })
             
             self.queueDetailModal.isHidden = false
             UIView.animate(withDuration: 0.3, animations: {

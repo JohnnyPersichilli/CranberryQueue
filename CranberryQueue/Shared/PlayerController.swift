@@ -213,6 +213,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                 return
             }
             guard let contents = snapshot?.data() else {
+                self.mapDelegate?.clear()
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)
