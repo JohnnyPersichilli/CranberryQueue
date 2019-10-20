@@ -253,17 +253,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func addSongTapped(song: Song) {
         songTableView.voteTapped(isUpvote: true, song: song)
-        
-        self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            if snap.documents.count == 0 {
-                self.playerController.enqueueSongWith(song.uri)
-            }
-        })
-        
+                
         self.nextUpLabel.isHidden = false
         self.songTableView.isHidden = false
         let searchImage: UIImage = UIImage(named: "searchIcon")!
