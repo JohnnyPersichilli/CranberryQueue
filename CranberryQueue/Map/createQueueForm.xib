@@ -12,6 +12,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="createQueueForm" customModule="CranberryQueue" customModuleProvider="target">
             <connections>
+                <outlet property="cancelIconImageView" destination="DuP-4q-rKT" id="M5U-Dj-Yb1"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Kn1-kz-TLm"/>
                 <outlet property="queueNameTextField" destination="8bY-8F-kEY" id="Iac-vq-h2J"/>
                 <outlet property="scopeLabel" destination="23F-Xh-qms" id="9Bg-mb-a0N"/>
@@ -29,6 +30,13 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ifz-8C-SwG">
                             <rect key="frame" x="0.0" y="137" width="414" height="123"/>
                             <subviews>
+                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="xIcon" translatesAutoresizingMaskIntoConstraints="NO" id="DuP-4q-rKT">
+                                    <rect key="frame" x="378" y="0.0" width="36" height="36"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="36" id="IjE-Nv-xV5"/>
+                                        <constraint firstAttribute="width" constant="36" id="h81-3h-neS"/>
+                                    </constraints>
+                                </imageView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Queue Name:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zch-5m-yKo">
                                     <rect key="frame" x="26" y="11" width="183" height="37"/>
                                     <constraints>
@@ -86,6 +94,8 @@
                                 <constraint firstAttribute="bottom" secondItem="iqm-3W-uP0" secondAttribute="bottom" constant="17" id="QnE-Gf-AVt"/>
                                 <constraint firstItem="Zch-5m-yKo" firstAttribute="leading" secondItem="ifz-8C-SwG" secondAttribute="leading" constant="26" id="UIO-3p-FVO"/>
                                 <constraint firstItem="iqm-3W-uP0" firstAttribute="leading" secondItem="ifz-8C-SwG" secondAttribute="leading" id="sVl-fv-Yni"/>
+                                <constraint firstAttribute="trailing" secondItem="DuP-4q-rKT" secondAttribute="trailing" id="umq-FR-MN1"/>
+                                <constraint firstItem="DuP-4q-rKT" firstAttribute="top" secondItem="ifz-8C-SwG" secondAttribute="top" id="xaa-IU-yCJ"/>
                             </constraints>
                         </view>
                     </subviews>
@@ -106,4 +116,7 @@
             <point key="canvasLocation" x="47.826086956521742" y="35.491071428571423"/>
         </view>
     </objects>
+    <resources>
+        <image name="xIcon" width="1000" height="1000"/>
+    </resources>
 </document>

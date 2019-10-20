@@ -18,6 +18,8 @@ class createQueueForm: UIView {
     
     @IBOutlet var scopeLabel: UILabel!
     
+    @IBOutlet var cancelIconImageView: UIImageView!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()

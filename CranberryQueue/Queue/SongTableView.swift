@@ -148,7 +148,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return isHost
+        return indexPath.section == 0 ? false : isHost
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
