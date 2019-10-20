@@ -54,6 +54,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     var queueId: String? = nil
     var isPremium = false
     var code: String? = nil
+    
+    var isWaitingForRemote = false
 
     var playerController = PlayerController.sharedInstance
 
@@ -94,6 +96,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     @objc func handleAppDidBecomeActiveNotification(notification: Notification) {
+        createQueueForm.isHidden = true
+        createQueueForm.queueNameTextField.resignFirstResponder()
+        
         if let isEnabled = UserDefaults.standard.object(forKey: "isLocationEnabled") as? Bool {
             if isEnabled {
                 return
@@ -119,6 +124,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func updateConnectionStatus(connected: Bool) {
+        if !isWaitingForRemote {
+            return
+        }
+        isWaitingForRemote = false
         if connected {
             delegate?.addTapped()
             createQueueForm.isHidden = false
@@ -139,9 +148,11 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     func setLocationEnabled(status: Bool) {
+        print("set location enabled was called")
         if !status {
             if let _ = UserDefaults.standard.object(forKey: "isLocationEnabled") as? Bool {}
             else {
+                print("escaped first time user w/ no user defaults")
                 return
             }
             let alert = UIAlertController(title: "Location services disabled", message: "Please enable location to continue.", preferredStyle: .alert)
@@ -169,6 +180,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         self.isHost = isHost
         self.delegate?.setQueue(queueId)
         self.delegate?.setLocationEnabled(true)
+        //self.createQueueForm.isHidden = true
+        //self.createQueueForm.queueNameTextField.resignFirstResponder()
     }
 
     func updateGeoCode(city: String, region: String) {
@@ -275,11 +288,13 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         createQueueForm.queueNameTextField.text = ""
         self.closeDetailModalTapped()
         self.joinFormCancelTapped()
+        isWaitingForRemote = true
         let del = UIApplication.shared.delegate as! AppDelegate
         del.startAppRemote()
     }
     
     @objc func createFormCancelTapped() {
+        isWaitingForRemote = false
         createQueueForm.queueNameTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3, animations: {
             self.createQueueForm.alpha = 0
