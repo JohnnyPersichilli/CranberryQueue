@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Firebase
 
 class QueueDetailModal: UIView {
 
@@ -30,9 +29,7 @@ class QueueDetailModal: UIView {
     @IBOutlet var closeIconImageView: UIImageView!
     
     var currentQueue: CQLocation? = nil
-    
-    weak var db: Firestore? = nil
-    
+        
     var distance: Double = 0 {
         didSet {
             //if distance is less than .75 miles use feet else use miles
@@ -82,38 +79,37 @@ class QueueDetailModal: UIView {
         }
     }
     
-    func fetchSongInfo() {
-        self.db?.collection("playback").document(currentQueue!.queueId).getDocument(completion: { (snapshot, error) in
-            if let err = error {
-                print(err)
-            }
-            let currSong = snapshot?.data()?["name"] as? String ?? ""
-            let currArtist = snapshot?.data()?["artist"] as? String ?? ""
-            let songImage = snapshot?.data()?["imageURL"] as? String ?? ""
-            
-            if(songImage != ""){
-                let url = URL(string: songImage)
-                let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
-                    guard let data2 = dataBack else {
-                        print("no data")
-                        return }
-                    DispatchQueue.main.async {
-                        self.albumImageView.image = UIImage(data: data2)
-                        self.queueNameLabel.text = self.currentQueue!.name
-                        self.songNameLabel.text = currSong + " - " + currArtist
-                        self.numMembersLabel.text = String(self.currentQueue!.numMembers)
-                    }
-                }
-                task.resume()
-            }else{
+    func updateWithPlaybackDoc(doc: [String:Any]) {
+        let currSong = doc["name"] as? String ?? ""
+        let currArtist = doc["artist"] as? String ?? ""
+        let songImage = doc["imageURL"] as? String ?? ""
+        
+        if(songImage != ""){
+            let url = URL(string: songImage)
+            let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
+                guard let data2 = dataBack else {
+                    print("no data")
+                    return }
                 DispatchQueue.main.async {
-                    self.numMembersLabel.text = String(self.currentQueue!.numMembers)
+                    self.albumImageView.image = UIImage(data: data2)
                     self.queueNameLabel.text = self.currentQueue!.name
-                    self.albumImageView.image = UIImage(named: "defaultPerson")!
-                    self.songNameLabel.text = "No song currently playing"
+                    self.songNameLabel.text = currSong + " - " + currArtist
+                    self.numMembersLabel.text = String(self.currentQueue!.numMembers)
                 }
             }
-        })
+            task.resume()
+        }else{
+            DispatchQueue.main.async {
+                self.numMembersLabel.text = String(self.currentQueue!.numMembers)
+                self.queueNameLabel.text = self.currentQueue!.name
+                self.albumImageView.image = UIImage(named: "defaultPerson")!
+                self.songNameLabel.text = "No song currently playing"
+            }
+        }
+    }
+    
+    func fetchSongInfo() {
+        
     }
         
 }
