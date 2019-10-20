@@ -29,7 +29,6 @@ class QueueTableViewCell: UITableViewCell {
     
     @IBOutlet var shadowView: UIView!
     
-    
     var uid: String? = nil
     
     var songId: String? = nil
@@ -62,8 +61,6 @@ class QueueTableViewCell: UITableViewCell {
         
         downvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 90*3.1415926/180)
         upvoteButtonImageView.transform = CGAffineTransform(rotationAngle: 270*3.1415926/180)
-        
-        addShadow()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -83,11 +80,15 @@ class QueueTableViewCell: UITableViewCell {
     }
     
     func addShadow() {
+        if (contentView.layer.sublayers?.contains(shadowLayer) ?? false) {
+            return
+        }
+        
         shadowLayer = CALayer()
         let mutablePath = CGMutablePath()
         let maskLayer = CAShapeLayer()
 
-        let usableBounds = CGRect(x: bounds.minX + 10, y: bounds.minY, width: bounds.width - 20, height: bounds.height)
+        let usableBounds = CGRect(x: contentView.frame.minX + 10, y: contentView.frame.minY, width: contentView.frame.width - 20, height: contentView.frame.height)
         let xOffset = CGFloat(2.3)
         let yOffset = CGFloat(4)
         let shadowOffset = CGSize(width: xOffset, height: yOffset)
@@ -114,14 +115,12 @@ class QueueTableViewCell: UITableViewCell {
         maskLayer.path = mutablePath
 
         shadowLayer.mask = maskLayer
-
-        layer.insertSublayer(shadowLayer, above: layer)
+        contentView.layer.insertSublayer(shadowLayer, above: layer)
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        shadowLayer.removeFromSuperlayer()
-        addShadow()
+        contentView.layoutSubviews()
     }
     
     @objc func upvoteTapped() {
