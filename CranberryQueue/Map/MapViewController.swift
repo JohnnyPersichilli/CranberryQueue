@@ -208,6 +208,10 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         let joinCancelTap = UITapGestureRecognizer(target: self, action: #selector(joinFormCancelTapped))
         joinQueueForm.cancelIconImageView.addGestureRecognizer(joinCancelTap)
         joinQueueForm.cancelIconImageView.isUserInteractionEnabled = true
+        
+        let createCancelTap = UITapGestureRecognizer(target: self, action: #selector(createFormCancelTapped))
+        createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
+        createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
 
         let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
         homeIconImageView.addGestureRecognizer(homeTap)
@@ -215,6 +219,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
 
     @objc func homeTapped() {
+        self.joinFormCancelTapped()
+        self.closeDetailModalTapped()
+        self.createFormCancelTapped()
         joinQueue(code: code!)
     }
 
@@ -240,6 +247,8 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     @objc func settingsTapped() {
         self.closeDetailModalTapped()
+        self.joinFormCancelTapped()
+        self.createFormCancelTapped()
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
         vc.mapDelegate = self
@@ -248,6 +257,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     @objc func searchTapped() {
         self.closeDetailModalTapped()
+        self.createFormCancelTapped()
         joinQueueForm.eventCodeTextField.text = ""
         joinQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
@@ -259,8 +269,19 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     @objc func addTapped() {
         createQueueForm.queueNameTextField.text = ""
         self.closeDetailModalTapped()
+        self.joinFormCancelTapped()
         let del = UIApplication.shared.delegate as! AppDelegate
         del.startAppRemote()
+    }
+    
+    @objc func createFormCancelTapped() {
+        createQueueForm.queueNameTextField.resignFirstResponder()
+        UIView.animate(withDuration: 0.3, animations: {
+            self.createQueueForm.alpha = 0
+        }) { (val) in
+            self.createQueueForm.isHidden = true
+            self.createQueueForm.scopeSwitch.isOn = true
+        }
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -272,28 +293,17 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
             return false
         }
         if textField == createQueueForm.queueNameTextField {
-            createQueueForm.queueNameTextField.resignFirstResponder()
-            UIView.animate(withDuration: 0.3, animations: {
-                self.createQueueForm.alpha = 0
-            }) { (val) in
-                self.createQueueForm.isHidden = true
-                self.createQueueForm.scopeSwitch.isOn = true
-            }
             if createQueueForm.scopeSwitch.isOn {
                 createQueue(withName: createQueueForm.queueNameTextField.text ?? "")
             }
             else {
                 createQueue(withCode: eventCodeFromTimestamp())
             }
+            self.createFormCancelTapped()
         }
         else if textField == joinQueueForm.eventCodeTextField {
-            joinQueueForm.eventCodeTextField.resignFirstResponder()
-            UIView.animate(withDuration: 0.3, animations: {
-                self.joinQueueForm.alpha = 0
-            }) { (val) in
-                self.joinQueueForm.isHidden = true
-            }
             joinQueue(code: textField.text!)
+            joinFormCancelTapped()
         }
         return true
     }
@@ -307,18 +317,12 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     }
     
     func openDetailModal(data: CQLocation) {
-        // Setup modal in child, animate from parent
+        // clicking same queue and window is open, close
         if(!queueDetailModal.isHidden && queueDetailModal.currentQueue?.queueId == data.queueId){
-            UIView.animate(withDuration: 0.3, animations: {
-                self.topDetailModalConstraint.isActive = true
-                self.bottomDetailModalConstraint.isActive = false
-                self.queueDetailModal.alpha = 0
-                self.view.layoutIfNeeded()
-            }) { (_) in
-                self.queueDetailModal.isHidden = true
-            }
+            closeDetailModalTapped()
         }
-        else { // clicked a different window while its open, dont close just rerender the data
+        // clicking new queue, reload and open
+        else {
             let distance = delegate?.getDistanceFrom(data)
             queueDetailModal.distance = distance ?? 0
             queueDetailModal.db = db
