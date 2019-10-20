@@ -113,6 +113,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     func logoutTapped() {
         loginContainer.isHidden = false
         isPremium = false
+        (UIApplication.shared.delegate as? AppDelegate)?.token = ""
     }
     
     func updateConnectionStatus(connected: Bool) {

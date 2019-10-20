@@ -47,6 +47,7 @@ class SettingsViewController: UIViewController {
     
     @objc func logoutTapped() {
         mapDelegate?.logoutTapped()
+        setDefaultInfo()
         self.presentingViewController?.dismiss(animated:true, completion: {
             self.navigationController?.popToRootViewController(animated: true)
         })
