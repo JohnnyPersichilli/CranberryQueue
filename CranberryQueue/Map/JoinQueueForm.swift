@@ -30,6 +30,8 @@ class JoinQueueForm: UIView {
         Bundle.main.loadNibNamed("JoinQueueForm", owner: self, options: nil)
         contentView.fixInView(self)
         
+        eventCodeTextField.autocorrectionType = .no
+        
         eventCodeTextField.returnKeyType = .join
     }
 
