@@ -69,6 +69,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
+            return
         }
         self.queueId = queueId
         self.isHost = isHost
