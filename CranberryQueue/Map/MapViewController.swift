@@ -65,6 +65,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         super.viewDidLoad()
 
         db = Firestore.firestore()
+        let settings = FirestoreSettings()
+        settings.isPersistenceEnabled = false
+        db?.settings = settings
         setupScreen()
         setupGestureRecognizers()
         createQueueForm.queueNameTextField.delegate = self
