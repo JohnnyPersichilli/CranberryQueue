@@ -120,6 +120,28 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
        NotificationCenter.default.removeObserver(self)
     }
     
+    func checkForReturningHost(withId id: String) {
+        db?.collection("contributor").whereField("host", isEqualTo: id).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count > 0 {
+                let oldQueueId = snap.documents[0].documentID
+                
+                self.isHost = true
+                self.queueId = oldQueueId
+                
+                self.delegate?.setQueue(oldQueueId)
+                
+                self.playerController.queueId = oldQueueId
+                self.playerController.isHost = true
+                self.playerController.db = self.db
+                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
+            }
+        })
+    }
+    
     func logoutTapped() {
         loginContainer.isHidden = false
         isPremium = false
@@ -333,6 +355,9 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
 
     func dismissLoginContainer(isPremium: Bool) {
         self.isPremium = isPremium
+        if isPremium {
+            self.checkForReturningHost(withId: self.uid)
+        }
         DispatchQueue.main.async {
             self.loginContainer.isHidden = true
             self.addIconImageView.isHidden = !self.isPremium
