@@ -23,6 +23,7 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var timeLabel: UILabel!
     
     @IBOutlet var helpLabel: UILabel!
+    @IBOutlet weak var inactiveHostLabel: UILabel!
     
     
     var delegate: PlayerControllerDelegate?
@@ -47,6 +48,8 @@ class PlayerView: UIView, PlayerDelegate {
         titleLabel.text = nil
         timeLabel.text = nil
         
+        inactiveHostLabel.isHidden = true
+        
         setupGestureRecognizers()
     }
     
@@ -64,6 +67,7 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
         helpLabel.isHidden = true
+        inactiveHostLabel.isHidden = true
         var url = URL(string: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg")
         if(state.track.imageIdentifier.split(separator: ":").count >= 2){
             let trackId = state.track.imageIdentifier.split(separator: ":")[2]
@@ -87,6 +91,7 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updateSongUI(withInfo info: PlaybackInfo) {
         helpLabel.isHidden = true
+        inactiveHostLabel.isHidden = true
         let url = URL(string: info.imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
@@ -105,6 +110,22 @@ class PlayerView: UIView, PlayerDelegate {
         let posMinutes = (position/1000)/60 % 60
         let durSeconds = (duration/1000) % 60
         let durMinutes = (duration/1000)/60 % 60
+        if(position > duration){
+            DispatchQueue.main.async {
+                self.inactiveHostLabel.isHidden = false
+                self.albumImageView.image = nil
+                self.titleLabel.text = nil
+                self.timeLabel.text = nil
+                self.helpLabel.isHidden = true
+                if(posMinutes == durMinutes){
+                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
+                }else{
+                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
+                }
+                
+            }
+            return
+        }
         var stringPosSeconds = String((position/1000) % 60)
         var stringDurSeconds = String((duration/1000) % 60)
         if posSeconds < 10 {
@@ -123,6 +144,7 @@ class PlayerView: UIView, PlayerDelegate {
         titleLabel.text = nil
         timeLabel.text = nil
         helpLabel.isHidden = false
+        inactiveHostLabel.isHidden = true
     }
 
 }
