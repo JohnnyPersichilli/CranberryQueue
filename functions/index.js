@@ -118,6 +118,42 @@ exports.scheduledPurgeOldPlayback = functions.pubsub.schedule('every 24 hours').
   return null;
 });
 
+
+exports.collectPlaybackAnalytics = functions.firestore
+    .document('playback/{queueId}')
+    .onWrite((change, context) => {
+        if (!change.after.exists) {
+            return 0
+        }
+        const after = change.after.data()
+        if (change.before.exists) {
+            const before = change.before.data()
+            if (before.uri == after.uri) {
+                return 0
+            }
+        }
+        db.collection('location').doc(context.params.queueId).get()
+        .then(doc => {
+            if (!doc.exists) {
+                return 0
+            }
+            const data = doc.data()
+            db.collection('playbackArchive').add({
+                artist: after.artist,
+                name: after.name,
+                uri: after.uri,
+                imageURL: after.imageURL,
+                city: data.city,
+                region: data.region,
+                time: admin.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                return 0
+            })
+
+        })
+    })
+
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
     .onCreate((snap, context) => {
