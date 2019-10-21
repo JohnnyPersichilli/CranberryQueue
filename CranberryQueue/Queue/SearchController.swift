@@ -45,6 +45,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         searchTableView.dataSource = self
         searchTextField.delegate = self
         searchTextField.returnKeyType = .search
+        searchTextField.autocorrectionType = .no
         
         db = Firestore.firestore()
         
