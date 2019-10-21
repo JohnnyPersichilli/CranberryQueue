@@ -14,6 +14,7 @@ protocol SettingsMapDelegate: class {
 
 class SettingsViewController: UIViewController {
     
+    
     @IBOutlet weak var mapIcon: UIImageView!
     
     @IBOutlet weak var spotifyProfilePicture: UIImageView!
@@ -27,6 +28,8 @@ class SettingsViewController: UIViewController {
     @IBOutlet var logoutImageView: UIImageView!
     
     weak var mapDelegate: SettingsMapDelegate? = nil
+    
+    @IBOutlet weak var settingsOptionTable: SettingsTableView!
     
     var token: String {
         get {
@@ -61,6 +64,10 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupGestureRecognizers()
+        
+        settingsOptionTable.delegate = self as? UITableViewDelegate
+        settingsOptionTable.dataSource = self as? UITableViewDataSource
+        
         if token == "" {
             setDefaultInfo()
         }
@@ -130,5 +137,7 @@ class SettingsViewController: UIViewController {
         }
         task.resume()
     }
+    
+    
     
 }
