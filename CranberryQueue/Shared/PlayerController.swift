@@ -128,6 +128,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
                 
             })
+            return
         }
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
