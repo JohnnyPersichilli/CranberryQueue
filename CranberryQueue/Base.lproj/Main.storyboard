@@ -628,16 +628,13 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="G6I-Ne-Umw" customClass="TableView">
                                 <rect key="frame" x="34" y="307" width="307" height="268"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="268" id="Dgv-XU-UBV"/>
-                                </constraints>
                                 <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="aboutUsCell" id="chr-ZJ-fgs" customClass="SettingsTableViewCell" customModule="CranberryQueue" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="307" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="chr-ZJ-fgs" id="xtv-A4-6pq">
-                                            <rect key="frame" x="0.0" y="0.0" width="307" height="43.666666666666664"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="chr-ZJ-fgs" id="xtv-A4-6pq">
+                                            <rect key="frame" x="0.0" y="0.0" width="307" height="43.333332061767578"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About us" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eh4-8n-Ri6">
@@ -688,9 +685,6 @@
                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bcZ-hQ-sQc">
                                         <rect key="frame" x="0.0" y="37" width="307" height="231"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="231" id="uv3-R3-fP7"/>
-                                        </constraints>
                                         <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -711,7 +705,7 @@
                                     <constraint firstAttribute="trailing" secondItem="K3V-nJ-YR4" secondAttribute="trailing" constant="8" id="R7z-nr-8m5"/>
                                     <constraint firstAttribute="bottom" secondItem="bcZ-hQ-sQc" secondAttribute="bottom" id="X9V-98-Y2k"/>
                                     <constraint firstItem="K3V-nJ-YR4" firstAttribute="top" secondItem="fUE-e6-oOI" secondAttribute="top" constant="8" id="XWa-Bn-y67"/>
-                                    <constraint firstAttribute="height" constant="268" id="rKg-0Y-3m5"/>
+                                    <constraint firstItem="ouV-Ph-A7p" firstAttribute="top" secondItem="fUE-e6-oOI" secondAttribute="top" constant="8" id="Yay-mB-MzF"/>
                                     <constraint firstAttribute="trailing" secondItem="bcZ-hQ-sQc" secondAttribute="trailing" id="v3n-WR-2hB"/>
                                 </constraints>
                             </view>
@@ -725,15 +719,17 @@
                             <constraint firstItem="btv-c4-Y1k" firstAttribute="centerX" secondItem="XiO-gN-XtK" secondAttribute="centerX" id="9jj-g3-vwr"/>
                             <constraint firstItem="bK2-cz-Gpq" firstAttribute="trailing" secondItem="tHr-Q1-hpG" secondAttribute="trailing" constant="34" id="Q03-3i-yyE"/>
                             <constraint firstItem="FL6-VI-iR2" firstAttribute="top" secondItem="bK2-cz-Gpq" secondAttribute="top" constant="21" id="V4f-Bw-2la"/>
+                            <constraint firstItem="btv-c4-Y1k" firstAttribute="top" secondItem="G6I-Ne-Umw" secondAttribute="bottom" constant="10" id="b5L-mv-qvN"/>
                             <constraint firstItem="bK2-cz-Gpq" firstAttribute="trailing" secondItem="FL6-VI-iR2" secondAttribute="trailing" constant="26" id="d3f-wr-hTw"/>
                             <constraint firstItem="tHr-Q1-hpG" firstAttribute="top" secondItem="xlA-0K-q3Z" secondAttribute="bottom" constant="21" id="iOc-TJ-dfC"/>
                             <constraint firstItem="G6I-Ne-Umw" firstAttribute="leading" secondItem="bK2-cz-Gpq" secondAttribute="leading" constant="34" id="jjr-Ws-rgv"/>
                             <constraint firstItem="xlA-0K-q3Z" firstAttribute="top" secondItem="bK2-cz-Gpq" secondAttribute="top" constant="26" id="lbj-TT-fJk"/>
+                            <constraint firstItem="btv-c4-Y1k" firstAttribute="top" secondItem="fUE-e6-oOI" secondAttribute="bottom" constant="10" id="n84-lD-R6L"/>
                             <constraint firstItem="z5z-3Q-oy2" firstAttribute="leading" secondItem="bK2-cz-Gpq" secondAttribute="leading" constant="34" id="noM-yS-Lmo"/>
                             <constraint firstItem="tHr-Q1-hpG" firstAttribute="leading" secondItem="bK2-cz-Gpq" secondAttribute="leading" constant="34" id="oab-cA-mnt"/>
                             <constraint firstItem="bK2-cz-Gpq" firstAttribute="trailing" secondItem="z5z-3Q-oy2" secondAttribute="trailing" constant="34" id="xI8-I2-c6C"/>
                             <constraint firstItem="G6I-Ne-Umw" firstAttribute="top" secondItem="z5z-3Q-oy2" secondAttribute="bottom" constant="24" id="xJJ-f2-zPj"/>
-                            <constraint firstItem="btv-c4-Y1k" firstAttribute="bottom" secondItem="bK2-cz-Gpq" secondAttribute="bottom" id="xq3-Qz-wat"/>
+                            <constraint firstItem="btv-c4-Y1k" firstAttribute="bottom" secondItem="XiO-gN-XtK" secondAttribute="bottom" constant="-34" id="xq3-Qz-wat"/>
                             <constraint firstItem="xlA-0K-q3Z" firstAttribute="leading" secondItem="bK2-cz-Gpq" secondAttribute="leading" constant="34" id="yVj-7o-uMl"/>
                             <constraint firstItem="bK2-cz-Gpq" firstAttribute="trailing" secondItem="fUE-e6-oOI" secondAttribute="trailing" constant="34" id="ya4-SQ-uOP"/>
                         </constraints>
