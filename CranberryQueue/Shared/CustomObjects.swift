@@ -39,6 +39,11 @@ struct PlaybackInfo {
     var uri = String()
 }
 
+struct SettingsOption {
+    var name = String()
+    var text = String()
+}
+
 extension Song: Equatable {
     static func == (left: Song, right: Song) -> Bool {
         return left.docID == right.docID
