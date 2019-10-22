@@ -77,7 +77,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         if isHost {
             updateConnectionStatus(connected: true)
         }
-        else if queueId != nil {
+        else {
             setupGuestListeners()
         }
     }
@@ -123,6 +123,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         if isEnqueuing {
             isEnqueuing = false
             return
+        }
+        if queueId == nil {
+            remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
+                
+            })
         }
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
