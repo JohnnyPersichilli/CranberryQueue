@@ -29,13 +29,11 @@ class QueueDetailModal: UIView {
     @IBOutlet var closeIconImageView: UIImageView!
     
     var currentQueue: CQLocation? = nil
-    
-    let metersInMile = 1609.34
-    let feetInMeter = 3.28083985
-    let joinGreen = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
         
     var distance: Double = 0 {
         didSet {
+            let metersInMile = 1609.34
+            let feetInMeter = 3.28083985
             //if distance is less than .25 miles use feet else use miles
             if(distance/metersInMile < 0.25){
                 let distanceInFeet = (distance*feetInMeter)
@@ -66,6 +64,7 @@ class QueueDetailModal: UIView {
     }
     
     func setJoinEnabled() {
+        let joinGreen = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
         //can set this as the radius if we are letting users do that or an arbitrary number like 500m
         let maxDistance = 500.0
         if(distance > maxDistance){
@@ -91,25 +90,21 @@ class QueueDetailModal: UIView {
                     print("no data")
                     return
                 }
-                DispatchQueue.main.async {
-                    self.albumImageView.image = UIImage(data: imageData)
-                    self.queueNameLabel.text = self.currentQueue!.name
-                    self.songNameLabel.text = currSong + " - " + currArtist
-                    self.numMembersLabel.text = String(self.currentQueue!.numMembers)
-                }
+                let songString = currSong + " - " + currArtist
+                self.updatePlaybackUI(queueName: self.currentQueue!.name, numMembers: self.currentQueue!.numMembers, songString: songString, albumImage: UIImage(data: imageData)!)
             }
             task.resume()
         }else{
-            DispatchQueue.main.async {
-                self.numMembersLabel.text = String(self.currentQueue!.numMembers)
-                self.queueNameLabel.text = self.currentQueue!.name
-                self.albumImageView.image = UIImage(named: "defaultPerson")!
-                self.songNameLabel.text = "No song currently playing"
-            }
+            updatePlaybackUI(queueName: self.currentQueue!.name, numMembers: self.currentQueue!.numMembers, songString: "No song currently playing", albumImage: UIImage(named: "defaultPerson")!)
         }
     }
-//    currently not implemented
-//    func fetchSongInfo() {
-//
-//    }
+    
+    func updatePlaybackUI(queueName: String, numMembers:Int, songString: String, albumImage: UIImage){
+        DispatchQueue.main.async {
+            self.albumImageView.image = albumImage
+            self.queueNameLabel.text = queueName
+            self.songNameLabel.text = songString
+            self.numMembersLabel.text = String(numMembers)
+        }
+    }
 }
