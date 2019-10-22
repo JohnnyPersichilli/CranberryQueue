@@ -38,13 +38,6 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var moreDetailTextView: UITextView!
     @IBOutlet weak var closeMoreDetailImage: UIImageView!
     
-    var token: String {
-        get {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            return delegate.token
-        }
-    }
-    
     struct SettingsOption {
         var name = String()
         var text = String()
@@ -73,6 +66,13 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         faqOption,
         reportBugOption,
     ]
+    
+    var token: String {
+        get {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            return delegate.token
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -136,9 +136,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             self.settingsOptionTable.isHidden = false
             UIView.animate(withDuration: 0.3, animations: {
                 self.settingsOptionTable.alpha = 1
-            }) { (val) in
-                
-            }
+            })
         }
     }
     
@@ -163,9 +161,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             self.settingsMoreDetailView.isHidden = false
             UIView.animate(withDuration: 0.3, animations: {
                 self.settingsMoreDetailView.alpha = 1
-            }) { (val) in
-                
-            }
+            })
         }
         DispatchQueue.main.async {
             self.moreDetailTitleLabel.text = option.name
@@ -213,7 +209,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                     self.setDefaultImage()
                 }
             } catch {
-                print(error.localizedDescription)
+                print("Could not serialize JSON")
             }
         }
         task.resume()
@@ -231,7 +227,6 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             completion(data)
         }
-        
         task.resume()
     }
     
