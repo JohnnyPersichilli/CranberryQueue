@@ -15,7 +15,7 @@ exports.deleteLocation = functions.firestore
         const queueId = context.params.locationId
 
         //remove subcollection in contributor, so its not orphaned
-        db.collection('contributor').doc(queueId).collection('members').get().then((querySnapshot) => {
+        return db.collection('contributor').doc(queueId).collection('members').get().then((querySnapshot) => {
             // this will actually trigger the other onDelete listener, so we need to set a global boolean to ignore that update
             querySnapshot.forEach((doc) => {
                 doc.ref.delete()
@@ -25,46 +25,42 @@ exports.deleteLocation = functions.firestore
             // console.log("contributor table: " + locationId + " successfully deleted")
             db.collection('contributor').doc(queueId).delete()
 
-        })
+            //delete the playback doc
+            db.collection('playback').doc(queueId).delete()
 
-        //delete the playback doc
-        db.collection('playback').doc(queueId).delete().then(() => {
-            // console.log("playback table: " + queueId + " successfully deleted")
-        })
-
-        //deleting songs from the playlist song table so not orphaned
-        db.collection('playlist').doc(queueId).collection('songs').get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                //now delete the song out of the
-                doc.ref.delete()
+            //deleting songs from the playlist song table so not orphaned
+            db.collection('playlist').doc(queueId).collection('songs').get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    //now delete the song out of the
+                    doc.ref.delete()
+                })
+            }).then(() => {
+                // console.log("successfully deleted playlist " + queueId + " table")
+                db.collection('playlist').doc(queueId).delete()
             })
-        }).then(() => {
-            // console.log("successfully deleted playlist " + queueId + " table")
-            db.collection('playlist').doc(queueId).delete()
-        })
 
-        // delete songs from song table
-        db.collection('song').where("queueId", "==", queueId).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                //in each song object, we need to remove all entries from upvote users and downvote userse
-                doc.ref.collection('upvoteUsers').get().then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        doc.ref.delete()
-                    })
-                }).then(() => {
-                    doc.ref.collection('downvoteUsers').get().then((querySnapshot) => {
+            // delete songs from song table
+            db.collection('song').where("queueId", "==", queueId).get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    //in each song object, we need to remove all entries from upvote users and downvote userse
+                    doc.ref.collection('upvoteUsers').get().then((querySnapshot) => {
                         querySnapshot.forEach((doc) => {
                             doc.ref.delete()
                         })
+                    }).then(() => {
+                        doc.ref.collection('downvoteUsers').get().then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                doc.ref.delete()
+                            })
+                        })
+                    }).then(() => {
+                        //finally, delete the song obj
+                        doc.ref.delete()
                     })
-                }).then(() => {
-                    //finally, delete the song obj
-                    doc.ref.delete()
                 })
             })
         })
-      return null
     })
 
 exports.addNumMembers = functions.firestore
@@ -73,11 +69,8 @@ exports.addNumMembers = functions.firestore
 
     const queueId = context.params.queueId;
 
-    db.collection('location').doc(queueId).update({
+    return db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(1)
-    })
-    .then( () => {
-        return;
     })
 });
 
@@ -96,9 +89,8 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
     db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(-1)
     })
-    .then( () => {
+    .then(() => {
         response.status(200).send('success');
-        return;
     })
 });
 
@@ -132,7 +124,7 @@ exports.collectPlaybackAnalytics = functions.firestore
                 return 0
             }
         }
-        db.collection('location').doc(context.params.queueId).get()
+        return db.collection('location').doc(context.params.queueId).get()
         .then(doc => {
             if (!doc.exists) {
                 return 0
@@ -161,7 +153,7 @@ exports.updateNetVotes = functions.firestore
     const songId = context.params.songId;
     const uid = context.params.uid;
 
-    db.collection('song').doc(songId).get()
+    return db.collection('song').doc(songId).get()
     .then(doc => {
         const queueId = doc.data().queueId
         db.collection('song').doc(songId).collection('downvoteUsers').get()
@@ -213,7 +205,7 @@ exports.updateDownvotes = functions.firestore
     const songId = context.params.songId;
     const uid = context.params.uid;
 
-    db.collection('song').doc(songId).get()
+    return db.collection('song').doc(songId).get()
     .then(doc => {
         const queueId = doc.data().queueId
         db.collection('song').doc(songId).collection('upvoteUsers').get()
@@ -221,9 +213,6 @@ exports.updateDownvotes = functions.firestore
             if (snapshot.empty) {
                 db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                     votes: admin.firestore.FieldValue.increment(-1)
-                })
-                .then( () => {
-                    return;
                 })
             }
             else {
@@ -238,16 +227,10 @@ exports.updateDownvotes = functions.firestore
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-2)
                     })
-                    .then( () => {
-                        return;
-                    })
                 }
                 else {
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-1)
-                    })
-                    .then( () => {
-                        return;
                     })
                 }
             }
