@@ -29,16 +29,20 @@ class QueueDetailModal: UIView {
     @IBOutlet var closeIconImageView: UIImageView!
     
     var currentQueue: CQLocation? = nil
+    
+    let metersInMile = 1609.34
+    let feetInMeter = 3.28083985
+    let joinGreen = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
         
     var distance: Double = 0 {
         didSet {
-            //if distance is less than .75 miles use feet else use miles
-            if(distance/1609 < 0.75){
-                let distanceInFeet = (distance*3.28083985)
+            //if distance is less than .25 miles use feet else use miles
+            if(distance/metersInMile < 0.25){
+                let distanceInFeet = (distance*feetInMeter)
                 let roundedFeetString = String(format: "%.2f", distanceInFeet)
                 distanceLabel.text = roundedFeetString + "ft"
             }else{
-                let distanceInMiles = (distance/1609)
+                let distanceInMiles = (distance/metersInMile)
                 let roundedMileString = String(format: "%.1f", distanceInMiles)
                 distanceLabel.text =  roundedMileString + "mi"
             }
@@ -59,10 +63,6 @@ class QueueDetailModal: UIView {
     func commonInit() {
         Bundle.main.loadNibNamed("QueueDetailModal", owner: self, options: nil)
         contentView.fixInView(self)
-        
-        queueNameLabel.text = ""
-        songNameLabel.text = ""
-        distanceLabel.text = ""
     }
     
     func setJoinEnabled() {
@@ -74,7 +74,7 @@ class QueueDetailModal: UIView {
             joinButton.isOpaque = true
         }else{
             joinButton.isEnabled = true
-            joinButton.backgroundColor = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
+            joinButton.backgroundColor = joinGreen
             joinButton.isOpaque = false
         }
     }
@@ -87,11 +87,12 @@ class QueueDetailModal: UIView {
         if(songImage != ""){
             let url = URL(string: songImage)
             let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
-                guard let data2 = dataBack else {
+                guard let imageData = dataBack else {
                     print("no data")
-                    return }
+                    return
+                }
                 DispatchQueue.main.async {
-                    self.albumImageView.image = UIImage(data: data2)
+                    self.albumImageView.image = UIImage(data: imageData)
                     self.queueNameLabel.text = self.currentQueue!.name
                     self.songNameLabel.text = currSong + " - " + currArtist
                     self.numMembersLabel.text = String(self.currentQueue!.numMembers)
@@ -107,9 +108,8 @@ class QueueDetailModal: UIView {
             }
         }
     }
-    
-    func fetchSongInfo() {
-        
-    }
-        
+//    currently not implemented
+//    func fetchSongInfo() {
+//
+//    }
 }
