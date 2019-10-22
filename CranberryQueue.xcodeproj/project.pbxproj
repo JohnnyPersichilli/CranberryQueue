@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C45F19C235E52AA0074DDA7 /* SettingsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45F19B235E52AA0074DDA7 /* SettingsTableView.swift */; };
 		1C45F19E235E540E0074DDA7 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */; };
 		4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */; };
 		4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */; };
@@ -41,7 +40,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1C45F19B235E52AA0074DDA7 /* SettingsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableView.swift; sourceTree = "<group>"; };
 		1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDetailModal.swift; sourceTree = "<group>"; };
@@ -100,6 +98,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		1C45F1A1235E8B390074DDA7 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */,
+				4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		4CDB8449232BD2A1002559BB = {
 			isa = PBXGroup;
 			children = (
@@ -124,7 +131,7 @@
 			children = (
 				4CDB8455232BD2A1002559BB /* AppDelegate.swift */,
 				4CDB8459232BD2A1002559BB /* Main.storyboard */,
-				4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */,
+				1C45F1A1235E8B390074DDA7 /* Settings */,
 				4CED2E06232DB0DB008C6DAA /* Map */,
 				4CED2E07232DB0F6008C6DAA /* Shared */,
 				4CED2E08232DB10E008C6DAA /* Queue */,
@@ -173,8 +180,6 @@
 				4C4CD3E0232C9D1500F17BB8 /* QueueViewController.swift */,
 				4CA5BC04232D4B8D007F8D38 /* SearchController.swift */,
 				4C55CCB7232CB1F30059C898 /* SongTableView.swift */,
-				1C45F19B235E52AA0074DDA7 /* SettingsTableView.swift */,
-				1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */,
 				4C55CCBB232CB28C0059C898 /* QueueTableViewCell.swift */,
 				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
 			);
@@ -369,7 +374,6 @@
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,
 				4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */,
-				1C45F19C235E52AA0074DDA7 /* SettingsTableView.swift in Sources */,
 				4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */,
 				4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */,
 				4CDB8456232BD2A1002559BB /* AppDelegate.swift in Sources */,
