@@ -320,6 +320,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
     
     @objc func createFormCancelTapped() {
         isWaitingForRemote = false
+        delegate?.setQueue(nil)
         createQueueForm.queueNameTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3, animations: {
             self.createQueueForm.alpha = 0
