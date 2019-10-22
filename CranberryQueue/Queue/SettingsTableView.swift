@@ -31,7 +31,7 @@ class SettingsTableView: UITableView, UITableViewDelegate, UITableViewDataSource
         var cell = SettingsTableViewCell()
         cell = self.dequeueReusableCell(withIdentifier: "aboutUsCell", for: indexPath) as! SettingsTableViewCell
         var option = optionsArray[indexPath.section]
-        cell.optionNameLabel.text = option["name"]
+        cell.optionsNameLabel.text = option["name"]
         return cell
     }
     
