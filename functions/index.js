@@ -205,7 +205,7 @@ exports.updateDownvotes = functions.firestore
     const songId = context.params.songId;
     const uid = context.params.uid;
 
-    db.collection('song').doc(songId).get()
+    return db.collection('song').doc(songId).get()
     .then(doc => {
         const queueId = doc.data().queueId
         db.collection('song').doc(songId).collection('upvoteUsers').get()
@@ -213,9 +213,6 @@ exports.updateDownvotes = functions.firestore
             if (snapshot.empty) {
                 db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                     votes: admin.firestore.FieldValue.increment(-1)
-                })
-                .then( () => {
-                    return;
                 })
             }
             else {
@@ -230,16 +227,10 @@ exports.updateDownvotes = functions.firestore
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-2)
                     })
-                    .then( () => {
-                        return;
-                    })
                 }
                 else {
                     db.collection('playlist').doc(queueId).collection('songs').doc(songId).update({
                         votes: admin.firestore.FieldValue.increment(-1)
-                    })
-                    .then( () => {
-                        return;
                     })
                 }
             }
