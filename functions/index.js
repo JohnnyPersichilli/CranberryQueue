@@ -124,7 +124,7 @@ exports.collectPlaybackAnalytics = functions.firestore
                 return 0
             }
         }
-        db.collection('location').doc(context.params.queueId).get()
+        return db.collection('location').doc(context.params.queueId).get()
         .then(doc => {
             if (!doc.exists) {
                 return 0
