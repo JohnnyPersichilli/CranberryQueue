@@ -91,15 +91,23 @@ class QueueDetailModal: UIView {
                     return
                 }
                 let songString = currSong + " - " + currArtist
-                self.updatePlaybackUI(queueName: self.currentQueue!.name, numMembers: self.currentQueue!.numMembers, songString: songString, albumImage: UIImage(data: imageData)!)
+                self.updateModalUI(queueName: self.currentQueue!.name,
+                                   numMembers: self.currentQueue!.numMembers,
+                                   songString: songString,
+                                   albumImage:UIImage(data: imageData)!
+                )
             }
             task.resume()
         }else{
-            updatePlaybackUI(queueName: self.currentQueue!.name, numMembers: self.currentQueue!.numMembers, songString: "No song currently playing", albumImage: UIImage(named: "defaultPerson")!)
+            updateModalUI(queueName: self.currentQueue!.name,
+                          numMembers: self.currentQueue!.numMembers,
+                          songString: "No song currently playing",
+                          albumImage: UIImage(named: "defaultPerson")!
+            )
         }
     }
     
-    func updatePlaybackUI(queueName: String, numMembers:Int, songString: String, albumImage: UIImage){
+    func updateModalUI(queueName: String, numMembers:Int, songString: String, albumImage: UIImage){
         DispatchQueue.main.async {
             self.albumImageView.image = albumImage
             self.queueNameLabel.text = queueName
