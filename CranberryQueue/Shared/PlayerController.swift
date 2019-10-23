@@ -69,6 +69,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
+            return
         }
         self.queueId = queueId
         self.isHost = isHost
@@ -76,7 +77,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         if isHost {
             updateConnectionStatus(connected: true)
         }
-        else if queueId != nil {
+        else {
             setupGuestListeners()
         }
     }
@@ -121,6 +122,12 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         if isEnqueuing {
             isEnqueuing = false
+            return
+        }
+        if queueId == nil {
+            remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
+                
+            })
             return
         }
         mapDelegate?.updateSongUI(withState: playerState)
