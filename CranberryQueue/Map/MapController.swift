@@ -10,15 +10,15 @@ import UIKit
 import GoogleMaps
 import Firebase
 
-protocol mapDelegate: class {
+protocol MapControllerDelegate: class {
     func updateGeoCode(city: String, region: String)
-    func openDetailModal(data: CQLocation)
+    func toggleDetailModal(withData data: CQLocation)
     func setLocationEnabled(status: Bool)
 }
 
-class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, mapControllerDelegate {
+class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, ControllerMapDelegate {
     
-    weak var delegate: mapDelegate?
+    weak var mapControllerDelegate: MapControllerDelegate?
     
     var db: Firestore? = nil
     var queuesInLocationRef: ListenerRegistration? = nil
@@ -65,7 +65,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
         }
-        delegate?.openDetailModal(data: marker.userData as! CQLocation)
+        mapControllerDelegate?.toggleDetailModal(withData: marker.userData as! CQLocation)
         return true
     }
 
@@ -157,7 +157,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         default:
             isEnabled = false
         }
-        delegate?.setLocationEnabled(status: isEnabled)
+        mapControllerDelegate?.setLocationEnabled(status: isEnabled)
         UserDefaults.standard.set(isEnabled, forKey: "isLocationEnabled")
     }
     
@@ -180,7 +180,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print(error!)
                 return
             }
-            self.delegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
+            self.mapControllerDelegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
             self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
         }
     }

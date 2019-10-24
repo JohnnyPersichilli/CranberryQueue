@@ -16,7 +16,7 @@ protocol PlayerDelegate: class {
     func clear()
 }
 
-class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
+class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
     
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {

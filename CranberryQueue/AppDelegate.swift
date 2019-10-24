@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import GoogleMaps
 
-protocol mainDelegate: class {
+protocol RemoteDelegate: class {
     func updateConnectionStatus(connected: Bool)
 }
 
@@ -22,8 +22,8 @@ protocol SessionDelegate: class {
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate {
     var window: UIWindow?
     
-    weak var delegate: mainDelegate?
-    weak var appMapDelegate: mainDelegate?
+    weak var appPlayerDelegate: RemoteDelegate?
+    weak var appMapDelegate: RemoteDelegate?
     weak var seshDelegate: SessionDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
@@ -55,10 +55,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
+        UIApplication.shared.isIdleTimerDisabled = true
+        
         FirebaseApp.configure()
         GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
-        //GMSPlacesClient.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
-        // Insanely important 2 lines below
         return true
     }
     
@@ -93,7 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("connected")
-        delegate?.updateConnectionStatus(connected: true)
+        appPlayerDelegate?.updateConnectionStatus(connected: true)
         appMapDelegate?.updateConnectionStatus(connected: true)
     }
     
@@ -103,6 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("failed")
+        /// player controller does not need to be notified of failure
         appMapDelegate?.updateConnectionStatus(connected: false)
     }
     

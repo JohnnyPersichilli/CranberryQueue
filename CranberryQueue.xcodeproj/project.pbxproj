@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1C45F19E235E540E0074DDA7 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */; };
+		4C30112B235FDAB90097CA97 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C30112A235FDAB90097CA97 /* Colors.swift */; };
 		4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */; };
 		4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */; };
 		4C4CD3D5232C556F00F17BB8 /* style.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C4CD3D4232C556F00F17BB8 /* style.json */; };
@@ -42,6 +43,7 @@
 /* Begin PBXFileReference section */
 		1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C30112A235FDAB90097CA97 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDetailModal.swift; sourceTree = "<group>"; };
 		4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QueueDetailModal.xib; sourceTree = "<group>"; };
 		4C4CD3D4232C556F00F17BB8 /* style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = style.json; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				4C4CD3D8232C6C5B00F17BB8 /* PlayerController.swift */,
 				4CCA7610234502AD007FB121 /* PlayerView.swift */,
 				4CCA7612234502E4007FB121 /* PlayerView.xib */,
+				4C30112A235FDAB90097CA97 /* Colors.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -361,6 +364,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C55CCB8232CB1F30059C898 /* SongTableView.swift in Sources */,
+				4C30112B235FDAB90097CA97 /* Colors.swift in Sources */,
 				4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */,
 				4CDB8458232BD2A1002559BB /* MapViewController.swift in Sources */,
 				4CCA7611234502AD007FB121 /* PlayerView.swift in Sources */,

@@ -215,10 +215,9 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     func setupScreen() {
-        let colors = Colors()
-        let backgroundLayer = colors.gl1
-        backgroundLayer?.frame = view.frame
-        view.layer.insertSublayer(backgroundLayer!, at: 0)
+        let backgroundLayer = Colors.queueGradient
+        backgroundLayer.frame = view.frame
+        view.layer.insertSublayer(backgroundLayer, at: 0)
     }
     
     @objc func searchTapped() {
