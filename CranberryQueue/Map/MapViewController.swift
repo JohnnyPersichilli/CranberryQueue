@@ -19,7 +19,7 @@ protocol ControllerMapDelegate: class {
 
 class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
     
-    // Location info labels
+    // Labels
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var regionLabel: UILabel!
 
@@ -157,7 +157,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
-    // Checks contributor database for user hosted queues and conditionally sets their local data
+    // Helper checks contributor database for user hosted queues and conditionally sets their local data
     func checkForReturningHost(withId id: String) {
         db?.collection("contributor").whereField("host", isEqualTo: id).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
@@ -179,17 +179,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Try to open create queue modal on successful appRemote connection
+    // Called when "+" icon tapped
     @objc func addTapped() {
         createQueueForm.queueNameTextField.text = ""
         self.closeDetailModal()
         self.closeJoinForm()
+        /// tries to connect the app remote before opening the create queue modal
         isWaitingForRemote = true
         let del = UIApplication.shared.delegate as! AppDelegate
         del.startAppRemote()
     }
     
-    // Called when appRemote has finished trying to connect # MainDelegate
+    // Called when appRemote has finished attempting to connect # MainDelegate
     func updateConnectionStatus(connected: Bool) {
         /// also called when app becomes active, so don't open modal
         if !isWaitingForRemote {
@@ -203,12 +204,14 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 self.createQueueForm.alpha = 1
             }
             createQueueForm.queueNameTextField.becomeFirstResponder()
+            /// textfieldshouldreturn continues lifecycle
         }
         else {
             showAppRemoteAlert()
         }
     }
     
+    // Helper to close create queue modal
     @objc func closeCreateForm() {
         isWaitingForRemote = false
         controllerMapDelegate?.setQueue(nil)
@@ -221,6 +224,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
+    // Called when search icon is tapped
     @objc func searchTapped() {
         self.closeDetailModal()
         self.closeCreateForm()
@@ -229,9 +233,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         UIView.animate(withDuration: 0.3) {
             self.joinQueueForm.alpha = 1
             self.joinQueueForm.eventCodeTextField.becomeFirstResponder()
+            /// textfieldshouldreturn continues lifecycle
         }
     }
     
+    // Helper to close join private queue modal
     @objc func closeJoinForm() {
         joinQueueForm.eventCodeTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3, animations: {
@@ -251,10 +257,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField == createQueueForm.queueNameTextField {
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
-                createQueue(withName: createQueueForm.queueNameTextField.text ?? "")
+                createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
             }
             else {
-                createQueue(withCode: eventCodeFromTimestamp())
+                createPrivateQueue(withCode: eventCodeFromTimestamp())
             }
             /// close the create queue modal
             self.closeCreateForm()
@@ -286,14 +292,77 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return result;
     }
     
+    // Join queue from queue detail modal
+    @objc func joinQueue() {
+        let data = queueDetailModal.currentQueue!
+        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+        }
+    }
+    
+    // Join queue from search icon
+    func joinQueue(code: String) {
+        db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count == 0 { return }
+            let id = snap.documents[0].documentID
+            self.getIsUserHostOf(queueId: id) { (isHost) in
+                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+            }
+        })
+    }
+    
+    // Create queue from add icon
+    func createPublicQueue(withName name: String) {
+        var ref : DocumentReference? = nil
+        ref = db?.collection("contributor").addDocument(data: [
+            "host": self.uid
+        ]) { (val) in
+            let id = ref!.documentID
+            let coords = self.controllerMapDelegate?.getCoords()
+            self.db?.collection("location").document(id).setData([
+                "lat" : coords?["lat"] ?? 0,
+                "long" : coords?["long"] ?? 0,
+                "city": self.cityLabel.text ?? "",
+                "region": self.regionLabel.text ?? "",
+                "numMembers": 0,
+                "currentSong": "",
+                "name" : name
+                ])
+            let name = self.createQueueForm.queueNameTextField.text!
+            self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
+        }
+    }
+
+    // Create queue from create queue modal
+    func createPrivateQueue(withCode code: String) {
+        self.closeDetailModal()
+        var ref : DocumentReference? = nil
+        ref = db?.collection("contributor").addDocument(data: [
+            "host": self.uid
+        ]) { (val) in
+            let id = ref!.documentID
+            self.db?.collection("location").document(id).setData([
+                "numMembers": 0,
+                "currentSong": "",
+                "code" : code
+                ])
+            self.presentQueueScreen(queueId: id, name: code, code: code, isHost: true)
+        }
+    }
+    
+    // Helper presents the Queue View Controller with options
     func presentQueueScreen(queueId: String, name: String, code: String?, isHost: Bool) {
         var isPrivate = false
         if code != nil {
             isPrivate = true
         }
-        DispatchQueue.main.async {
-            self.controllerMapDelegate?.setQueue(queueId)
-        }
+        
+        self.controllerMapDelegate?.setQueue(queueId)
+        
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
         vc.queueName = isPrivate ? code : name
@@ -309,171 +378,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if isHost {
             vc.isHost = true
             // Host may not have app remote connected !! need global control bool like addTapped
+            self.playerController.setupPlayer(queueId: queueId, isHost: true)
             self.playerController.updateConnectionStatus(connected: true)
         }
         vc.mapDelegate = self
         self.present(vc, animated:true, completion:{
             self.controllerMapDelegate?.setLocationEnabled(false)
+            self.closeDetailModal()
         })
     }
     
-    func joinQueue(code: String) {
-        db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            if snap.documents.count == 0 { return }
-            let id = snap.documents[0].documentID
-            self.getIsUserHostOf(queueId: id) { (isHost) in
-                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-            }
-        })
-
-    }
-    
-    @objc func joinQueue() {
-        self.closeDetailModal()
-
-        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
-        
-        let data = queueDetailModal.currentQueue!
-        
-        vc.queueName = data.name
-        vc.queueId = data.queueId
-        vc.uid = self.uid
-        vc.isHost = false
-
-        vc.mapDelegate = self
-
-        DispatchQueue.main.async {
-            self.controllerMapDelegate?.setQueue(data.queueId)
-        }
-
-        if self.queueId != vc.queueId {
-            leaveCurrentQueue()
-        }
-
-        db?.collection("contributor").document(data.queueId).collection("members").document(self.uid).setData([:
-             ], completion: { (val) in
-                 })
-
-        db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
-            if let err = error {
-                print(err)
-            }
-            //see if the users was previously in the queue, if they were numMembers does not change
-            if let host = snapshot?.data()?["host"] as? String {
-                if self.uid == host {
-                    vc.isHost = true
-                    vc.isRejoining = true
-                }
-            }
-            self.controllerMapDelegate?.setLocationEnabled(false)
-            self.present(vc, animated:true, completion:nil)
-        })
-    }
-    
-    func getIsUserHostOf(queueId: String, completion: @escaping (Bool) -> Void) {
-        db?.collection("contributor").document(data.queueId).getDocument(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            if let host = snap["host"] as? String {
-                if self.uid == host {
-                    completion(true)
-                }
-                else {
-                    completion(false)
-                }
-            }
-        })
-    }
-
-    func createQueue(withCode code: String) {
-        self.closeDetailModal()
-        var ref : DocumentReference? = nil
-        ref = db?.collection("contributor").addDocument(data: [
-            "host": self.uid
-        ]) { (val) in
-            let id = ref!.documentID
-            self.controllerMapDelegate?.setQueue(id)
-
-            self.db?.collection("location").document(id).setData([
-                "numMembers": 0,
-                "currentSong": "",
-                "code" : code
-                ])
-
-            self.leaveCurrentQueue()
-
-            self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
-                ], completion: { (val) in
-            })
-
-            let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-
-            let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
-            vc.queueName = code
-            vc.queueId = id
-            vc.uid = self.uid
-            vc.isHost = true
-            vc.isPrivate = true
-            vc.mapDelegate = self
-
-            self.playerController.setupPlayer(queueId: id, isHost: true)
-            self.controllerMapDelegate?.setLocationEnabled(false)
-            self.present(vc, animated:true, completion:nil)
-        }
-
-    }
-
-    func createQueue(withName name: String) {
-        self.closeDetailModal()
-
-        let coords = controllerMapDelegate?.getCoords()
-
-        var ref : DocumentReference? = nil
-        ref = db?.collection("contributor").addDocument(data: [
-            "host": self.uid
-        ]) { (val) in
-            let id = ref!.documentID
-            self.controllerMapDelegate?.setQueue(id)
-
-            self.db?.collection("location").document(id).setData([
-                "lat" : coords?["lat"] ?? 0,
-                "long" : coords?["long"] ?? 0,
-                "city": self.cityLabel.text ?? "",
-                "region": self.regionLabel.text ?? "",
-                "numMembers": 0,
-                "currentSong": "",
-                "name" : name
-                ])
-
-            self.leaveCurrentQueue()
-
-            self.db?.collection("contributor").document(id).collection("members").document(self.uid).setData([:
-                ], completion: { (val) in
-            })
-
-            let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-
-            let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
-            vc.queueName = self.createQueueForm.queueNameTextField.text
-            vc.queueId = id
-            vc.uid = self.uid
-            vc.isHost = true
-            vc.mapDelegate = self
-
-            self.playerController.setupPlayer(queueId: id, isHost: true)
-            self.controllerMapDelegate?.setLocationEnabled(false)
-            self.present(vc, animated:true, completion:nil)
-        }
-    }
-
-    // Removes user from their current queue or deletes the queue if they are the host
+    // Helper removes user from their current queue or deletes the queue if they are the host
     func leaveCurrentQueue() {
         guard let queueId = queueId else {
             return
@@ -496,6 +411,24 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
         task.resume()
+    }
+    
+    // Checks if user is host of any queues by querying contributor table
+    func getIsUserHostOf(queueId: String, completion: @escaping (Bool) -> Void) {
+        db?.collection("contributor").document(queueId).getDocument(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if let host = snap["host"] as? String {
+                if self.uid == host {
+                    completion(true)
+                }
+                else {
+                    completion(false)
+                }
+            }
+        })
     }
     
     // Called by queue view controller when returning to map # QueueMapDelegate
@@ -526,6 +459,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         joinQueue(code: code!)
     }
     
+    // Called when settings icon is tapped
     @objc func settingsTapped() {
         self.closeDetailModal()
         self.closeJoinForm()
@@ -536,20 +470,20 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.present(vc, animated:true, completion:nil)
     }
     
-    // Called when logout is tapped in settings # SettingsMapDelegate
+    // Called when logout is tapped from settings # SettingsMapDelegate
     func logoutTapped() {
         loginContainer.isHidden = false
         isPremium = false
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
     }
     
-    // Geocode has been set by location manager # MapDelegate
+    // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
         regionLabel.text = region
     }
     
-    // Map marker was tapped with location doc data # MapDelegate
+    // Called when map marker was tapped with location doc data # MapDelegate
     func toggleDetailModal(withData data: CQLocation) {
         /// Close if clicking same queue while modal is open
         if(!queueDetailModal.isHidden && queueDetailModal.currentQueue?.queueId == data.queueId){
@@ -577,7 +511,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Animates queue detail modal open
+    // Helper animates queue detail modal open
     func showDetailModal() {
         self.queueDetailModal.isHidden = false
         UIView.animate(withDuration: 0.3, animations: {
@@ -588,7 +522,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Animates queue detail modal closed
+    // Helper animates queue detail modal closed
     @objc func closeDetailModal() {
        UIView.animate(withDuration: 0.3, animations: {
             self.topDetailModalConstraint.isActive = true
@@ -623,6 +557,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
+    // Helper shows location not enabled alert
     func showLocationAlert() {
         let alert = UIAlertController(title: "Location Services disabled", message: "Enable location to continue.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Settings", style: .default, handler: { action in
@@ -631,6 +566,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.present(alert, animated: true)
     }
     
+    // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
         let alert = UIAlertController(title: "Spotify could not connect", message: "Please close the Spotify App and try again.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
@@ -642,12 +578,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.present(alert, animated: true)
     }
     
-    // Asks if the status bar should be white on black or vice versa
+    // If the status bar should be white on black or vice versa
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
     
-    // Prepare embedded child View Controllers before mounting them to view hierarchy
+    // Called to prepare embedded child View Controllers before mounting them to view hierarchy
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.destination is MapController {
             /// swap delegates with MapController
