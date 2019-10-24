@@ -190,7 +190,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         del.startAppRemote()
     }
     
-    // Called when appRemote has finished attempting to connect # MainDelegate
+    // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
         /// also called when app becomes active, so don't open modal
         if !isWaitingForRemote {
