@@ -92,19 +92,19 @@ class QueueDetailModal: UIView {
                 }
                 let songString = currSong + " - " + currArtist
                 self.updateModalUI(
-                                   queueName: self.currentQueue!.name,
-                                   numMembers: self.currentQueue!.numMembers,
-                                   songString: songString,
-                                   albumImage:UIImage(data: imageData)!
+                    queueName: self.currentQueue!.name,
+                    numMembers: self.currentQueue!.numMembers,
+                    songString: songString,
+                    albumImage:UIImage(data: imageData)!
                 )
             }
             task.resume()
         }else{
             updateModalUI(
-                          queueName: self.currentQueue!.name,
-                          numMembers: self.currentQueue!.numMembers,
-                          songString: "No song currently playing",
-                          albumImage: UIImage(named: "defaultPerson")!
+                queueName: self.currentQueue!.name,
+                numMembers: self.currentQueue!.numMembers,
+                songString: "No song currently playing",
+                albumImage: UIImage(named: "defaultPerson")!
             )
         }
     }
