@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol PlayerDelegate: class {
+protocol appPlayerDelegate: class {
     func updateSongUI(withInfo: PlaybackInfo)
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
@@ -17,22 +17,6 @@ protocol PlayerDelegate: class {
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
-    
-    func updateConnectionStatus(connected: Bool) {
-        if connected && isHost {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            token = delegate.token
-            remote = delegate.appRemote
-            setupHostListeners()
-        }
-    }
-    
-    func swiped() {
-        print(eventCodeFromTimestamp())
-        if queueId != nil && isHost {
-            skipSong()
-        }
-    }
         
     var queueId: String? = nil
     var isHost = false
@@ -51,12 +35,28 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     var isEnqueuing = false
     
-    var mapDelegate: PlayerDelegate?
-    var queueDelegate: PlayerDelegate?
+    var mapDelegate: appPlayerDelegate?
+    var queueDelegate: appPlayerDelegate?
     
     var guestListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
+    
+    func updateConnectionStatus(connected: Bool) {
+        if connected && isHost {
+            let delegate = UIApplication.shared.delegate as! AppDelegate
+            token = delegate.token
+            remote = delegate.appRemote
+            setupHostListeners()
+        }
+    }
+    
+    func swiped() {
+        print(eventCodeFromTimestamp())
+        if queueId != nil && isHost {
+            skipSong()
+        }
+    }
 
     func setupPlayer(queueId: String?, isHost: Bool) {
         if queueId != self.queueId || queueId == nil {
@@ -125,9 +125,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
             return
         }
         if queueId == nil {
-            remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
-                
-            })
+            remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in })
             return
         }
         mapDelegate?.updateSongUI(withState: playerState)
@@ -199,6 +197,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
         return db?.collection("playlist").document(queueId).collection("songs")
     }
     
+    
+    // Setup host and guest listeners together?
     func setupHostListeners() {
         print(remote!.isConnected)
         print(remote?.playerAPI)
@@ -239,10 +239,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
                 self.runTimer()
             }
         })
-    }
-    
-    func showHelpText() {
-        
     }
     
     func eventCodeFromTimestamp() -> String {
