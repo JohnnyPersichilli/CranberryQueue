@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol LoginDelegate: class {
+protocol LoginMapDelegate: class {
     func dismissLoginContainer(isPremium: Bool)
 }
 
@@ -21,7 +21,7 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     
     var activityIndicator = UIActivityIndicatorView()
     
-    weak var delegate: LoginDelegate? = nil
+    weak var loginMapDelegate: LoginMapDelegate? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,14 +38,13 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     }
     
     func setupModalUI() {
-        let colors = Colors()
         spotifyContinueModal.layer.cornerRadius = 13
         spotifyContinueModal.layer.borderWidth = 1
-        spotifyContinueModal.layer.borderColor = colors.themeBorderColor
+        spotifyContinueModal.layer.borderColor = Colors.border.cgColor
         
         guestContinueModal.layer.cornerRadius = 13
         guestContinueModal.layer.borderWidth = 1
-        guestContinueModal.layer.borderColor = colors.themeBorderColor
+        guestContinueModal.layer.borderColor = Colors.border.cgColor
         
         loginButton.layer.cornerRadius = 14
         continueButton.layer.cornerRadius = 14
@@ -65,12 +64,12 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
 
     
     @objc func guestLabelTapped() {
-        delegate?.dismissLoginContainer(isPremium: false)
+        loginMapDelegate?.dismissLoginContainer(isPremium: false)
     }
     
     func updateSessionStatus(connected: Bool) {
         if(connected) {
-            delegate?.dismissLoginContainer(isPremium: true)
+            loginMapDelegate?.dismissLoginContainer(isPremium: true)
             DispatchQueue.main.asyncAfter(deadline: .now()+1) {
                 self.spotifyContinueModal.alpha = 1
                 self.guestContinueModal.alpha = 1
