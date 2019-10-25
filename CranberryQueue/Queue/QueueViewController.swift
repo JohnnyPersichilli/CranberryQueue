@@ -95,7 +95,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
         
         playerView.delegate = playerController
-        playerController.queueDelegate = playerView as? ControllerPlayerDelegate
+        playerController.queueDelegate = playerView
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
         
         if isRejoining {
