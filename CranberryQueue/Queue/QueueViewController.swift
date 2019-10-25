@@ -52,30 +52,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         
         db = Firestore.firestore()
         
-        setupScreen()
-        songTableView.delegate = songTableView
-        songTableView.dataSource = songTableView
-        
-        nameLabel.text = queueName
-        
-        searchView.isHidden = true
-        searchView.alpha = 0
-        
-        songTableView.queueId = queueId
-        songTableView.uid = self.uid
-        songTableView.isHost = isHost
-        songTableView.loadPreviousVotes()
-        songTableView.watchPlaylist()
-        songTableView.songDelegate = self
-        
-        setupGestureRecognizers()
         watchLocationDoc()
 
-        leaveQueueButton.alpha = 0.8
-        
         if(isHost){
             leaveQueueButton.setTitle("Delete Queue", for: .normal)
-            //leaveQueueButton.setTitleColor(.red, for: .normal)
         }
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
@@ -85,6 +65,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         playerView.delegate = playerController
         playerController.queueDelegate = playerView
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
+        
+        //general screen setup
+        setupSongTableView()
+        setupGestureRecognizers()
+        setupScreen()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -96,6 +81,18 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         DispatchQueue.main.async {
             self.numSongsLabel.text = String(numSongs)
         }
+    }
+    
+    // setup related to the song table view
+    func setupSongTableView() {
+        songTableView.delegate = songTableView
+        songTableView.dataSource = songTableView
+        songTableView.queueId = queueId
+        songTableView.uid = self.uid
+        songTableView.isHost = isHost
+        songTableView.loadPreviousVotes()
+        songTableView.watchPlaylist()
+        songTableView.songDelegate = self
     }
     
     func watchLocationDoc() {
@@ -175,6 +172,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     func setupScreen() {
+        leaveQueueButton.alpha = 0.8
+        searchView.isHidden = true
+        searchView.alpha = 0
+        nameLabel.text = queueName
         let backgroundLayer = Colors.queueGradient
         backgroundLayer.frame = view.frame
         view.layer.insertSublayer(backgroundLayer, at: 0)
