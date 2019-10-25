@@ -32,13 +32,15 @@ class QueueDetailModal: UIView {
         
     var distance: Double = 0 {
         didSet {
-            //if distance is less than .75 miles use feet else use miles
-            if(distance/1609 < 0.75){
-                let distanceInFeet = (distance*3.28083985)
+            let metersInMile = 1609.34
+            let feetInMeter = 3.28083985
+            //if distance is less than .25 miles use feet else use miles
+            if(distance/metersInMile < 0.25){
+                let distanceInFeet = (distance*feetInMeter)
                 let roundedFeetString = String(format: "%.2f", distanceInFeet)
                 distanceLabel.text = roundedFeetString + "ft"
             }else{
-                let distanceInMiles = (distance/1609)
+                let distanceInMiles = (distance/metersInMile)
                 let roundedMileString = String(format: "%.1f", distanceInMiles)
                 distanceLabel.text =  roundedMileString + "mi"
             }
@@ -59,13 +61,10 @@ class QueueDetailModal: UIView {
     func commonInit() {
         Bundle.main.loadNibNamed("QueueDetailModal", owner: self, options: nil)
         contentView.fixInView(self)
-        
-        queueNameLabel.text = ""
-        songNameLabel.text = ""
-        distanceLabel.text = ""
     }
     
     func setJoinEnabled() {
+        let joinGreen = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
         //can set this as the radius if we are letting users do that or an arbitrary number like 500m
         let maxDistance = 500.0
         if(distance > maxDistance){
@@ -74,7 +73,7 @@ class QueueDetailModal: UIView {
             joinButton.isOpaque = true
         }else{
             joinButton.isEnabled = true
-            joinButton.backgroundColor = UIColor(red: 0.349, green: 0.663, blue: 0.486, alpha: 1)
+            joinButton.backgroundColor = joinGreen
             joinButton.isOpaque = false
         }
     }
@@ -87,29 +86,35 @@ class QueueDetailModal: UIView {
         if(songImage != ""){
             let url = URL(string: songImage)
             let task = URLSession.shared.dataTask(with: url!) {(dataBack, response, error) in
-                guard let data2 = dataBack else {
+                guard let imageData = dataBack else {
                     print("no data")
-                    return }
-                DispatchQueue.main.async {
-                    self.albumImageView.image = UIImage(data: data2)
-                    self.queueNameLabel.text = self.currentQueue!.name
-                    self.songNameLabel.text = currSong + " - " + currArtist
-                    self.numMembersLabel.text = String(self.currentQueue!.numMembers)
+                    return
                 }
+                let songString = currSong + " - " + currArtist
+                self.updateModalUI(
+                    queueName: self.currentQueue!.name,
+                    numMembers: self.currentQueue!.numMembers,
+                    songString: songString,
+                    albumImage:UIImage(data: imageData)!
+                )
             }
             task.resume()
         }else{
-            DispatchQueue.main.async {
-                self.numMembersLabel.text = String(self.currentQueue!.numMembers)
-                self.queueNameLabel.text = self.currentQueue!.name
-                self.albumImageView.image = UIImage(named: "defaultPerson")!
-                self.songNameLabel.text = "No song currently playing"
-            }
+            updateModalUI(
+                queueName: self.currentQueue!.name,
+                numMembers: self.currentQueue!.numMembers,
+                songString: "No song currently playing",
+                albumImage: UIImage(named: "defaultPerson")!
+            )
         }
     }
     
-    func fetchSongInfo() {
-        
+    func updateModalUI(queueName: String, numMembers:Int, songString: String, albumImage: UIImage){
+        DispatchQueue.main.async {
+            self.albumImageView.image = albumImage
+            self.queueNameLabel.text = queueName
+            self.songNameLabel.text = songString
+            self.numMembersLabel.text = String(numMembers)
+        }
     }
-        
 }
