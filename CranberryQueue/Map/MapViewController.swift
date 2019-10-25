@@ -76,7 +76,7 @@ class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, Log
         UIApplication.shared.isIdleTimerDisabled = true
 
         playerView.delegate = playerController
-        playerController.mapDelegate = playerView
+        playerController.mapDelegate = playerView as! appPlayerDelegate
         
         queueDetailModal.isHidden = true
         
