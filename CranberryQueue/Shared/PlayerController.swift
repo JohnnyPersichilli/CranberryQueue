@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol appPlayerDelegate: class {
+protocol ControllerPlayerDelegate: class {
     func updateSongUI(withInfo: PlaybackInfo)
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
@@ -35,8 +35,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate,
     
     var isEnqueuing = false
     
-    var mapDelegate: appPlayerDelegate?
-    var queueDelegate: appPlayerDelegate?
+    var mapDelegate: ControllerPlayerDelegate?
+    var queueDelegate: ControllerPlayerDelegate?
     
     var guestListener: ListenerRegistration? = nil
     
