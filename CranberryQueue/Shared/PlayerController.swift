@@ -16,7 +16,7 @@ protocol ControllerPlayerDelegate: class {
     func clear()
 }
 
-class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, mainDelegate, PlayerControllerDelegate {
+class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
         
     var queueId: String? = nil
     var isHost = false

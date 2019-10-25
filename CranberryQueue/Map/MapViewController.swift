@@ -17,7 +17,7 @@ protocol mapControllerDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate, mainDelegate, SettingsMapDelegate {
+class MapViewController: UIViewController, mapDelegate, UITextFieldDelegate, LoginDelegate, QueueMapDelegate, RemoteDelegate, SettingsMapDelegate {
 
     @IBOutlet var cityLabel: UILabel!
 

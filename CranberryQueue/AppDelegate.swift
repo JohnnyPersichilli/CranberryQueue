@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import GoogleMaps
 
-protocol mainDelegate: class {
+protocol RemoteDelegate: class {
     func updateConnectionStatus(connected: Bool)
 }
 
@@ -22,8 +22,8 @@ protocol SessionDelegate: class {
 class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate, SPTAppRemoteDelegate {
     var window: UIWindow?
     
-    weak var delegate: mainDelegate?
-    weak var appMapDelegate: mainDelegate?
+    weak var delegate: RemoteDelegate?
+    weak var appMapDelegate: RemoteDelegate?
     weak var seshDelegate: SessionDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
