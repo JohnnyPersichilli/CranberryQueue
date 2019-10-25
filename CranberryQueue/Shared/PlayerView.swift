@@ -12,7 +12,7 @@ protocol PlayerControllerDelegate: class {
     func swiped()
 }
 
-class PlayerView: UIView, PlayerDelegate {
+class PlayerView: UIView, appPlayerDelegate {
 
     @IBOutlet var contentView: UIView!
     
