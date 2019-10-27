@@ -27,28 +27,17 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var isPrivate = false
     
     @IBOutlet weak var leaveQueueButton: UIButton!
-    
     @IBOutlet var songTableView: SongTableView!
-    
     @IBOutlet var searchIconImageView: UIImageView!
-    
     @IBOutlet var nameLabel: UILabel!
-    
     @IBOutlet var numMembersLabel: UILabel!
-    
     @IBOutlet var numSongsLabel: UILabel!
-    
     @IBOutlet var nextUpLabel: UILabel!
-    
     @IBOutlet var searchView: UIView!
-    
     @IBOutlet var globeIcon: UIImageView!
-    
     @IBOutlet var playerView: PlayerView!
     
-    
     weak var delegate: queueDelegate? = nil
-    
     weak var mapDelegate: QueueMapDelegate? = nil
     
     var queueRef: ListenerRegistration? = nil
@@ -56,38 +45,16 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var db : Firestore? = nil
     
     var playerController = PlayerController.sharedInstance
-    
-    var isRejoining = false
             
     override func viewDidLoad() {
         super.viewDidLoad()
         
         db = Firestore.firestore()
         
-        setupScreen()
-        songTableView.delegate = songTableView
-        songTableView.dataSource = songTableView
-        
-        nameLabel.text = queueName
-        
-        searchView.isHidden = true
-        searchView.alpha = 0
-        
-        songTableView.queueId = queueId
-        songTableView.uid = self.uid
-        songTableView.isHost = isHost
-        songTableView.loadPreviousVotes()
-        songTableView.watchPlaylist()
-        songTableView.songDelegate = self
-        
-        setupGestureRecognizers()
         watchLocationDoc()
 
-        leaveQueueButton.alpha = 0.8
-        
         if(isHost){
             leaveQueueButton.setTitle("Delete Queue", for: .normal)
-            //leaveQueueButton.setTitleColor(.red, for: .normal)
         }
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
@@ -98,14 +65,21 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         playerController.queueDelegate = playerView
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
         
-        if isRejoining {
-            playerController.updateConnectionStatus(connected: true)
-        }
+        //general screen setup
+        setupSongTableView()
+        setupGestureRecognizers()
+        setupScreen()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         queueRef?.remove()
         songTableView.songRef?.remove()
+    }
+    
+    func navigateToRoot() {
+        self.presentingViewController?.dismiss(animated: true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
     }
     
     func updateNumSongs(_ numSongs: Int) {
@@ -114,19 +88,28 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
     }
     
+    // setup related to the song table view
+    func setupSongTableView() {
+        songTableView.delegate = songTableView
+        songTableView.dataSource = songTableView
+        songTableView.queueId = queueId
+        songTableView.uid = self.uid
+        songTableView.isHost = isHost
+        songTableView.loadPreviousVotes()
+        songTableView.watchPlaylist()
+        songTableView.songDelegate = self
+    }
+    
     func watchLocationDoc() {
         db = Firestore.firestore()
         queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
-                
                 guard let snap = snapshot else {
                     print(error!)
                     return
                 }
-                
                 guard let doc = snap.data() else {
                     self.cleanup()
-                    
                     return
                 }
                 let numMembers = doc["numMembers"] as! Int
@@ -152,7 +135,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func cleanup() {
         let alert = UIAlertController(title: "Queue no longer exists", message: "The host deleted the queue or there was a problem retrieving queue information.", preferredStyle: UIAlertController.Style.alert)
-        
         alert.addAction(UIAlertAction(title: "Return to map", style: UIAlertAction.Style.default, handler: self.returnToMapFromAlert))
         self.present(alert, animated: true, completion: nil)
     }
@@ -160,10 +142,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func returnToMapFromAlert(alert: UIAlertAction!) {
         playerController.setupPlayer(queueId: nil, isHost: false)
-        
-        self.presentingViewController?.dismiss(animated: true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
+        self.navigateToRoot()
         self.queueName = nil
         self.queueId = nil
         self.queueRef?.remove()
@@ -177,47 +156,50 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             self.db?.collection("location").document(self.queueId!).delete()
         } else {
             //delete from members now an endpoint
-            let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
-             var request = URLRequest(url: url)
-            let dictionary = ["queueId":self.queueId,"uid":self.uid]
-            request.httpBody = try! JSONEncoder().encode(dictionary)
-            request.httpMethod = "PUT"
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
-            
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                if let res = response {
-                    print(res)
-                }
-                if let err = error {
-                    print(err)
-                    return
-                }
-            }
-            task.resume()
+            removeFromMembersRequest(queueId: self.queueId!, uid: self.uid!)
         }
         
         self.queueId = nil
-        //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
         
-        self.presentingViewController?.dismiss(animated: true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
+        self.navigateToRoot()
     }
     
     @objc func globeTapped() {
         mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil)
-        self.presentingViewController?.dismiss(animated: true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
+        self.navigateToRoot()
     }
     
     func setupScreen() {
+        leaveQueueButton.alpha = 0.8
+        searchView.isHidden = true
+        searchView.alpha = 0
+        nameLabel.text = queueName
         let backgroundLayer = Colors.queueGradient
         backgroundLayer.frame = view.frame
         view.layer.insertSublayer(backgroundLayer, at: 0)
+    }
+    
+    func dismissSearchViewAnimation() {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.nextUpLabel.alpha = 1
+            self.songTableView.alpha = 1
+            self.searchView.alpha = 0
+        }) { (_) in
+            self.searchView.isHidden = true
+        }
+    }
+    
+    func presentSearchViewAnimation() {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.nextUpLabel.alpha = 0
+            self.songTableView.alpha = 0
+            self.searchView.alpha = 1
+        }) { (val) in
+            self.nextUpLabel.isHidden = true
+            self.songTableView.isHidden = true
+        }
     }
     
     @objc func searchTapped() {
@@ -226,27 +208,14 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             searchView.isHidden = false
             let closeSearchImage: UIImage = UIImage(named: "xIcon")!
             searchIconImageView.image = closeSearchImage
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 0
-                self.songTableView.alpha = 0
-                self.searchView.alpha = 1
-            }) { (val) in
-                self.nextUpLabel.isHidden = true
-                self.songTableView.isHidden = true
-            }
+            presentSearchViewAnimation()
         } else {
             delegate?.searchTapped(shouldHideContents: true)
             self.nextUpLabel.isHidden = false
             self.songTableView.isHidden = false
             let searchImage: UIImage = UIImage(named: "searchIcon")!
             searchIconImageView.image = searchImage
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 1
-                self.songTableView.alpha = 1
-                self.searchView.alpha = 0
-            }) { (_) in
-                self.searchView.isHidden = true
-            }
+            dismissSearchViewAnimation()
         }
     }
     
@@ -257,24 +226,33 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.songTableView.isHidden = false
         let searchImage: UIImage = UIImage(named: "searchIcon")!
         searchIconImageView.image = searchImage
-        UIView.animate(withDuration: 0.4, animations: {
-            self.nextUpLabel.alpha = 1
-            self.songTableView.alpha = 1
-            self.searchView.alpha = 0
-        }) { (_) in
-            self.searchView.isHidden = true
+        dismissSearchViewAnimation()
+    }
+    
+    //removes the user from the queue
+    func removeFromMembersRequest(queueId: String, uid: String) {
+        let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
+         var request = URLRequest(url: url)
+        let dictionary = ["queueId": queueId,"uid": uid]
+        request.httpBody = try! JSONEncoder().encode(dictionary)
+        request.httpMethod = "PUT"
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Accept")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let res = response {
+                print(res)
+            }
+            if let err = error {
+                print(err)
+                return
+            }
         }
+        task.resume()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if false //segue.destination is PlayerViewController
-        {
-//            let vc = segue.destination as? PlayerViewController
-//            vc?.queueId = queueId
-//            vc?.isHost = isHost
-//            vc?.updateConnectionStatus(connected: true)
-        }
-        else if segue.destination is SearchController {
+        if segue.destination is SearchController {
             let vc = segue.destination as? SearchController
   
             vc?.delegate = self
@@ -283,6 +261,8 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             self.delegate = vc
         }
     }
+    
+    
 
     /*
     // MARK: - Navigation
