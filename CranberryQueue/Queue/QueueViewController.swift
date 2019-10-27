@@ -37,7 +37,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     @IBOutlet var globeIcon: UIImageView!
     @IBOutlet var playerView: PlayerView!
     
-    
     weak var delegate: queueDelegate? = nil
     weak var mapDelegate: QueueMapDelegate? = nil
     
@@ -77,6 +76,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         songTableView.songRef?.remove()
     }
     
+    func navigateToRoot() {
+        self.presentingViewController?.dismiss(animated: true, completion: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
+    }
+    
     func updateNumSongs(_ numSongs: Int) {
         DispatchQueue.main.async {
             self.numSongsLabel.text = String(numSongs)
@@ -99,15 +104,12 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         db = Firestore.firestore()
         queueRef = db?.collection("location").document(queueId!)
             .addSnapshotListener({ (snapshot, error) in
-                
                 guard let snap = snapshot else {
                     print(error!)
                     return
                 }
-                
                 guard let doc = snap.data() else {
                     self.cleanup()
-                    
                     return
                 }
                 let numMembers = doc["numMembers"] as! Int
@@ -133,7 +135,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func cleanup() {
         let alert = UIAlertController(title: "Queue no longer exists", message: "The host deleted the queue or there was a problem retrieving queue information.", preferredStyle: UIAlertController.Style.alert)
-        
         alert.addAction(UIAlertAction(title: "Return to map", style: UIAlertAction.Style.default, handler: self.returnToMapFromAlert))
         self.present(alert, animated: true, completion: nil)
     }
@@ -155,11 +156,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             self.db?.collection("location").document(self.queueId!).delete()
         } else {
             //delete from members now an endpoint
-            removeFromMemebersRequest()
+            removeFromMembersRequest(queueId: self.queueId!, uid: self.uid!)
         }
         
         self.queueId = nil
-        //playerDelegate?.updatePlayerWith(queueId: nil, isHost: isHost)
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
         
@@ -181,33 +181,41 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         view.layer.insertSublayer(backgroundLayer, at: 0)
     }
     
+    func dismissSearchViewAnimation() {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.nextUpLabel.alpha = 1
+            self.songTableView.alpha = 1
+            self.searchView.alpha = 0
+        }) { (_) in
+            self.searchView.isHidden = true
+        }
+    }
+    
+    func presentSearchViewAnimation() {
+        UIView.animate(withDuration: 0.4, animations: {
+            self.nextUpLabel.alpha = 0
+            self.songTableView.alpha = 0
+            self.searchView.alpha = 1
+        }) { (val) in
+            self.nextUpLabel.isHidden = true
+            self.songTableView.isHidden = true
+        }
+    }
+    
     @objc func searchTapped() {
         if(searchView.isHidden) {
             delegate?.searchTapped(shouldHideContents: false)
             searchView.isHidden = false
             let closeSearchImage: UIImage = UIImage(named: "xIcon")!
             searchIconImageView.image = closeSearchImage
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 0
-                self.songTableView.alpha = 0
-                self.searchView.alpha = 1
-            }) { (val) in
-                self.nextUpLabel.isHidden = true
-                self.songTableView.isHidden = true
-            }
+            presentSearchViewAnimation()
         } else {
             delegate?.searchTapped(shouldHideContents: true)
             self.nextUpLabel.isHidden = false
             self.songTableView.isHidden = false
             let searchImage: UIImage = UIImage(named: "searchIcon")!
             searchIconImageView.image = searchImage
-            UIView.animate(withDuration: 0.4, animations: {
-                self.nextUpLabel.alpha = 1
-                self.songTableView.alpha = 1
-                self.searchView.alpha = 0
-            }) { (_) in
-                self.searchView.isHidden = true
-            }
+            dismissSearchViewAnimation()
         }
     }
     
@@ -218,20 +226,14 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.songTableView.isHidden = false
         let searchImage: UIImage = UIImage(named: "searchIcon")!
         searchIconImageView.image = searchImage
-        UIView.animate(withDuration: 0.4, animations: {
-            self.nextUpLabel.alpha = 1
-            self.songTableView.alpha = 1
-            self.searchView.alpha = 0
-        }) { (_) in
-            self.searchView.isHidden = true
-        }
+        dismissSearchViewAnimation()
     }
     
     //removes the user from the queue
-    func removeFromMemebersRequest() {
+    func removeFromMembersRequest(queueId: String, uid: String) {
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
          var request = URLRequest(url: url)
-        let dictionary = ["queueId":self.queueId,"uid":self.uid]
+        let dictionary = ["queueId": queueId,"uid": uid]
         request.httpBody = try! JSONEncoder().encode(dictionary)
         request.httpMethod = "PUT"
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
@@ -247,12 +249,6 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             }
         }
         task.resume()
-    }
-    
-    func navigateToRoot() {
-        self.presentingViewController?.dismiss(animated: true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
