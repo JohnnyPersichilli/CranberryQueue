@@ -97,6 +97,14 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         })
     }
     
+    func setCircle (_ circle : GMSCircle) {
+        circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
+        circle.strokeWidth = 2
+        circle.zIndex = 0
+        circle.map = map
+        circles.append(circle)
+    }
+    
     func drawMarkers() {
         for queue in queues {
             let circleCenter = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
@@ -104,11 +112,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
             let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
             circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
-            circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
-            circle.strokeWidth = 2
-            circle.zIndex = 0
-            circle.map = map
-            circles.append(circle)
+            setCircle(circle)
             
             let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
             let marker = GMSMarker(position: position)
@@ -208,11 +212,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         
         let circle = GMSCircle(position: curCoords!, radius: 200)
         circle.fillColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
-        circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
-        circle.strokeWidth = 2
-        circle.zIndex = 0
-        circle.map = map
-        circles.append(circle)
+        setCircle(circle)
         
         self.drawMarkers()
     }
