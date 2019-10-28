@@ -21,7 +21,7 @@ class PlayerView: UIView, PlayerDelegate {
             if #available(iOS 13.0, *) {
                 playPauseImage.image = UIImage(systemName: "play.fill")
             }else{
-                playPauseImage.image = UIImage(named: "xIcon")
+                playPauseImage.image = UIImage(named: "whitePlayIcon")
             }
         }else{
             if #available(iOS 13.0, *) {
