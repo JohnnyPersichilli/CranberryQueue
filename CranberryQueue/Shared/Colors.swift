@@ -10,8 +10,9 @@ import Foundation
 import UIKit
 
 class Colors {
-    static let genericTop = UIColor(red: 166.0 / 255.0, green: 166.0 / 255.0, blue: 166.0 / 255.0, alpha: 1.0)
-    static let genericBottom = UIColor(red: 103.0 / 255.0, green: 122.0 / 255.0, blue: 161.0 / 255.0, alpha: 1.0)
+    static let genericTop = UIColor(red: 178.0 / 255.0, green: 86.0 / 255.0, blue: 86.0 / 255.0, alpha: 1.0)
+    static let genericMiddle = UIColor(red: 190.0 / 255.0, green: 123.0 / 255.0, blue: 123.0 / 255.0, alpha: 1.0)
+    static let genericBottom = UIColor(red: 46.0 / 255.0, green: 46.0 / 255.0, blue: 46.0 / 255.0, alpha: 1.0)
     
     static let border = UIColor(red: 85.0 / 255.0, green: 85.0 / 255.0, blue: 85.0 / 255.0, alpha: 1.0)
     
@@ -20,14 +21,16 @@ class Colors {
     
     static var mapGradient = gradientFromColors(
         top: genericTop,
+        middle: genericMiddle,
         bottom: genericBottom,
-        locations: [0.0, 1.0]
+        locations: [0.0, 0.4, 1.0]
     )
     
     static var queueGradient = gradientFromColors(
-        top: genericBottom,
-        bottom: genericTop,
-        locations: [0.3, 1.0]
+        top: genericTop,
+        middle: genericMiddle,
+        bottom: genericBottom,
+        locations: [0.0, 0.4, 1.0]
     )
     
     /**
@@ -37,9 +40,9 @@ class Colors {
      - Parameter locations: The positions of the colors [1].
      - Returns: Gradient using the above options.
     */
-    static func gradientFromColors(top: UIColor, bottom: UIColor, locations: [NSNumber]) -> CAGradientLayer {
+    static func gradientFromColors(top: UIColor, middle: UIColor, bottom: UIColor, locations: [NSNumber]) -> CAGradientLayer {
         let gradient = CAGradientLayer()
-        gradient.colors = [top.cgColor, bottom.cgColor]
+        gradient.colors = [top.cgColor, middle.cgColor, bottom.cgColor]
         gradient.locations = locations
         return gradient
     }

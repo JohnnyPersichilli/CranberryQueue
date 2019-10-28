@@ -34,6 +34,10 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         continueButton.addGestureRecognizer(guestLabelTap)
         continueButton.isUserInteractionEnabled = true
         
+        let backgroundLayer = Colors.queueGradient
+        backgroundLayer.frame = view.frame
+        view.layer.insertSublayer(backgroundLayer, at: 0)
+        
         setupModalUI()
     }
     
