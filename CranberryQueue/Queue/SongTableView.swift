@@ -116,7 +116,6 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     
     func voteTapped(isUpvote: Bool, song: Song) {
         var weight = isUpvote ? 1 : -1
-        pendingVotes.append(song)
         if isUpvote {
             upvotes.append(song.docID)
             if pendingVotes.contains(where: {$0 == song}) {
@@ -126,7 +125,6 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             downvotes.removeAll(where: {$0 == song.docID})
         }
         else {
-            pendingVotes.append(song)
             downvotes.append(song.docID)
             if pendingVotes.contains(where: {$0 == song}) || upvotes.contains(where: {$0 == song.docID}) {
                 weight -= 1
@@ -134,6 +132,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             pendingVotes.removeAll(where: {$0 == song})
             upvotes.removeAll(where: {$0 == song.docID})
         }
+        pendingVotes.append(song)
         UserDefaults.standard.set(upvotes, forKey: "\(queueId!)/upvotes")
         UserDefaults.standard.set(downvotes, forKey: "\(queueId!)/downvotes")
         if let cell = visibleCells.first(where: {($0 as! QueueTableViewCell).song == song}) as? QueueTableViewCell {

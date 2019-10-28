@@ -77,7 +77,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         setupSongTableView()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         queueRef?.remove()
         songTableView.songRef?.remove()
     }
