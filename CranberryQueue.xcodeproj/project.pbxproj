@@ -35,6 +35,7 @@
 		4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */; };
 		4CDB8468232BD592002559BB /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CDB8467232BD592002559BB /* SpotifyiOS.framework */; };
 		4CFD140A23595639008F0A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4CFD140923595639008F0A4E /* GoogleService-Info.plist */; };
+		6E63198523667C180031FA2C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E63198423667C180031FA2C /* Constants.swift */; };
 		6E8F84F32339C443005C23A9 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8F84F22339C443005C23A9 /* LoginController.swift */; };
 		95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */; };
 		BA4DA89423426D7700DCE8E3 /* activityIndicatorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */; };
@@ -73,6 +74,7 @@
 		4CDB8467232BD592002559BB /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		4CDB8469232BD7A6002559BB /* CranberryQueue-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CranberryQueue-Bridging-Header.h"; sourceTree = "<group>"; };
 		4CFD140923595639008F0A4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6E63198423667C180031FA2C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		6E8F84F22339C443005C23A9 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = activityIndicatorPresenter.swift; sourceTree = "<group>"; };
 		C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.release.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.release.xcconfig"; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 				4CCA7610234502AD007FB121 /* PlayerView.swift */,
 				4CCA7612234502E4007FB121 /* PlayerView.xib */,
 				4C30112A235FDAB90097CA97 /* Colors.swift */,
+				6E63198423667C180031FA2C /* Constants.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */,
 				4C4CD3E1232C9D1500F17BB8 /* QueueViewController.swift in Sources */,
 				4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */,
+				6E63198523667C180031FA2C /* Constants.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,

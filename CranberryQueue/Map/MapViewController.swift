@@ -336,6 +336,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
         }
     }
+    
+    // Convert state names to full name PA ~> Pennsylvania
+    func convertToFullRegionName(region: String) -> String? {
+        return Constants.stateDictionary[region]
+    }
 
     // Create queue from create queue modal
     func createPrivateQueue(withCode code: String) {
@@ -480,7 +485,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
-        regionLabel.text = region
+        regionLabel.text = self.convertToFullRegionName(region: region)
     }
     
     // Called when map marker was tapped with location doc data # MapDelegate
