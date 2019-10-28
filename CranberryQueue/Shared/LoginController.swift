@@ -25,7 +25,11 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupGestureRecognizers()
+        setupModalUI()
+    }
     
+    func setupGestureRecognizers(){
         let spotifyLabelTap = UITapGestureRecognizer(target: self, action: #selector(spotifyLabelTapped))
         loginButton.addGestureRecognizer(spotifyLabelTap)
         loginButton.isUserInteractionEnabled = true
@@ -33,8 +37,6 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         let guestLabelTap = UITapGestureRecognizer(target: self, action: #selector(guestLabelTapped))
         continueButton.addGestureRecognizer(guestLabelTap)
         continueButton.isUserInteractionEnabled = true
-        
-        setupModalUI()
     }
     
     func setupModalUI() {
@@ -67,23 +69,27 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         loginMapDelegate?.dismissLoginContainer(isPremium: false)
     }
     
+    func showContinueModals(){
+        self.spotifyContinueModal.alpha = 1;
+        self.guestContinueModal.alpha = 1
+    }
+    
     func updateSessionStatus(connected: Bool) {
         if(connected) {
             loginMapDelegate?.dismissLoginContainer(isPremium: true)
             DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-                self.spotifyContinueModal.alpha = 1
-                self.guestContinueModal.alpha = 1
+                self.showContinueModals()
                 self.hideActivityIndicator()
             }
         }
         else {
             UIView.animate(withDuration: 1, animations: {
-                self.spotifyContinueModal.alpha = 1;
-                self.guestContinueModal.alpha = 1
+                self.showContinueModals()
             }) { (Bool) in
                 self.hideActivityIndicator()
             }
         }
     }
+    
 }
 
