@@ -13,6 +13,7 @@ protocol PlayerDelegate: class {
     func updateSongUI(withInfo: PlaybackInfo)
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
+    func updatePlayPauseUI(isPaused: Bool)
     func clear()
 }
 
@@ -28,9 +29,26 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func swiped() {
-        print(eventCodeFromTimestamp())
         if queueId != nil && isHost {
             skipSong()
+        }
+    }
+    
+    func playPause(isPaused: Bool){
+        if(isPaused){
+            self.remote?.playerAPI?.resume({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
+        }else{
+            self.remote?.playerAPI?.pause({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
         }
     }
         
@@ -133,13 +151,20 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
+        
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
         
         duration = json["duration"] as! Int
         position = json["position"] as! Int
-        if (json["isPaused"] as! Bool) {
+        let isPaused = json["isPaused"] as! Bool
+        
+        self.mapDelegate?.updatePlayPauseUI(isPaused: isPaused)
+        self.queueDelegate?.updatePlayPauseUI(isPaused: isPaused)
+        
+        if (isPaused) {
             timer.invalidate()
+            
             mapDelegate?.updateTimerUI(position: position, duration: duration)
             queueDelegate?.updateTimerUI(position: position, duration: duration)
         }
