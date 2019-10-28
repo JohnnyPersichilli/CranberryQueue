@@ -65,17 +65,25 @@ class PlayerView: UIView, PlayerDelegate {
         delegate?.swiped()
     }
     
+    //Same function as player controller
+    func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {
+        var imageURL = ""
+        
+        if(playerState.track.imageIdentifier.split(separator: ":").count >= 2){
+            imageURL = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
+        }
+        else{
+            print("no track image in JSON file for:", playerState.track.name)
+            imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
+        }
+        
+        return imageURL
+    }
+    
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
         helpLabel.isHidden = true
         inactiveHostLabel.isHidden = true
-        var url = URL(string: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg")
-        if(state.track.imageIdentifier.split(separator: ":").count >= 2){
-            let trackId = state.track.imageIdentifier.split(separator: ":")[2]
-            url = URL(string: "https://i.scdn.co/image/\(trackId)")
-        }else{
-            //may need to update default image even though its never being used?
-            print("no track image for:", state.track.name)
-        }
+        let url = URL( string: getURLFrom(state) )
         
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
