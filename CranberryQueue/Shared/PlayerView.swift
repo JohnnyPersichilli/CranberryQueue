@@ -10,10 +10,19 @@ import UIKit
 
 protocol PlayerControllerDelegate: class {
     func swiped()
+    func playPause(isPaused: Bool)
 }
 
 class PlayerView: UIView, PlayerDelegate {
-
+    func updatePlayPauseUI(isPaused: Bool) {
+        if(isPaused){
+            playPauseImage.image = UIImage(named: "xIcon")
+        }else{
+            playPauseImage.image = UIImage(named: "defaultPerson")
+        }
+    }
+    
+    
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
@@ -24,9 +33,12 @@ class PlayerView: UIView, PlayerDelegate {
     
     @IBOutlet var helpLabel: UILabel!
     @IBOutlet weak var inactiveHostLabel: UILabel!
+    @IBOutlet weak var playPauseImage: UIImageView!
+    @IBOutlet weak var skipSongImage: UIImageView!
     
     
     var delegate: PlayerControllerDelegate?
+    var isPaused = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -54,14 +66,21 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func setupGestureRecognizers() {
-//        let forwardSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swiped))
-//        forwardSwipe.direction = .left
-        let forwardSwipe = UITapGestureRecognizer(target: self, action: #selector(swiped))
-        contentView.addGestureRecognizer(forwardSwipe)
-        contentView.isUserInteractionEnabled = true
+        let skipSongTap = UITapGestureRecognizer(target: self, action: #selector(skipSongTapped))
+        skipSongImage.addGestureRecognizer(skipSongTap)
+        skipSongImage.isUserInteractionEnabled = true
+        
+        let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
+        playPauseImage.addGestureRecognizer(playPauseTap)
+        playPauseImage.isUserInteractionEnabled = true
     }
     
-    @objc func swiped() {
+    @objc func playPauseTapped(){
+        delegate?.playPause(isPaused: isPaused)
+        isPaused = !isPaused
+    }
+    
+    @objc func skipSongTapped() {
         delegate?.swiped()
     }
     
