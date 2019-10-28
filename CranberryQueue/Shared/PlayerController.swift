@@ -35,7 +35,21 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func playPause(isPaused: Bool){
-        pauseSong(isPaused: isPaused)
+        if(isPaused){
+            self.remote?.playerAPI?.resume({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
+        }else{
+            self.remote?.playerAPI?.pause({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
+        }
     }
         
     var queueId: String? = nil
@@ -61,8 +75,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var guestListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
-    
-    var isPaused = false
 
     func setupPlayer(queueId: String?, isHost: Bool) {
         if queueId != self.queueId || queueId == nil {
@@ -115,26 +127,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         })
     }
     
-    func pauseSong(isPaused: Bool){
-        if(isPaused){
-            self.remote?.playerAPI?.resume({ (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-                self.isPaused = false
-            })
-        }else{
-            self.remote?.playerAPI?.pause({ (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-                self.isPaused = true
-            })
-        }
-    }
-    
     func enqueueSongWith(_ uri: String) {
         isEnqueuing = true
         self.remote?.playerAPI?.enqueueTrackUri(uri, callback: { (response, error) in
@@ -165,7 +157,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         
         duration = json["duration"] as! Int
         position = json["position"] as! Int
-        isPaused = json["isPaused"] as! Bool
+        let isPaused = json["isPaused"] as! Bool
         
         self.mapDelegate?.updatePlayPauseUI(isPaused: isPaused)
         self.queueDelegate?.updatePlayPauseUI(isPaused: isPaused)
