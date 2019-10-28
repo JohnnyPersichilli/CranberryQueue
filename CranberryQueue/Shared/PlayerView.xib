@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina5_9" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -72,15 +70,17 @@
                     <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="greenCheck" translatesAutoresizingMaskIntoConstraints="NO" id="9XD-Fr-R0L">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-pause-white" translatesAutoresizingMaskIntoConstraints="NO" id="9XD-Fr-R0L">
                     <rect key="frame" x="340" y="10" width="25" height="25"/>
+                    <color key="tintColor" cocoaTouchSystemColor="lightTextColor"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="25" id="29n-KM-ebT"/>
                         <constraint firstAttribute="height" constant="25" id="H67-ZQ-72z"/>
                     </constraints>
                 </imageView>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="whiteRightChevron" translatesAutoresizingMaskIntoConstraints="NO" id="cbC-VW-lMN">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-skip-forward-white" translatesAutoresizingMaskIntoConstraints="NO" id="cbC-VW-lMN">
                     <rect key="frame" x="375" y="10" width="25" height="25"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="25" id="1vh-EX-wtG"/>
                         <constraint firstAttribute="height" constant="25" id="dvk-Ug-KIO"/>
@@ -111,7 +111,7 @@
         </view>
     </objects>
     <resources>
-        <image name="greenCheck" width="20" height="20"/>
-        <image name="whiteRightChevron" width="192" height="192"/>
+        <image name="ios-pause-white" width="27" height="31"/>
+        <image name="ios-skip-forward-white" width="31" height="31"/>
     </resources>
 </document>

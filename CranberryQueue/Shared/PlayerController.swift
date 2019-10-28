@@ -35,8 +35,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func playPause(isPaused: Bool){
-        self.isPaused = isPaused
-        pauseSong()
+        pauseSong(isPaused: isPaused)
     }
         
     var queueId: String? = nil
@@ -116,7 +115,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         })
     }
     
-    func pauseSong(){
+    func pauseSong(isPaused: Bool){
         if(isPaused){
             self.remote?.playerAPI?.resume({ (response, error) in
                 if let err = error {

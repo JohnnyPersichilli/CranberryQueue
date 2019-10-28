@@ -15,10 +15,20 @@ protocol PlayerControllerDelegate: class {
 
 class PlayerView: UIView, PlayerDelegate {
     func updatePlayPauseUI(isPaused: Bool) {
+        self.isPaused = isPaused
+        skipSongImage.image = UIImage(named: "ios-skip-forward-white")
         if(isPaused){
-            playPauseImage.image = UIImage(named: "xIcon")
+            if #available(iOS 13.0, *) {
+                playPauseImage.image = UIImage(systemName: "play.fill")
+            }else{
+                playPauseImage.image = UIImage(named: "xIcon")
+            }
         }else{
-            playPauseImage.image = UIImage(named: "defaultPerson")
+            if #available(iOS 13.0, *) {
+                playPauseImage.image = UIImage(systemName: "pause.fill")
+            }else{
+                playPauseImage.image = UIImage(named: "ios-pause-white")
+            }
         }
     }
     
@@ -59,6 +69,8 @@ class PlayerView: UIView, PlayerDelegate {
         
         titleLabel.text = nil
         timeLabel.text = nil
+        playPauseImage.image = nil
+        skipSongImage.image = nil
         
         inactiveHostLabel.isHidden = true
         
@@ -77,7 +89,6 @@ class PlayerView: UIView, PlayerDelegate {
     
     @objc func playPauseTapped(){
         delegate?.playPause(isPaused: isPaused)
-        isPaused = !isPaused
     }
     
     @objc func skipSongTapped() {
@@ -132,6 +143,8 @@ class PlayerView: UIView, PlayerDelegate {
         if(position > duration){
             DispatchQueue.main.async {
                 self.inactiveHostLabel.isHidden = false
+                self.playPauseImage.image = nil
+                self.skipSongImage.image = nil
                 self.albumImageView.image = nil
                 self.titleLabel.text = nil
                 self.timeLabel.text = nil
@@ -159,6 +172,8 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func clear() {
+        playPauseImage.image = nil
+        skipSongImage.image = nil
         albumImageView.image = nil
         titleLabel.text = nil
         timeLabel.text = nil
