@@ -327,7 +327,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 "lat" : coords?["lat"] ?? 0,
                 "long" : coords?["long"] ?? 0,
                 "city": self.cityLabel.text ?? "",
-                "region":  self.regionLabel.text ?? "",
+                "region": self.regionLabel.text ?? "",
                 "numMembers": 0,
                 "currentSong": "",
                 "name" : name
