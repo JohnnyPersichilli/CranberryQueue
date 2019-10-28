@@ -14,22 +14,35 @@ protocol PlayerControllerDelegate: class {
 }
 
 class PlayerView: UIView, PlayerDelegate {
-    func updatePlayPauseUI(isPaused: Bool) {
-        self.isPaused = isPaused
-        skipSongImage.image = UIImage(named: "ios-skip-forward-white")
-        if(isPaused){
-            if #available(iOS 13.0, *) {
-                playPauseImage.image = UIImage(systemName: "play.fill")
+    func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
+        if(isHost){
+            bottomGuestTimeLabelConstraint.constant = 7.5
+            self.isPaused = isPaused
+            skipSongImage.image = UIImage(named: "ios-skip-forward-white")
+            if(isPaused){
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "play.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "whitePlayIcon")
+                }
             }else{
-                playPauseImage.image = UIImage(named: "whitePlayIcon")
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "pause.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "ios-pause-white")
+                }
             }
+            playPauseImage.isUserInteractionEnabled = true
+            skipSongImage.isUserInteractionEnabled = true
         }else{
-            if #available(iOS 13.0, *) {
-                playPauseImage.image = UIImage(systemName: "pause.fill")
-            }else{
-                playPauseImage.image = UIImage(named: "ios-pause-white")
-            }
+            bottomGuestTimeLabelConstraint.constant = 25
+            playPauseImage.image = nil
+            skipSongImage.image = nil
+            playPauseImage.isUserInteractionEnabled = false
+            skipSongImage.isUserInteractionEnabled = false
+            
         }
+
     }
     
     
@@ -45,6 +58,8 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
+    @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
+    
     
     
     var delegate: PlayerControllerDelegate?

@@ -13,7 +13,7 @@ protocol PlayerDelegate: class {
     func updateSongUI(withInfo: PlaybackInfo)
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
-    func updatePlayPauseUI(isPaused: Bool)
+    func updatePlayPauseUI(isPaused: Bool, isHost: Bool)
     func clear()
 }
 
@@ -35,21 +35,26 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func playPause(isPaused: Bool){
-        if(isPaused){
-            self.remote?.playerAPI?.resume({ (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-            })
+        if(queueId != nil && isHost){
+            if(isPaused){
+                self.remote?.playerAPI?.resume({ (response, error) in
+                    if let err = error {
+                        print(err)
+                        return
+                    }
+                })
+            }else{
+                self.remote?.playerAPI?.pause({ (response, error) in
+                    if let err = error {
+                        print(err)
+                        return
+                    }
+                })
+            }
         }else{
-            self.remote?.playerAPI?.pause({ (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-            })
+            
         }
+
     }
         
     var queueId: String? = nil
@@ -119,12 +124,14 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func skipSong() {
-        self.remote?.playerAPI?.skip(toNext: { (_, error) in
-            if let err = error {
-                print(err)
-                return
-            }
-        })
+        if(queueId != nil && isHost){
+            self.remote?.playerAPI?.skip(toNext: { (_, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
+        }
     }
     
     func enqueueSongWith(_ uri: String) {
@@ -159,8 +166,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         position = json["position"] as! Int
         let isPaused = json["isPaused"] as! Bool
         
-        self.mapDelegate?.updatePlayPauseUI(isPaused: isPaused)
-        self.queueDelegate?.updatePlayPauseUI(isPaused: isPaused)
+        self.mapDelegate?.updatePlayPauseUI(isPaused: isPaused, isHost: isHost)
+        self.queueDelegate?.updatePlayPauseUI(isPaused: isPaused, isHost: isHost)
         
         if (isPaused) {
             timer.invalidate()
@@ -249,6 +256,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)
+            
             
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)
