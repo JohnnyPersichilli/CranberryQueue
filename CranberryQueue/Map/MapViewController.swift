@@ -327,7 +327,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 "lat" : coords?["lat"] ?? 0,
                 "long" : coords?["long"] ?? 0,
                 "city": self.cityLabel.text ?? "",
-                "region": self.regionLabel.text ?? "",
+                "region":  self.regionLabel.text ?? "",
                 "numMembers": 0,
                 "currentSong": "",
                 "name" : name
@@ -335,6 +335,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             let name = self.createQueueForm.queueNameTextField.text!
             self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
         }
+    }
+    
+    // Convert state names to full name PA ~> Pennsylvania
+    func convertToFullRegionName(region: String) -> String? {
+        return Constants.stateDictionary[region]
     }
 
     // Create queue from create queue modal
@@ -480,7 +485,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
-        regionLabel.text = region
+        regionLabel.text = self.convertToFullRegionName(region: region)
     }
     
     // Called when map marker was tapped with location doc data # MapDelegate
