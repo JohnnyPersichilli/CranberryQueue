@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina5_9" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,6 +14,8 @@
                 <outlet property="contentView" destination="iN0-l3-epB" id="Svh-za-1zX"/>
                 <outlet property="helpLabel" destination="gAR-Ux-jFY" id="7bz-cj-T6k"/>
                 <outlet property="inactiveHostLabel" destination="fh8-Zy-0tG" id="EmA-g9-fEz"/>
+                <outlet property="playPauseImage" destination="9XD-Fr-R0L" id="Hri-kO-igs"/>
+                <outlet property="skipSongImage" destination="cbC-VW-lMN" id="i2i-xG-D3o"/>
                 <outlet property="timeLabel" destination="vj7-cZ-fDJ" id="epW-pN-Keo"/>
                 <outlet property="titleLabel" destination="SVW-cU-kTq" id="ZeK-ZM-gw4"/>
             </connections>
@@ -26,8 +26,9 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1:14 | 2:30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vj7-cZ-fDJ">
-                    <rect key="frame" x="301" y="26.666666666666671" width="88" height="16"/>
+                    <rect key="frame" x="321" y="45.666666666666664" width="88" height="16"/>
                     <constraints>
+                        <constraint firstAttribute="height" constant="16" id="9jU-WI-g0j"/>
                         <constraint firstAttribute="width" constant="88" id="VM7-1U-WsD"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="light" pointSize="13"/>
@@ -43,7 +44,7 @@
                     </constraints>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Soul Food - Logic" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVW-cU-kTq">
-                    <rect key="frame" x="74" y="12.666666666666664" width="212" height="44"/>
+                    <rect key="frame" x="74" y="12.666666666666664" width="232" height="44"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="p2i-X2-gmv"/>
                     </constraints>
@@ -69,24 +70,48 @@
                     <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-pause-white" translatesAutoresizingMaskIntoConstraints="NO" id="9XD-Fr-R0L">
+                    <rect key="frame" x="340" y="10" width="25" height="25"/>
+                    <color key="tintColor" cocoaTouchSystemColor="lightTextColor"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="25" id="29n-KM-ebT"/>
+                        <constraint firstAttribute="height" constant="25" id="H67-ZQ-72z"/>
+                    </constraints>
+                </imageView>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-skip-forward-white" translatesAutoresizingMaskIntoConstraints="NO" id="cbC-VW-lMN">
+                    <rect key="frame" x="375" y="10" width="25" height="25"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="25" id="1vh-EX-wtG"/>
+                        <constraint firstAttribute="height" constant="25" id="dvk-Ug-KIO"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="igS-h2-awn" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="4It-CQ-qBD"/>
+                <constraint firstItem="9XD-Fr-R0L" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="6Zc-NY-a8Z"/>
                 <constraint firstItem="gAR-Ux-jFY" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="9q8-9A-h6k"/>
                 <constraint firstItem="SVW-cU-kTq" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="DTD-kb-PXF"/>
                 <constraint firstItem="igS-h2-awn" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="19" id="QqH-E1-VUo"/>
-                <constraint firstItem="vj7-cZ-fDJ" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="Saz-MT-IBQ"/>
                 <constraint firstItem="fh8-Zy-0tG" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="WOe-ka-4a7"/>
                 <constraint firstItem="gAR-Ux-jFY" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="a2i-KJ-vRy"/>
+                <constraint firstAttribute="trailing" secondItem="cbC-VW-lMN" secondAttribute="trailing" constant="14" id="ayL-rH-uLf"/>
                 <constraint firstItem="fh8-Zy-0tG" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="b98-3A-Vwl"/>
+                <constraint firstItem="cbC-VW-lMN" firstAttribute="leading" secondItem="9XD-Fr-R0L" secondAttribute="trailing" constant="10" id="btH-lA-Lrs"/>
                 <constraint firstItem="SVW-cU-kTq" firstAttribute="leading" secondItem="igS-h2-awn" secondAttribute="trailing" constant="13" id="c9h-jH-GGd"/>
-                <constraint firstAttribute="trailing" secondItem="vj7-cZ-fDJ" secondAttribute="trailing" constant="25" id="dtc-wP-zQ8"/>
+                <constraint firstAttribute="trailing" secondItem="vj7-cZ-fDJ" secondAttribute="trailing" constant="5" id="dtc-wP-zQ8"/>
+                <constraint firstAttribute="bottom" secondItem="vj7-cZ-fDJ" secondAttribute="bottom" constant="7.3300000000000001" id="kVJ-nK-hBn"/>
                 <constraint firstItem="vj7-cZ-fDJ" firstAttribute="leading" secondItem="SVW-cU-kTq" secondAttribute="trailing" constant="15" id="kck-Ch-YYW"/>
+                <constraint firstItem="cbC-VW-lMN" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="qZu-lk-yrQ"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <point key="canvasLocation" x="139" y="154"/>
+            <point key="canvasLocation" x="137.59999999999999" y="152.58620689655174"/>
         </view>
     </objects>
+    <resources>
+        <image name="ios-pause-white" width="27" height="31"/>
+        <image name="ios-skip-forward-white" width="31" height="31"/>
+    </resources>
 </document>
