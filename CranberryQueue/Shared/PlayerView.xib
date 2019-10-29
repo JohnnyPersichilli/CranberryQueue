@@ -11,6 +11,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PlayerView" customModule="CranberryQueue" customModuleProvider="target">
             <connections>
                 <outlet property="albumImageView" destination="igS-h2-awn" id="jFQ-Iw-wUf"/>
+                <outlet property="bottomGuestTimeLabelConstraint" destination="kVJ-nK-hBn" id="py3-Tg-0Uh"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Svh-za-1zX"/>
                 <outlet property="helpLabel" destination="gAR-Ux-jFY" id="7bz-cj-T6k"/>
                 <outlet property="inactiveHostLabel" destination="fh8-Zy-0tG" id="EmA-g9-fEz"/>
@@ -26,7 +27,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1:14 | 2:30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vj7-cZ-fDJ">
-                    <rect key="frame" x="321" y="45.666666666666664" width="88" height="16"/>
+                    <rect key="frame" x="321" y="28" width="88" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="9jU-WI-g0j"/>
                         <constraint firstAttribute="width" constant="88" id="VM7-1U-WsD"/>
@@ -101,7 +102,7 @@
                 <constraint firstItem="cbC-VW-lMN" firstAttribute="leading" secondItem="9XD-Fr-R0L" secondAttribute="trailing" constant="10" id="btH-lA-Lrs"/>
                 <constraint firstItem="SVW-cU-kTq" firstAttribute="leading" secondItem="igS-h2-awn" secondAttribute="trailing" constant="13" id="c9h-jH-GGd"/>
                 <constraint firstAttribute="trailing" secondItem="vj7-cZ-fDJ" secondAttribute="trailing" constant="5" id="dtc-wP-zQ8"/>
-                <constraint firstAttribute="bottom" secondItem="vj7-cZ-fDJ" secondAttribute="bottom" constant="7.3300000000000001" id="kVJ-nK-hBn"/>
+                <constraint firstAttribute="bottom" secondItem="vj7-cZ-fDJ" secondAttribute="bottom" constant="25" id="kVJ-nK-hBn"/>
                 <constraint firstItem="vj7-cZ-fDJ" firstAttribute="leading" secondItem="SVW-cU-kTq" secondAttribute="trailing" constant="15" id="kck-Ch-YYW"/>
                 <constraint firstItem="cbC-VW-lMN" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="qZu-lk-yrQ"/>
             </constraints>
