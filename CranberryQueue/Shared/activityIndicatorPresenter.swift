@@ -24,11 +24,10 @@ public extension activityIndicatorPresenter where Self: UIViewController {
 
     func showActivityIndicator() {
         DispatchQueue.main.async {
-
             self.activityIndicator.style = .whiteLarge
             self.activityIndicator.frame = CGRect(x: 50, y: 50, width: 160, height: 160) //or whatever size you would like
             self.activityIndicator.transform = CGAffineTransform(scaleX: 3, y: 3)
-            self.activityIndicator.color = .green
+            self.activityIndicator.color = .white
             self.activityIndicator.center = CGPoint(x: self.view.bounds.size.width / 2, y: self.view.bounds.height / 2)
             self.view.addSubview(self.activityIndicator)
             self.activityIndicator.startAnimating()
