@@ -117,6 +117,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
         backToQueueIconImageView.addGestureRecognizer(homeTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
+        
+        let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
+        playerView.addGestureRecognizer(playerHomeTap)
+        playerView.isUserInteractionEnabled = true
     }
     
     func setupFirebase() {
@@ -175,6 +179,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
             self.isHost = true
             self.queueId = oldQueueId
+            
+            self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                guard let oldQueueName = snap["name"] else {
+                    return
+                }
+                self.name = oldQueueName as! String
+            })
             
             self.controllerMapDelegate?.setQueue(oldQueueId)
             
@@ -461,7 +476,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeCreateForm()
         if(code != nil){
             joinQueue(code: code!)
-        }else if(queueId != nil){
+        }else if(queueId != nil && name != nil){
             self.getIsUserHostOf(queueId: queueId!) { (isHost) in
                 self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
             }

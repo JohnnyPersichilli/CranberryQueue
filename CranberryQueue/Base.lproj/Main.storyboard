@@ -74,8 +74,8 @@
                                             <constraint firstAttribute="width" constant="50" id="hlM-QG-V1o"/>
                                         </constraints>
                                     </view>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="lock.rotation.open" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ytp-G7-bVE">
-                                        <rect key="frame" x="2.6666666666666856" y="58.666666666666636" width="50" height="48.666666666666664"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-key" translatesAutoresizingMaskIntoConstraints="NO" id="ytp-G7-bVE">
+                                        <rect key="frame" x="2.6666666666666856" y="57.666666666666629" width="50" height="50"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -528,7 +528,7 @@
                                 </connections>
                             </containerView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="163" width="28.000000000000114" height="28.000000000000114"/>
+                                <rect key="frame" x="316" y="163" width="28" height="28"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
                                     <constraint firstAttribute="height" constant="28" id="srv-GA-83n"/>
@@ -1179,7 +1179,7 @@
         <image name="greenCheck" width="20" height="20"/>
         <image name="greyLock" width="192" height="192"/>
         <image name="ios-checkmark-circle-outline" width="24" height="24"/>
-        <image name="lock.rotation.open" catalog="system" width="64" height="54"/>
+        <image name="ios-key" width="29" height="28"/>
         <image name="music.house.fill" catalog="system" width="64" height="52"/>
         <image name="peopleIcon" width="512" height="512"/>
         <image name="plus" width="500" height="500"/>
