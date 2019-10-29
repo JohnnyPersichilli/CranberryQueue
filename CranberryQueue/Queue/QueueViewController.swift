@@ -45,13 +45,25 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     var db : Firestore? = nil
     
     var playerController = PlayerController.sharedInstance
-            
+    
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
         db = Firestore.firestore()
         
-        watchLocationDoc()
+        playerView.delegate = playerController
+        playerController.queueDelegate = playerView
+        playerController.setupPlayer(queueId: queueId!, isHost: isHost)
+        
+        setupGestureRecognizers()
+        setupScreen()
+        
+        songTableView.delegate = songTableView
+        songTableView.dataSource = songTableView
+        
+        songTableView.songDelegate = self
+    }
+            
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
         if(isHost){
             leaveQueueButton.setTitle("Delete Queue", for: .normal)
@@ -61,17 +73,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
             searchIconImageView.isUserInteractionEnabled = false
         }
         
-        playerView.delegate = playerController
-        playerController.queueDelegate = playerView
-        playerController.setupPlayer(queueId: queueId!, isHost: isHost)
-        
-        //general screen setup
+        watchLocationDoc()
         setupSongTableView()
-        setupGestureRecognizers()
-        setupScreen()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         queueRef?.remove()
         songTableView.songRef?.remove()
     }
@@ -90,14 +96,11 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     // setup related to the song table view
     func setupSongTableView() {
-        songTableView.delegate = songTableView
-        songTableView.dataSource = songTableView
         songTableView.queueId = queueId
         songTableView.uid = self.uid
         songTableView.isHost = isHost
         songTableView.loadPreviousVotes()
         songTableView.watchPlaylist()
-        songTableView.songDelegate = self
     }
     
     func watchLocationDoc() {
