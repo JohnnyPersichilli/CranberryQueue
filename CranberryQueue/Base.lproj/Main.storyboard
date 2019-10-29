@@ -75,12 +75,12 @@
                                         </constraints>
                                     </view>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ios-key" translatesAutoresizingMaskIntoConstraints="NO" id="ytp-G7-bVE">
-                                        <rect key="frame" x="2.6666666666666856" y="57.666666666666629" width="50" height="50"/>
+                                        <rect key="frame" x="7.6666666666666856" y="62.666666666666629" width="40" height="40"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="50" id="WjN-dd-bNp"/>
-                                            <constraint firstAttribute="height" constant="50" id="v63-SV-275"/>
+                                            <constraint firstAttribute="width" constant="40" id="WjN-dd-bNp"/>
+                                            <constraint firstAttribute="height" constant="40" id="v63-SV-275"/>
                                         </constraints>
                                     </imageView>
                                     <view alpha="0.90000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fW4-eV-RHE">
@@ -107,21 +107,21 @@
                                     <constraint firstAttribute="trailing" secondItem="KC5-cl-twp" secondAttribute="trailing" constant="2.5" id="BPL-pF-MU8"/>
                                     <constraint firstItem="fW4-eV-RHE" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="2.5" id="BQb-yC-Hbd"/>
                                     <constraint firstAttribute="width" constant="55" id="C5c-ho-TIP"/>
-                                    <constraint firstItem="fW4-eV-RHE" firstAttribute="top" secondItem="ytp-G7-bVE" secondAttribute="bottom" constant="2.5" id="EsO-q7-7jC"/>
+                                    <constraint firstItem="fW4-eV-RHE" firstAttribute="top" secondItem="ytp-G7-bVE" secondAttribute="bottom" constant="7.5" id="EsO-q7-7jC"/>
                                     <constraint firstAttribute="trailing" secondItem="fW4-eV-RHE" secondAttribute="trailing" constant="2.5" id="FLK-2Y-LNK"/>
                                     <constraint firstAttribute="trailing" secondItem="tXg-Ds-Jzc" secondAttribute="trailing" constant="2.5" id="STe-YZ-TJF"/>
                                     <constraint firstItem="tXg-Ds-Jzc" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="2.5" id="W0i-yh-OKi"/>
                                     <constraint firstAttribute="trailing" secondItem="caK-1g-VFi" secondAttribute="trailing" constant="2.5" id="WNr-fo-DR6"/>
-                                    <constraint firstAttribute="trailing" secondItem="ytp-G7-bVE" secondAttribute="trailing" constant="2.5" id="WgE-6a-Zj6"/>
+                                    <constraint firstAttribute="trailing" secondItem="ytp-G7-bVE" secondAttribute="trailing" constant="7.5" id="WgE-6a-Zj6"/>
                                     <constraint firstAttribute="height" constant="165" id="ZMs-u6-8Gc"/>
                                     <constraint firstItem="caK-1g-VFi" firstAttribute="top" secondItem="sku-rS-XwC" secondAttribute="top" constant="2" id="acY-B7-nO7"/>
                                     <constraint firstItem="KC5-cl-twp" firstAttribute="top" secondItem="fW4-eV-RHE" secondAttribute="bottom" constant="2" id="ePH-0Z-SbP"/>
                                     <constraint firstItem="KC5-cl-twp" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="2.5" id="hBA-FL-h9B"/>
                                     <constraint firstItem="tXg-Ds-Jzc" firstAttribute="top" secondItem="caK-1g-VFi" secondAttribute="bottom" constant="2" id="jNp-TR-zjr"/>
-                                    <constraint firstItem="ytp-G7-bVE" firstAttribute="top" secondItem="tXg-Ds-Jzc" secondAttribute="bottom" constant="2.5" id="ruE-v4-ri9"/>
+                                    <constraint firstItem="ytp-G7-bVE" firstAttribute="top" secondItem="tXg-Ds-Jzc" secondAttribute="bottom" constant="7.5" id="ruE-v4-ri9"/>
                                     <constraint firstAttribute="bottom" secondItem="KC5-cl-twp" secondAttribute="bottom" constant="2" id="uqN-YO-0Co"/>
                                     <constraint firstItem="caK-1g-VFi" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="2.5" id="xys-ln-4MY"/>
-                                    <constraint firstItem="ytp-G7-bVE" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="2.5" id="yU4-Jv-TQz"/>
+                                    <constraint firstItem="ytp-G7-bVE" firstAttribute="leading" secondItem="sku-rS-XwC" secondAttribute="leading" constant="7.5" id="yU4-Jv-TQz"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7k1-xL-an5" customClass="createQueueForm" customModule="CranberryQueue" customModuleProvider="target">
@@ -528,7 +528,7 @@
                                 </connections>
                             </containerView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="163" width="28" height="28"/>
+                                <rect key="frame" x="316" y="163" width="28.000000000000114" height="28.000000000000114"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
                                     <constraint firstAttribute="height" constant="28" id="srv-GA-83n"/>
