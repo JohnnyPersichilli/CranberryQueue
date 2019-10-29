@@ -505,7 +505,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
-        regionLabel.text = self.convertToFullRegionName(region: region)
+        regionLabel.text = region
+        //regionLabel.text = self.convertToFullRegionName(region: region)
     }
     
     // Called when map marker was tapped with location doc data # MapDelegate
