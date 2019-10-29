@@ -23,12 +23,16 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var regionLabel: UILabel!
 
-    // Buttons
-    @IBOutlet var addIconImageView: UIImageView!
-    @IBOutlet var searchIconImageView: UIImageView!
-    @IBOutlet var homeIconImageView: UIImageView!
+    // Views
+    @IBOutlet weak var mapOptionsView: UIView!
+    
+    //Buttons
     @IBOutlet var settingsIconImageView: UIImageView!
-
+    @IBOutlet weak var createIconImageView: UIImageView!
+    @IBOutlet weak var privateSearchIconImageView: UIImageView!
+    @IBOutlet weak var backToQueueIconImageView: UIImageView!
+    
+    
     // Forms
     @IBOutlet var createQueueForm: createQueueForm!
     @IBOutlet var joinQueueForm: JoinQueueForm!
@@ -58,6 +62,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var isHost = false
     var isPremium = false
     var code: String? = nil
+    var name: String? = nil
     /// should open create modal when app remote connected
     var isWaitingForRemote = false
     
@@ -73,6 +78,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
 
     func setupScreen() {
+        self.mapOptionsView.layer.cornerRadius = 10
         self.navigationController?.isNavigationBarHidden = true
         let backgroundLayer = Colors.mapGradient
         backgroundLayer.frame = view.frame
@@ -81,8 +87,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
 
     func setupGestureRecognizers() {
         let addTap = UITapGestureRecognizer(target: self, action: #selector(addTapped))
-        addIconImageView.addGestureRecognizer(addTap)
-        addIconImageView.isUserInteractionEnabled = true
+        createIconImageView.addGestureRecognizer(addTap)
+        createIconImageView.isUserInteractionEnabled = true
 
         let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
         settingsIconImageView.addGestureRecognizer(settingsTap)
@@ -97,8 +103,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
         
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
-        searchIconImageView.addGestureRecognizer(searchTap)
-        searchIconImageView.isUserInteractionEnabled = true
+        privateSearchIconImageView.addGestureRecognizer(searchTap)
+        privateSearchIconImageView.isUserInteractionEnabled = true
 
         let joinCancelTap = UITapGestureRecognizer(target: self, action: #selector(closeJoinForm))
         joinQueueForm.cancelIconImageView.addGestureRecognizer(joinCancelTap)
@@ -109,8 +115,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
 
         let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
-        homeIconImageView.addGestureRecognizer(homeTap)
-        homeIconImageView.isUserInteractionEnabled = true
+        backToQueueIconImageView.addGestureRecognizer(homeTap)
+        backToQueueIconImageView.isUserInteractionEnabled = true
     }
     
     func setupFirebase() {
@@ -153,7 +159,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
         DispatchQueue.main.async {
             self.loginContainer.isHidden = true
-            self.addIconImageView.isHidden = !self.isPremium
+            self.createIconImageView.isHidden = !self.isPremium
         }
     }
     
@@ -364,6 +370,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         var isPrivate = false
         if code != nil {
             isPrivate = true
+        }else{
+            self.code = nil
         }
         
         self.controllerMapDelegate?.setQueue(queueId)
@@ -437,21 +445,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Called by queue view controller when returning to map # QueueMapDelegate
-    func update(queueId: String?, isHost: Bool, privateCode: String?) {
+    func update(queueId: String?, isHost: Bool, privateCode: String?, name: String?) {
         self.code = privateCode
-        /// shows home button if in private queue
-        if privateCode != nil {
-            self.addIconImageView.isHidden = true
-            self.searchIconImageView.isHidden = true
-            self.homeIconImageView.isHidden = false
-        }
-        else {
-            self.addIconImageView.isHidden = !isPremium
-            self.searchIconImageView.isHidden = false
-            self.homeIconImageView.isHidden = true
-        }
         self.queueId = queueId
         self.isHost = isHost
+        self.name = name
         self.controllerMapDelegate?.setQueue(queueId)
         self.controllerMapDelegate?.setLocationEnabled(true)
     }
@@ -461,7 +459,14 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeJoinForm()
         self.closeDetailModal()
         self.closeCreateForm()
-        joinQueue(code: code!)
+        if(code != nil){
+            joinQueue(code: code!)
+        }else if(queueId != nil){
+            self.getIsUserHostOf(queueId: queueId!) { (isHost) in
+                self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
+            }
+        }
+
     }
     
     // Called when settings icon is tapped
