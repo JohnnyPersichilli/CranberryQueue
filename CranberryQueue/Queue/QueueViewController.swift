@@ -14,7 +14,7 @@ protocol queueDelegate: class {
 }
 
 protocol QueueMapDelegate: class {
-    func update(queueId: String?, isHost: Bool, privateCode: String?)
+    func update(queueId: String?, isHost: Bool, privateCode: String?, name: String?)
 }
 
 class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
@@ -146,7 +146,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         self.queueName = nil
         self.queueId = nil
         self.queueRef?.remove()
-        self.mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
+        self.mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
     }
     
     @objc func leaveQueueTapped() {
@@ -160,14 +160,14 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
         }
         
         self.queueId = nil
-        mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil)
+        mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
         
         self.navigateToRoot()
     }
     
     @objc func globeTapped() {
-        mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil)
+        mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil, name: !isPrivate ? self.nameLabel.text : nil)
         self.navigateToRoot()
     }
     
