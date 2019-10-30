@@ -501,6 +501,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func logoutTapped() {
         loginContainer.isHidden = false
         isPremium = false
+        if isHost {
+            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+            self.playerController.setupPlayer(queueId: nil, isHost: false)
+        }
+        isHost = false
+        
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
     }
     
