@@ -527,7 +527,6 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-<<<<<<< Updated upstream
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DKF-G0-cDU">
                                 <rect key="frame" x="28" y="164" width="319" height="517"/>
                                 <connections>
@@ -535,12 +534,8 @@
                                 </connections>
                             </containerView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="163" width="28.000000000000114" height="28.000000000000114"/>
-=======
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="plus" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
                                 <rect key="frame" x="316" y="169" width="28" height="23.666666666666657"/>
                                 <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
->>>>>>> Stashed changes
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
                                     <constraint firstAttribute="height" constant="28" id="srv-GA-83n"/>
@@ -1272,7 +1267,6 @@
         <image name="checkmark.circle" catalog="system" width="64" height="62"/>
         <image name="downChevronIcon " width="752" height="752"/>
         <image name="globeIcon" width="300" height="296"/>
-<<<<<<< Updated upstream
         <image name="greyLock" width="192" height="192"/>
         <image name="ios-key" width="29" height="28"/>
         <image name="music.house.fill" catalog="system" width="64" height="52"/>
@@ -1280,19 +1274,6 @@
         <image name="plus" width="500" height="500"/>
         <image name="plus.circle.fill" catalog="system" width="64" height="62"/>
         <image name="searchIcon" width="503" height="503"/>
-=======
-        <image name="greenCheck" width="20" height="20"/>
-        <image name="greyPlusIcon" width="640" height="640"/>
-        <image name="greySearchIcon" width="600" height="598"/>
-        <image name="house" width="299" height="285"/>
-        <image name="ios-checkmark-circle-outline" width="24" height="24"/>
-        <image name="lock.fill" catalog="system" width="64" height="64"/>
-        <image name="magnifyingglass" catalog="system" width="64" height="56"/>
-        <image name="music.note.list" catalog="system" width="64" height="56"/>
-        <image name="person.2.fill" catalog="system" width="64" height="40"/>
-        <image name="plus" width="500" height="500"/>
-        <image name="plus" catalog="system" width="64" height="56"/>
->>>>>>> Stashed changes
         <image name="settingsIcon" width="720" height="720"/>
         <image name="spotifyLogout" width="75.666664123535156" height="14.333333015441895"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="62" height="64"/>
