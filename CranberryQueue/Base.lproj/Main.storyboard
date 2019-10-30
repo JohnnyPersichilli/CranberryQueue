@@ -527,12 +527,6 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DKF-G0-cDU">
-                                <rect key="frame" x="28" y="164" width="319" height="517"/>
-                                <connections>
-                                    <segue destination="Adk-wO-HdC" kind="embed" id="HFd-nD-yGM"/>
-                                </connections>
-                            </containerView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
                                 <rect key="frame" x="316" y="169" width="28" height="23.666666666666657"/>
                                 <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1264,15 +1258,17 @@
         </scene>
     </scenes>
     <resources>
-        <image name="checkmark.circle" catalog="system" width="64" height="62"/>
+        <image name="checkmark.circle" catalog="system" width="64" height="60"/>
         <image name="downChevronIcon " width="752" height="752"/>
+        <image name="equalizerIcon" width="308" height="308"/>
         <image name="globeIcon" width="300" height="296"/>
         <image name="greyLock" width="192" height="192"/>
         <image name="ios-key" width="29" height="28"/>
+        <image name="magnifyingglass" catalog="system" width="64" height="56"/>
         <image name="music.house.fill" catalog="system" width="64" height="52"/>
         <image name="peopleIcon" width="512" height="512"/>
         <image name="plus" width="500" height="500"/>
-        <image name="plus.circle.fill" catalog="system" width="64" height="62"/>
+        <image name="plus.circle.fill" catalog="system" width="64" height="60"/>
         <image name="searchIcon" width="503" height="503"/>
         <image name="settingsIcon" width="720" height="720"/>
         <image name="spotifyLogout" width="75.666664123535156" height="14.333333015441895"/>
