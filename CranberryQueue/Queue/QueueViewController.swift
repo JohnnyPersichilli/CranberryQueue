@@ -154,7 +154,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     @objc func leaveQueueTapped() {
         //if your the host, then delete the queue when leaving
         if(isHost){
-            let alert = UIAlertController(title: "Delete \(queueName ?? "")?", message: "", preferredStyle: UIAlertController.Style.alert)
+            let alert = UIAlertController(title: "Delete \(queueName ?? "")?", message: "This action will permanently delete this queue", preferredStyle: UIAlertController.Style.alert)
              //firebase fn handles all garbage cleanup for this
             alert.addAction(UIAlertAction(title: "Delete", style: UIAlertAction.Style.destructive, handler: { action in
                 self.db?.collection("location").document(self.queueId!).delete()
