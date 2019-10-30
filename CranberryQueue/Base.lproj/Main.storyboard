@@ -263,27 +263,22 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c7x-u5-Qir">
-                                        <rect key="frame" x="153" y="63.666666666666671" width="104" height="30"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="exit-symbol" translatesAutoresizingMaskIntoConstraints="NO" id="Joz-wR-pot">
+                                        <rect key="frame" x="157" y="68" width="26" height="22"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="104" id="JWc-yW-0p8"/>
-                                            <constraint firstAttribute="height" constant="30" id="fS7-sv-zeX"/>
+                                            <constraint firstAttribute="height" constant="22" id="3nx-Px-LeC"/>
+                                            <constraint firstAttribute="width" constant="26" id="oC1-NK-27e"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                        <state key="normal" title="Leave Queue">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <color key="titleShadowColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </state>
-                                    </button>
+                                    </imageView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="rlb-aE-c6W" firstAttribute="leading" secondItem="cxR-ff-UP1" secondAttribute="trailing" constant="1" id="1FH-LR-GXN"/>
+                                    <constraint firstItem="Joz-wR-pot" firstAttribute="centerY" secondItem="UeZ-NH-hQu" secondAttribute="centerY" id="4LL-os-6f3"/>
                                     <constraint firstItem="UeZ-NH-hQu" firstAttribute="centerY" secondItem="cxR-ff-UP1" secondAttribute="centerY" id="6Lu-lc-Mtv"/>
-                                    <constraint firstItem="c7x-u5-Qir" firstAttribute="leading" secondItem="1By-Ce-MQF" secondAttribute="trailing" constant="4" id="7CP-tN-Xpj"/>
                                     <constraint firstItem="cxR-ff-UP1" firstAttribute="leading" secondItem="MZv-Sk-RfX" secondAttribute="leading" constant="21" id="9tK-lg-BoL"/>
+                                    <constraint firstItem="Joz-wR-pot" firstAttribute="leading" secondItem="1By-Ce-MQF" secondAttribute="trailing" constant="8" id="9zl-1W-aGX"/>
                                     <constraint firstItem="1By-Ce-MQF" firstAttribute="centerY" secondItem="UeZ-NH-hQu" secondAttribute="centerY" id="GpI-Vt-hpH"/>
                                     <constraint firstAttribute="trailing" secondItem="QUe-8O-nZT" secondAttribute="trailing" constant="15" id="M9f-fe-khQ"/>
-                                    <constraint firstItem="c7x-u5-Qir" firstAttribute="bottom" secondItem="1By-Ce-MQF" secondAttribute="bottom" constant="4" id="NBg-uL-2XP"/>
                                     <constraint firstItem="QUe-8O-nZT" firstAttribute="top" secondItem="MZv-Sk-RfX" secondAttribute="top" constant="13" id="XzL-ef-N0L"/>
                                     <constraint firstAttribute="bottom" secondItem="cxR-ff-UP1" secondAttribute="bottom" constant="21" id="jTO-Ex-md2"/>
                                     <constraint firstItem="1By-Ce-MQF" firstAttribute="leading" secondItem="UeZ-NH-hQu" secondAttribute="trailing" constant="1" id="l1P-oK-SP3"/>
@@ -571,7 +566,7 @@
                     </view>
                     <connections>
                         <outlet property="globeIcon" destination="odU-bL-SM0" id="ybe-X4-375"/>
-                        <outlet property="leaveQueueButton" destination="c7x-u5-Qir" id="SP9-j1-jl1"/>
+                        <outlet property="leaveQueueImageView" destination="Joz-wR-pot" id="hdJ-ge-Z7f"/>
                         <outlet property="nameLabel" destination="QUe-8O-nZT" id="p1k-Q1-eDc"/>
                         <outlet property="nextUpLabel" destination="z4l-cv-zzi" id="NsT-RM-fke"/>
                         <outlet property="numMembersLabel" destination="rlb-aE-c6W" id="69g-Cl-boB"/>
@@ -1175,6 +1170,7 @@
     <resources>
         <image name="downChevronIcon " width="752" height="752"/>
         <image name="equalizerIcon" width="308" height="308"/>
+        <image name="exit-symbol" width="26" height="22"/>
         <image name="globeIcon" width="300" height="296"/>
         <image name="greenCheck" width="20" height="20"/>
         <image name="greyLock" width="192" height="192"/>
