@@ -9,56 +9,17 @@
 import UIKit
 import Firebase
 
-protocol searchDelegate: class {
-    func addSongTapped(song: Song)
-}
-
-class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, queueDelegate {
-    
-    func searchTapped(shouldHideContents: Bool) {
-        if(shouldHideContents) {
-            songs = []
-            searchTextField.resignFirstResponder()
-            searchTextField.text = ""
-            DispatchQueue.main.async {
-                self.searchTableView.reloadData()
-            }
-        } else {
-            searchTextField.becomeFirstResponder()
-        }
-    }
-    
-    @IBOutlet var searchTextField: UITextField!
-    
+class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, SegmentedChildDelegate {
+        
     @IBOutlet var searchTableView: UITableView!
+    @IBOutlet var searchBar: UISearchBar!
     
-    weak var delegate: searchDelegate?
+    weak var delegate: SegmentedJointDelegate?
     
     var db: Firestore?
     
-    var searchFirstTap: Bool = true
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        searchTableView.delegate = self
-        searchTableView.dataSource = self
-        searchTextField.delegate = self
-        searchTextField.returnKeyType = .search
-        searchTextField.autocorrectionType = .no
-        
-        db = Firestore.firestore()
-        
-    }
-    
     var songs = [Song]()
-    var isHost = false {
-        didSet {
-            if isHost {
-                // can do host things
-            }
-        }
-    }
+    var isHost = false
     var queueId: String? = nil
     var uid: String? = nil
     var token: String {
@@ -68,82 +29,87 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         }
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        if textField.text == nil || textField.text == "" {
-            return false
+        searchTableView.delegate = self
+        searchTableView.dataSource = self
+        
+        searchBar.delegate = self
+        searchBar.showsCancelButton = false
+        
+        db = Firestore.firestore()
+    }
+    
+    func clear() {
+        songs = []
+        searchBar.text = ""
+        searchTableView.reloadData()
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let text = searchBar.text else { return }
+        if text == "" { return }
+        
+        trackSearchWith(string: text) { (songs) in
+            self.songs = songs
+            DispatchQueue.main.async {
+                self.searchBar.resignFirstResponder()
+                self.searchBar.showsCancelButton = false
+                self.searchTableView.reloadData()
+            }
         }
-        
-        let searchString = (textField.text ?? "").addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.resignFirstResponder()
+        searchBar.text = ""
+    }
+    
+    func trackSearchWith(string: String, completion: @escaping ([Song]) -> Void) {
+        let searchString = (string).addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
         let url = URL(string: "https://api.spotify.com/v1/search?q=\(searchString)&type=track")!
         
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let res = response {
-                //print(res)
-            }
-            if let err = error {
-                print(err)
-                return
-            }
             guard let data0 = data else {
+                print(error!)
                 return
             }
             do {
                 let jsonRes = try JSONSerialization.jsonObject(with: data0, options: []) as? [String: Any]
                 let tracks = jsonRes?["tracks"] as! [String:Any]
                 let items = tracks["items"] as! [[String:Any]]
-                self.songs = []
+                var songs = [Song]()
                 for x in items {
                     let artistInfo = x["artists"] as! [[String:Any]]
                     let albumInfo = x["album"] as! [String:Any]
                     let imageInfo = (albumInfo["images"] as? [[String:Any]]) ?? [["url":"https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33"]]
-                    if(imageInfo.count > 0){
-                        let newSong = Song(
-                            name: x["name"] as! String,
-                            artist: artistInfo[0]["name"] as! String,
-                            imageURL: imageInfo[0]["url"] as! String,
-                            docID: "f",
-                            votes: 1,
-                            uri: x["uri"] as! String,
-                            next: false
-                        )
-                        self.songs.append(newSong)
-                    }else{
-                        let newSong = Song(
-                            name: x["name"] as! String,
-                            artist: artistInfo[0]["name"] as! String,
-                            imageURL: "https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33",
-                            docID: "f",
-                            votes: 1,
-                            uri: x["uri"] as! String,
-                            next: false
-                        )
-                        self.songs.append(newSong)
-                    }
+                    let newSong = Song(
+                        name: x["name"] as! String,
+                        artist: artistInfo[0]["name"] as! String,
+                        imageURL: imageInfo.count > 0 ? imageInfo[0]["url"] as! String : "https://i.scdn.co/image/239ec906572231368d8ebd72614094bd3bd10b33",
+                        docID: "f",
+                        votes: 1,
+                        uri: x["uri"] as! String,
+                        next: false
+                    )
+                    songs.append(newSong)
                 }
-                DispatchQueue.main.async {
-                    self.searchTableView.reloadData()
-                }
+                completion(songs)
                 
             } catch {
                 print(error.localizedDescription)
             }
         }
         task.resume()
-        //        let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
-        //            guard let data = data else {
-        //                print("no data")
-        //                return }
-        //            print(String(data: data, encoding: .utf8)!)
-        //        }
-        //
-        //        task.resume()
-        searchTextField.resignFirstResponder()
-        return true
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -153,16 +119,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     func numberOfSections(in tableView: UITableView) -> Int {
         return songs.count
     }
-    
-    //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    //        if indexPath.section == 0 {
-    //            return 90
-    //        }
-    //        else {
-    //            return 60
-    //        }
-    //    }
-    
+  
     func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         (view as! UITableViewHeaderFooterView).isHidden = true
     }
@@ -187,7 +144,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         }
         cell.songLabel.text = songs[indexPath.section].name
         cell.artistLabel.text = songs[indexPath.section].artist
-        //cell.layer.borderWidth = 1
         
         cell.song = songs[indexPath.section]
         
@@ -207,25 +163,18 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                 updatingCell?.albumImageView.image = UIImage(data: data)
             }
         }
-        
         task.resume()
-        
-        if indexPath.section == 0 {
-            
-        }
-        
+
         return cell
     }
     
-    @objc func addTapped(sender : UITapGestureRecognizer)
-    {
+    @objc func addTapped(sender : UITapGestureRecognizer) {
         let tapLocation = sender.location(in: self.searchTableView)
         let indexPath : IndexPath = self.searchTableView.indexPathForRow(at: tapLocation)!
         
-        if let cell = self.searchTableView.cellForRow(at: indexPath) as? SearchTableViewCell
-        {
+        if let cell = self.searchTableView.cellForRow(at: indexPath) as? SearchTableViewCell {
             songs = []
-            searchTextField.text = ""
+            searchBar.text = ""
             
             DispatchQueue.main.async {
                 self.searchTableView.reloadData()
@@ -247,7 +196,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
                         if snap.documents.count == 0 {
                             newSong["next"] = true
                         }
-                        
                         self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                             self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
                         })
@@ -279,15 +227,5 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         song.next = json["next"] as! Bool
         return song
     }
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
     
 }

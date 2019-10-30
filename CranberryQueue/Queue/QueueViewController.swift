@@ -9,15 +9,15 @@
 import UIKit
 import Firebase
 
-protocol queueDelegate: class {
-    func searchTapped(shouldHideContents: Bool)
-}
-
 protocol QueueMapDelegate: class {
     func update(queueId: String?, isHost: Bool, privateCode: String?, name: String?)
 }
 
-class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
+protocol QueueSegmentedDelegate: class {
+    func searchTapped(shouldHideContents: Bool)
+}
+
+class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDelegate {
 
     var queueName: String? = nil
     var queueId: String? = nil
@@ -33,12 +33,13 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     @IBOutlet var numMembersLabel: UILabel!
     @IBOutlet var numSongsLabel: UILabel!
     @IBOutlet var nextUpLabel: UILabel!
-    @IBOutlet var searchView: UIView!
     @IBOutlet var globeIcon: UIImageView!
     @IBOutlet var playerView: PlayerView!
     
-    weak var delegate: queueDelegate? = nil
+    @IBOutlet var segmentedContainerView: UIView!
+    
     weak var mapDelegate: QueueMapDelegate? = nil
+    weak var queueSegmentedDelegate: QueueSegmentedDelegate? = nil
     
     var queueRef: ListenerRegistration? = nil
     
@@ -176,29 +177,32 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     
     func setupScreen() {
         leaveQueueButton.alpha = 0.8
-        searchView.isHidden = true
-        searchView.alpha = 0
+        segmentedContainerView.isHidden = true
+        segmentedContainerView.alpha = 0
         nameLabel.text = queueName
         let backgroundLayer = Colors.queueGradient
         backgroundLayer.frame = view.frame
         view.layer.insertSublayer(backgroundLayer, at: 0)
     }
     
-    func dismissSearchViewAnimation() {
+    func dismissSegmentedContainerViewAnimation() {
+        self.nextUpLabel.isHidden = false
+        self.songTableView.isHidden = false
         UIView.animate(withDuration: 0.4, animations: {
             self.nextUpLabel.alpha = 1
             self.songTableView.alpha = 1
-            self.searchView.alpha = 0
+            self.segmentedContainerView.alpha = 0
         }) { (_) in
-            self.searchView.isHidden = true
+            self.segmentedContainerView.isHidden = true
         }
     }
     
-    func presentSearchViewAnimation() {
+    func presentSegmentedContainerViewAnimation() {
+        self.segmentedContainerView.isHidden = false
         UIView.animate(withDuration: 0.4, animations: {
             self.nextUpLabel.alpha = 0
             self.songTableView.alpha = 0
-            self.searchView.alpha = 1
+            self.segmentedContainerView.alpha = 1
         }) { (val) in
             self.nextUpLabel.isHidden = true
             self.songTableView.isHidden = true
@@ -206,19 +210,15 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     @objc func searchTapped() {
-        if(searchView.isHidden) {
-            delegate?.searchTapped(shouldHideContents: false)
-            searchView.isHidden = false
-            let closeSearchImage: UIImage = UIImage(named: "xIcon")!
-            searchIconImageView.image = closeSearchImage
-            presentSearchViewAnimation()
+        queueSegmentedDelegate?.searchTapped(shouldHideContents: segmentedContainerView.isHidden)
+        if(segmentedContainerView.isHidden) {
+            searchIconImageView.image = UIImage(named: "xIcon")!
+            presentSegmentedContainerViewAnimation()
         } else {
-            delegate?.searchTapped(shouldHideContents: true)
-            self.nextUpLabel.isHidden = false
-            self.songTableView.isHidden = false
-            let searchImage: UIImage = UIImage(named: "searchIcon")!
-            searchIconImageView.image = searchImage
-            dismissSearchViewAnimation()
+            if #available(iOS 13.0, *) {
+                searchIconImageView.image = UIImage(systemName: "plus")!
+            }
+            dismissSegmentedContainerViewAnimation()
         }
     }
     
@@ -227,9 +227,10 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
                 
         self.nextUpLabel.isHidden = false
         self.songTableView.isHidden = false
-        let searchImage: UIImage = UIImage(named: "searchIcon")!
-        searchIconImageView.image = searchImage
-        dismissSearchViewAnimation()
+        if #available(iOS 13.0, *) {
+            searchIconImageView.image = UIImage(systemName: "plus")!
+        }
+        dismissSegmentedContainerViewAnimation()
     }
     
     //removes the user from the queue
@@ -255,26 +256,14 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.destination is SearchController {
-            let vc = segue.destination as? SearchController
-  
-            vc?.delegate = self
+        if segue.destination is SegmentedViewController {
+            let vc = segue.destination as? SegmentedViewController
+            vc?.jointDelegate = self
+            queueSegmentedDelegate = vc
             vc?.queueId = queueId
             vc?.uid = uid
-            self.delegate = vc
         }
     }
     
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
