@@ -82,6 +82,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
         }
     }
     
+    func pauseAndDisconnectAppRemote() {
+        self.appRemote.playerAPI?.pause()
+        self.appRemote.disconnect()
+    }
+    
     func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
         seshDelegate?.updateSessionStatus(connected: false)
         print(error)
@@ -136,7 +141,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func startSession() {
         let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState]
-         self.sessionManager.initiateSession(with: requestedScopes, options: .default)
+        self.sessionManager.initiateSession(with: requestedScopes, options: .default)
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
