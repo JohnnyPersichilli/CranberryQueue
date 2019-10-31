@@ -51,9 +51,6 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         guestContinueModal.layer.cornerRadius = 13
         guestContinueModal.layer.borderWidth = 1
         guestContinueModal.layer.borderColor = Colors.border.cgColor
-        
-        loginButton.layer.cornerRadius = 14
-        continueButton.layer.cornerRadius = 14
     }
     
     @objc func spotifyLabelTapped() {
@@ -88,10 +85,9 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         }
         else {
             UIView.animate(withDuration: 1, animations: {
-                self.showContinueModals()
-            }) { (Bool) in
                 self.hideActivityIndicator()
-            }
+                self.showContinueModals()
+            })
         }
     }
     
