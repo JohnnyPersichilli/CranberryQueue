@@ -45,6 +45,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         songs = []
         searchBar.text = ""
         searchBar.resignFirstResponder()
+        searchBar.showsCancelButton = false
         searchTableView.reloadData()
     }
     

@@ -218,7 +218,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     }
     
     @objc func searchTapped() {
-        queueSegmentedDelegate?.searchTapped(shouldHideContents: segmentedContainerView.isHidden)
+        queueSegmentedDelegate?.searchTapped(shouldHideContents: !segmentedContainerView.isHidden)
         if(segmentedContainerView.isHidden) {
             searchIconImageView.image = UIImage(named: "xIcon")!
             presentSegmentedContainerViewAnimation()
