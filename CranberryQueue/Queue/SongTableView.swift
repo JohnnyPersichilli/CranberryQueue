@@ -13,7 +13,9 @@ protocol SongTableDelegate: class {
     func updateNumSongs(_ numSongs: Int)
 }
 
-class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, QueueCellDelegate {
+class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, QueueCellDelegate, PlayerTableDelegate {
+    
+    var shouldBeEnqueued: String?
     
     var songs = [Song]()
     var isHost = false {

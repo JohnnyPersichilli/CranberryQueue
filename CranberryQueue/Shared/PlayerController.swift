@@ -73,6 +73,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var position = 0
     
     var isEnqueuing = false
+    var wasEnqueued: String? = nil
     
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
@@ -202,6 +203,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             ref.setData(data, merge: true)
             
             self.enqueueSongWith(data["uri"] as! String)
+            self.wasEnqueued = data["uri"] as! String
         })
     }
     

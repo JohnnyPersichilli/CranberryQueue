@@ -11,6 +11,12 @@ import UIKit
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
+    var wasEnqueued: String? {get}
+    func enqueueNextSong()
+}
+
+protocol PlayerTableDelegate: class {
+    var shouldBeEnqueued: String? {get}
 }
 
 class PlayerView: UIView, PlayerDelegate {
@@ -62,7 +68,8 @@ class PlayerView: UIView, PlayerDelegate {
     
     
     
-    var delegate: PlayerControllerDelegate?
+    var controllerDelegate: PlayerControllerDelegate?
+    var tableDelegate: PlayerTableDelegate?
     var isPaused = false
     
     override init(frame: CGRect) {
@@ -103,11 +110,17 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     @objc func playPauseTapped(){
-        delegate?.playPause(isPaused: isPaused)
+        controllerDelegate?.playPause(isPaused: isPaused)
     }
     
     @objc func skipSongTapped() {
-        delegate?.swiped()
+        if controllerDelegate?.wasEnqueued == tableDelegate?.shouldBeEnqueued {
+        controllerDelegate?.swiped()
+        }
+        else {
+            controllerDelegate?.enqueueNextSong()
+            controllerDelegate?.swiped()
+        }
     }
     
     //Same function as player controller
