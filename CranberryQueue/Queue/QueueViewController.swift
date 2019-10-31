@@ -26,7 +26,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     var shouldHideContents = false
     var isPrivate = false
     
-    @IBOutlet weak var leaveQueueButton: UIButton!
+    @IBOutlet weak var leaveQueueImageView: UIImageView!
     @IBOutlet var songTableView: SongTableView!
     @IBOutlet var searchIconImageView: UIImageView!
     @IBOutlet var nameLabel: UILabel!
@@ -60,15 +60,14 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         songTableView.delegate = songTableView
         songTableView.dataSource = songTableView
         
+        if isHost {
+            leaveQueueImageView.image = UIImage(named: "delete-icon")
+        }
         songTableView.songDelegate = self
     }
             
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        if(isHost){
-            leaveQueueButton.setTitle("Delete Queue", for: .normal)
-        }
         
         if (UIApplication.shared.delegate as! AppDelegate).token == "" {
             searchIconImageView.isUserInteractionEnabled = false
@@ -133,8 +132,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         searchIconImageView.isUserInteractionEnabled = true
         
         let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTapped))
-        leaveQueueButton.addGestureRecognizer(leaveQueueTap)
-        leaveQueueButton.isUserInteractionEnabled = true
+        leaveQueueImageView.addGestureRecognizer(leaveQueueTap)
+        leaveQueueImageView.isUserInteractionEnabled = true
     }
     
     func cleanup() {
@@ -156,17 +155,27 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     @objc func leaveQueueTapped() {
         //if your the host, then delete the queue when leaving
         if(isHost){
-            //firebase fn handles all garbage cleanup for this
-            self.db?.collection("location").document(self.queueId!).delete()
+            let alert = UIAlertController(title: "Delete \(queueName ?? "")?", message: "This action will permanently delete this queue", preferredStyle: UIAlertController.Style.alert)
+             //firebase fn handles all garbage cleanup for this
+            alert.addAction(UIAlertAction(title: "Delete", style: UIAlertAction.Style.destructive, handler: { action in
+                self.db?.collection("location").document(self.queueId!).delete()
+                self.handleLeaveQueueActions()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler:
+                nil
+            ))
+            self.present(alert, animated: true)
         } else {
             //delete from members now an endpoint
             removeFromMembersRequest(queueId: self.queueId!, uid: self.uid!)
+            handleLeaveQueueActions()
         }
-        
+    }
+    
+    func handleLeaveQueueActions() {
         self.queueId = nil
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
-        
         self.navigateToRoot()
     }
     
@@ -176,7 +185,6 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     }
     
     func setupScreen() {
-        leaveQueueButton.alpha = 0.8
         segmentedContainerView.isHidden = true
         segmentedContainerView.alpha = 0
         nameLabel.text = queueName
