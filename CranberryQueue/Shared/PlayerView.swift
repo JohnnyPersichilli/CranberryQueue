@@ -7,17 +7,14 @@
 //
 
 import UIKit
+import Firebase
 
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
     var wasEnqueued: String? {get}
-    func enqueueNextSong()
 }
 
-protocol PlayerTableDelegate: class {
-    var shouldBeEnqueued: String? {get}
-}
 
 class PlayerView: UIView, PlayerDelegate {
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
@@ -66,11 +63,10 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet weak var skipSongImage: UIImageView!
     @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
     
-    
-    
     var controllerDelegate: PlayerControllerDelegate?
-    var tableDelegate: PlayerTableDelegate?
     var isPaused = false
+        
+    var db: Firestore? = nil
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -114,11 +110,25 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     @objc func skipSongTapped() {
-        if controllerDelegate?.wasEnqueued == tableDelegate?.shouldBeEnqueued {
+        var shouldBeEnqueued: String = ""
+        let queueId = PlayerController.sharedInstance.queueId
+        db = Firestore.firestore()
+        db?.collection("playlist").document(queueId!).collection("songs").whereField("next", isEqualTo: true).getDocuments(completion: { (snapshot, error) in
+            
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.documents.count == 0{
+                return
+            }
+            shouldBeEnqueued = snap.documents[0].data()["uri"] as! String
+        })
+        if controllerDelegate?.wasEnqueued == shouldBeEnqueued {
         controllerDelegate?.swiped()
         }
         else {
-            controllerDelegate?.enqueueNextSong()
+            PlayerController.sharedInstance.enqueueNextSong()
             controllerDelegate?.swiped()
         }
     }

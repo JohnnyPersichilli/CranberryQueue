@@ -143,7 +143,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.queueNameTextField.delegate = self
         joinQueueForm.eventCodeTextField.delegate = self
         
-        playerView.delegate = playerController
+        playerView.controllerDelegate = playerController
         playerController.mapDelegate = playerView
         
         let delegate = UIApplication.shared.delegate as! AppDelegate

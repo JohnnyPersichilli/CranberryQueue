@@ -49,7 +49,7 @@ class QueueViewController: UIViewController, searchDelegate, SongTableDelegate {
     override func viewDidLoad() {
         db = Firestore.firestore()
         
-        playerView.delegate = playerController
+        playerView.controllerDelegate = playerController
         playerController.queueDelegate = playerView
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
         
