@@ -44,6 +44,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
     func clear() {
         songs = []
         searchBar.text = ""
+        searchBar.resignFirstResponder()
         searchTableView.reloadData()
     }
     
