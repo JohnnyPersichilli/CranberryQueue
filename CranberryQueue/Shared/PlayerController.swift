@@ -62,11 +62,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     
     var remote: SPTAppRemote? = nil
     var token: String? = nil
+    var isSubscribed = false
     
     var db: Firestore? = nil
     
     var timer = Timer()
     var isTimerRunning = false
+    var skipSongDidRun = false
     
     var currentUri = String()
     var duration = 200
@@ -86,6 +88,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             })
+            isSubscribed = false
         }
         if queueId == nil {
             timer.invalidate()
@@ -145,7 +148,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        print("DBG: Entered playerStateDidChange")
         if isEnqueuing {
+            print("Is Enqueueing")
             isEnqueuing = false
             return
         }
@@ -182,7 +187,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
+            print("DBG: removing song")
             removeSongWith(uri, completion: {
+                print("DBG: enqueueing next song")
                 self.enqueueNextSong()
             })
         }
@@ -232,17 +239,21 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupHostListeners() {
+        
         print(remote!.isConnected)
         print(remote?.playerAPI)
         remote?.playerAPI?.delegate = self
+        if !self.isSubscribed {
         remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
             if let res = result {
                 print(res)
+                self.isSubscribed = true
             }
             if let error = error {
                 debugPrint(error.localizedDescription)
             }
         })
+        }
     }
     
     func setupGuestListeners() {
