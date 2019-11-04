@@ -74,6 +74,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     
     var isEnqueuing = false
     
+    var isSubbed = false
+    
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
     
@@ -84,14 +86,15 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     func setupPlayer(queueId: String?, isHost: Bool) {
         if queueId != self.queueId || queueId == nil {
             guestListener?.remove()
-            remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
-            })
         }
         if queueId == nil {
             timer.invalidate()
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
+            remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
+            })
+            self.isSubbed = false
             return
         }
         self.queueId = queueId
@@ -151,7 +154,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
         if queueId == nil {
             remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
-                
+                self.isSubbed = false
             })
             return
         }
@@ -234,9 +237,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     func setupHostListeners() {
         print(remote!.isConnected)
         print(remote?.playerAPI)
+        if isSubbed {
+            return
+        }
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
             if let res = result {
+                self.isSubbed = true
                 print(res)
             }
             if let error = error {
