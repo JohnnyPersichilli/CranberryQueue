@@ -300,19 +300,27 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         return result;
     }
     
+    func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {
+        var imageURL = ""
+        
+        if(playerState.track.imageIdentifier.split(separator: ":").count >= 2){
+            imageURL = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
+        }
+        else{
+            print("no track image in JSON file for:", playerState.track.name)
+            imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
+        }
+        
+        return imageURL
+    }
+    
     func playbackStateToJson(_ playerState: SPTAppRemotePlayerState) -> [String:Any] {
         var playback = [String:Any]()
         playback["name"] = playerState.track.name
         playback["artist"] = playerState.track.artist.name
         
-        if(playerState.track.imageIdentifier.split(separator: ":").count >= 2){
-            playback["imageURL"] = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
-        }else{
-            //may need to update default image even though its never being used?
-            print("no track image in JSON file for:", playerState.track.name)
-            playback["imageURL"] = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
-        }
-        
+
+        playback["imageURL"] = getURLFrom(playerState)
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
         playback["duration"] = Int(playerState.track.duration)
