@@ -407,6 +407,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.db?.collection("contributor").document(queueId).collection("members").document(self.uid).setData([:])
         vc.isHost = isHost
         vc.mapDelegate = self
+        vc.db = db
         self.present(vc, animated:true, completion:{
             self.controllerMapDelegate?.setLocationEnabled(false)
             self.closeDetailModal()

@@ -23,6 +23,7 @@
 		4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBD232CB8C00059C898 /* CustomObjects.swift */; };
 		4C8469D02357C1BF0098AE59 /* JoinQueueForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */; };
 		4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */; };
+		4C94F6662370B961009843FB /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6652370B961009843FB /* SearchTableView.swift */; };
 		4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */; };
 		4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC04232D4B8D007F8D38 /* SearchController.swift */; };
 		4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */; };
@@ -60,6 +61,7 @@
 		4C55CCBD232CB8C00059C898 /* CustomObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObjects.swift; sourceTree = "<group>"; };
 		4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinQueueForm.xib; sourceTree = "<group>"; };
 		4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinQueueForm.swift; sourceTree = "<group>"; };
+		4C94F6652370B961009843FB /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BC04232D4B8D007F8D38 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 		4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				4CBFCF5B236672410087B66F /* SegmentedViewController.swift */,
 				4CA5BC04232D4B8D007F8D38 /* SearchController.swift */,
 				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
+				4C94F6652370B961009843FB /* SearchTableView.swift */,
 			);
 			path = SegmentedModal;
 			sourceTree = "<group>";
@@ -390,6 +393,7 @@
 				4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */,
 				6E63198523667C180031FA2C /* Constants.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
+				4C94F6662370B961009843FB /* SearchTableView.swift in Sources */,
 				4CBFCF5C236672410087B66F /* SegmentedViewController.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,
