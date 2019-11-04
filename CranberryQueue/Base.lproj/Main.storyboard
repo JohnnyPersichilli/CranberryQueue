@@ -1128,7 +1128,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="319" height="486"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="68" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="H73-Vt-sWc">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="68" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="H73-Vt-sWc" customClass="SearchTableView" customModule="CranberryQueue" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="56" width="319" height="430"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
@@ -1214,7 +1214,7 @@
                     </view>
                     <connections>
                         <outlet property="searchBar" destination="oUS-zK-SZo" id="EY8-O6-tnz"/>
-                        <outlet property="searchTableView" destination="H73-Vt-sWc" id="gca-jk-MbU"/>
+                        <outlet property="searchTableView" destination="H73-Vt-sWc" id="sS0-DQ-pFy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e75-tR-OHA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

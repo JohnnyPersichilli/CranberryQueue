@@ -194,7 +194,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 print(error!)
                 return
             }
-            if snap.documents.count == 0 { return }
+            
+            if snap.isEmpty {
+                return
+            }
             let doc = snap.documents[0]
             var data = doc.data()
             let ref = doc.reference
@@ -217,13 +220,17 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
-                doc.reference.delete()
+                doc.reference.delete { (val) in
+                    completion()
+                }
             }
             else {
                 docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
-                docs[0].reference.delete()
+                docs[0].reference.delete { (val) in
+                    completion()
+                }
             }
-            completion()
+            
         })
     }
     
@@ -232,17 +239,18 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupHostListeners() {
-        print(remote!.isConnected)
-        print(remote?.playerAPI)
         remote?.playerAPI?.delegate = self
-        remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
-            if let res = result {
-                print(res)
-            }
-            if let error = error {
-                debugPrint(error.localizedDescription)
-            }
+        remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
+            self.remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
+                if let res = result {
+                    print(res)
+                }
+                if let error = error {
+                    debugPrint(error.localizedDescription)
+                }
+            })
         })
+        
     }
     
     func setupGuestListeners() {

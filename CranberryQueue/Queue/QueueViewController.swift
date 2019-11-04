@@ -49,9 +49,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     
     var playerController = PlayerController.sharedInstance
     
-    override func viewDidLoad() {
-        db = Firestore.firestore()
-        
+    override func viewDidLoad() {        
         playerView.delegate = playerController
         playerController.queueDelegate = playerView
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
@@ -274,8 +272,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
             queueSegmentedDelegate = vc
             vc?.queueId = queueId
             vc?.uid = uid
+            vc?.db = db
         }
     }
-    
 
 }
