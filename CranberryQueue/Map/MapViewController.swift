@@ -383,7 +383,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Helper presents the Queue View Controller with options
-    func presentQueueScreen(queueId: String, name: String, code: String?, isHost: Bool) {
+    func presentQueueScreen(queueId: String, name: String, code: String?, isHost: Bool){
         var isPrivate = false
         if code != nil {
             isPrivate = true
@@ -395,6 +395,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
+        vc.city = self.cityLabel.text
+        vc.region = self.region
         vc.queueName = isPrivate ? code : name
         vc.queueId = queueId
         vc.uid = self.uid

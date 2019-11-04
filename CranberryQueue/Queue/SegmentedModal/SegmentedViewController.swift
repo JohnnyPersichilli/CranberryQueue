@@ -28,6 +28,8 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate {
     
     var queueId: String?
     var uid: String?
+    var city: String?
+    var region: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,8 +74,14 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate {
             vc?.uid = uid
             childDelegate = vc
         }
-        else if false {
-            
+        else if segue.destination is FeaturedController {
+            let vc = segue.destination as? FeaturedController
+            vc?.city = self.city
+            vc?.region = self.region
+            vc?.delegate = jointDelegate
+            vc?.queueId = queueId
+            vc?.uid = uid
+            childDelegate = vc
         }
         else if false {
             

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1C45F19E235E540E0074DDA7 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */; };
+		1CAA461E236E910D00D34440 /* FeaturedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA461D236E910D00D34440 /* FeaturedController.swift */; };
+		1CAA4620236FB6C600D34440 /* FeaturedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA461F236FB6C600D34440 /* FeaturedTableViewCell.swift */; };
+		1CAA4622236FBD7D00D34440 /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA4621236FBD7D00D34440 /* SearchTableView.swift */; };
 		4C30112B235FDAB90097CA97 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C30112A235FDAB90097CA97 /* Colors.swift */; };
 		4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */; };
 		4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C4B7E7A2358C3D40037A86F /* QueueDetailModal.xib */; };
@@ -44,6 +47,9 @@
 
 /* Begin PBXFileReference section */
 		1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
+		1CAA461D236E910D00D34440 /* FeaturedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedController.swift; sourceTree = "<group>"; };
+		1CAA461F236FB6C600D34440 /* FeaturedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedTableViewCell.swift; sourceTree = "<group>"; };
+		1CAA4621236FBD7D00D34440 /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C30112A235FDAB90097CA97 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueDetailModal.swift; sourceTree = "<group>"; };
@@ -118,7 +124,10 @@
 			children = (
 				4CBFCF5B236672410087B66F /* SegmentedViewController.swift */,
 				4CA5BC04232D4B8D007F8D38 /* SearchController.swift */,
+				1CAA4621236FBD7D00D34440 /* SearchTableView.swift */,
+				1CAA461D236E910D00D34440 /* FeaturedController.swift */,
 				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
+				1CAA461F236FB6C600D34440 /* FeaturedTableViewCell.swift */,
 			);
 			path = SegmentedModal;
 			sourceTree = "<group>";
@@ -385,6 +394,7 @@
 				BA4DA89423426D7700DCE8E3 /* activityIndicatorPresenter.swift in Sources */,
 				4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */,
 				4C4CD3DF232C964700F17BB8 /* Extensions.swift in Sources */,
+				1CAA461E236E910D00D34440 /* FeaturedController.swift in Sources */,
 				4C55CCBC232CB28C0059C898 /* QueueTableViewCell.swift in Sources */,
 				4C4CD3E1232C9D1500F17BB8 /* QueueViewController.swift in Sources */,
 				4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */,
@@ -392,7 +402,9 @@
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
 				4CBFCF5C236672410087B66F /* SegmentedViewController.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
+				1CAA4622236FBD7D00D34440 /* SearchTableView.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,
+				1CAA4620236FB6C600D34440 /* FeaturedTableViewCell.swift in Sources */,
 				4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */,
 				4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */,
 				4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */,

@@ -25,6 +25,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     var isHost = false
     var shouldHideContents = false
     var isPrivate = false
+    var city: String? = nil
+    var region: String? = nil
     
     @IBOutlet weak var leaveQueueImageView: UIImageView!
     @IBOutlet var songTableView: SongTableView!
@@ -266,6 +268,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.destination is SegmentedViewController {
             let vc = segue.destination as? SegmentedViewController
+            vc?.city = self.city
+            vc?.region = self.region
             vc?.jointDelegate = self
             queueSegmentedDelegate = vc
             vc?.queueId = queueId
