@@ -318,8 +318,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         var playback = [String:Any]()
         playback["name"] = playerState.track.name
         playback["artist"] = playerState.track.artist.name
-        
-
         playback["imageURL"] = getURLFrom(playerState)
         playback["isPaused"] = playerState.isPaused
         playback["position"] = playerState.playbackPosition
