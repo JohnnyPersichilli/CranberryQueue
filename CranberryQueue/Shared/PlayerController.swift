@@ -239,17 +239,18 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupHostListeners() {
-        print(remote!.isConnected)
-        print(remote?.playerAPI)
         remote?.playerAPI?.delegate = self
-        remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
-            if let res = result {
-                print(res)
-            }
-            if let error = error {
-                debugPrint(error.localizedDescription)
-            }
+        remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
+            self.remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
+                if let res = result {
+                    print(res)
+                }
+                if let error = error {
+                    debugPrint(error.localizedDescription)
+                }
+            })
         })
+        
     }
     
     func setupGuestListeners() {
