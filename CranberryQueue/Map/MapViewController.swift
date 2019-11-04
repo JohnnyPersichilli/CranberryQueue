@@ -409,7 +409,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             vc.isHost = true
             // Host may not have app remote connected !! need global control bool like addTapped
             self.playerController.setupPlayer(queueId: queueId, isHost: true)
-            self.playerController.updateConnectionStatus(connected: true)
         }
         vc.mapDelegate = self
         self.present(vc, animated:true, completion:{
