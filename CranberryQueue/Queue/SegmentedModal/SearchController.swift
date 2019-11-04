@@ -16,9 +16,6 @@ class SearchController: UIViewController, UISearchBarDelegate, SegmentedChildDel
     
     weak var delegate: SegmentedJointDelegate?
     
-    var isHost = false
-    var queueId: String? = nil
-    var uid: String? = nil
     var token: String {
         get {
             let delegate = UIApplication.shared.delegate as! AppDelegate
