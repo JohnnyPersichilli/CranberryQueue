@@ -20,17 +20,6 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
     var city: String? = nil
     var region: String? = nil
     
-    var songs = [Song]()
-    var isHost = false
-    var queueId: String? = nil
-    var uid: String? = nil
-    var token: String {
-        get {
-            let delegate = UIApplication.shared.delegate as! AppDelegate
-            return delegate.token
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         

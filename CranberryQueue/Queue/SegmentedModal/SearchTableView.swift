@@ -39,7 +39,6 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
       func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
           if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
-              //clear()
               controllerDelegate?.addSongTapped(song: cell.song)
           }
       }
@@ -88,7 +87,6 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         let indexPath : IndexPath = indexPathForRow(at: tapLocation)!
         
         if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
-            //clear()
             controllerDelegate?.addSongTapped(song: cell.song)
         }
     }

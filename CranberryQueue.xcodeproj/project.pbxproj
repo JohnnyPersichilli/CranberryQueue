@@ -121,13 +121,6 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		1CAA46242370CBC600D34440 /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		4C199BF52367904E00374319 /* SegmentedModal */ = {
 			isa = PBXGroup;
 			children = (
@@ -150,7 +143,6 @@
 				4CDB8453232BD2A1002559BB /* Products */,
 				EEA6493014A3F051A5A326D1 /* Pods */,
 				12547C6EDEA2690E05C9CF60 /* Frameworks */,
-				1CAA46242370CBC600D34440 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
