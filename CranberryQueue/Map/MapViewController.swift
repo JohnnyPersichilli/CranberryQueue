@@ -13,7 +13,7 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
-    func getCoords() -> ([String:Any])
+    func getCoordsAndCity() -> ([String:Any])
     func setLocationEnabled(_ val: Bool)
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
@@ -346,7 +346,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             "host": self.uid
         ]) { (val) in
             let id = ref!.documentID
-            let coords = self.controllerMapDelegate?.getCoords()
+            let coords = self.controllerMapDelegate?.getCoordsAndCity()
             self.db?.collection("location").document(id).setData([
                 "lat" : coords?["lat"] ?? 0,
                 "long" : coords?["long"] ?? 0,

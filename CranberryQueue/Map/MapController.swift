@@ -239,7 +239,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     
     
-    func getCoords() -> ([String : Any]) {
+    func getCoordsAndCity() -> ([String : Any]) {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
         }
@@ -294,7 +294,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {
-        let myCoords = getCoords()
+        let myCoords = getCoordsAndCity()
         let myLocation = CLLocation(
             latitude: myCoords["lat"] as! CLLocationDegrees,
             longitude: myCoords["long"] as! CLLocationDegrees
