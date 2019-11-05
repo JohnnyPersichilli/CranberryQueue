@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import GoogleMaps
 import Firebase
 
 protocol ControllerMapDelegate: class {

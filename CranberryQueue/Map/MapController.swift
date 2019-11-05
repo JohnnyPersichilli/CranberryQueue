@@ -24,11 +24,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var queuesInLocationRef: ListenerRegistration? = nil
     
     var locationManager : CLLocationManager!
-    
     var map: GMSMapView? = nil
     
-    var currZoom: Float = 15.0
-
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
     var circles = [GMSCircle]()
@@ -36,6 +33,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var curCoords: CLLocationCoordinate2D? = nil
     var isFirstLoad = true
     var queueId: String? = nil
+    var currZoom: Float = 15.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,7 +64,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
-            let curCoords2D = CLLocation(latitude: curLoc.coordinate.latitude, longitude: curLoc.coordinate.longitude)
+            let curCoords2D = CLLocation(
+                latitude: curLoc.coordinate.latitude,
+                longitude: curLoc.coordinate.longitude
+            )
             getGeoCode(withLocation: curCoords2D)
         }
         mapControllerDelegate?.toggleDetailModal(withData: marker.userData as! CQLocation)
