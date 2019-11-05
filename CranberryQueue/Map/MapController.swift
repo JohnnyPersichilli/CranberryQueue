@@ -68,7 +68,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 latitude: curLoc.coordinate.latitude,
                 longitude: curLoc.coordinate.longitude
             )
-            getGeoCode(withLocation: curCoords2D)
+            getGeoCode(withLocation: curCoords2D){ city, region in
+                self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
+                self.watchLocationQueues(city: city, region: region)
+            }
         }
         mapControllerDelegate?.toggleDetailModal(withData: marker.userData as! CQLocation)
         return true
@@ -81,7 +84,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             latitude: mapView.camera.target.latitude,
             longitude: mapView.camera.target.longitude
         )
-        getGeoCode(withLocation: mapCenter)
+        getGeoCode(withLocation: mapCenter){ city, region in
+            self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
+            self.watchLocationQueues(city: city, region: region)
+        }
     }
 
     func watchLocationQueues(city: String, region: String) {
@@ -221,23 +227,30 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         curCoords = center
         
         setupMap(withCoords: center)
-        getGeoCode(withLocation: location!)
+        getGeoCode(withLocation: location!){ city, region in
+            self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
+            self.watchLocationQueues(city: city, region: region)
+        }
         
         self.locationManager.stopUpdatingLocation()
     }
     
-    func getGeoCode(withLocation loc: CLLocation) {
+    func getGeoCode(withLocation loc: CLLocation, completion: @escaping (String, String)->Void) {
         let coder = CLGeocoder()
         coder.reverseGeocodeLocation(loc) { (marks, error) in
             guard let res = marks else {
                 print("Geo code err:", error!)
                 return
             }
-            self.mapControllerDelegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
-            self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
+            completion(res[0].locality!, res[0].administrativeArea!)
+
         }
     }
     
+    func getGeoCompletionHandler(city: String, region: String){
+        self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
+        self.watchLocationQueues(city: city, region: region)
+    }
     
     
     func getCoordsAndCity() -> ([String : Any]) {
