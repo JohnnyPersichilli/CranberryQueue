@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GoogleMaps
 import Firebase
 
 protocol ControllerMapDelegate: class {
@@ -346,18 +347,33 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         ]) { (val) in
             let id = ref!.documentID
             let coords = self.controllerMapDelegate?.getCoords()
-            self.db?.collection("location").document(id).setData([
-                "lat" : coords?["lat"] ?? 0,
-                "long" : coords?["long"] ?? 0,
-                "city": self.cityLabel.text ?? "",
-                "region": self.region ?? "",
-                "numMembers": 0,
-                "currentSong": "",
-                "name" : name
-                ])
-            let name = self.createQueueForm.queueNameTextField.text!
-            self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
-        }
+            
+            var currCity = ""
+            var currRegion = ""
+            
+            let currPosition = CLLocation(latitude: coords?["lat"] ?? 0, longitude: coords?["long"] ?? 0)
+            let coder = CLGeocoder()
+            coder.reverseGeocodeLocation(currPosition) { (marks, error) in
+                guard let res = marks else {
+                    print("Geo code err:", error!)
+                    return
+                }
+                currCity = res[0].locality!
+                currRegion = res[0].administrativeArea!
+                
+                self.db?.collection("location").document(id).setData([
+                        "lat" : coords?["lat"] ?? 0,
+                        "long" : coords?["long"] ?? 0,
+                        "city": currCity,
+                        "region": currRegion,
+                        "numMembers": 0,
+                        "currentSong": "",
+                        "name" : name
+                        ])
+                    let name = self.createQueueForm.queueNameTextField.text!
+                    self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
+                }
+            }
     }
     
     // Convert state names to full name PA ~> Pennsylvania

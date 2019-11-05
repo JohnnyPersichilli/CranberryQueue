@@ -26,6 +26,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var locationManager : CLLocationManager!
     
     var map: GMSMapView? = nil
+    
+    var currZoom: Float = 15.0
 
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
@@ -64,15 +66,63 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
+            let curCoords2D = CLLocation(latitude: curLoc.coordinate.latitude, longitude: curLoc.coordinate.longitude)
+            getGeoCode(withLocation: curCoords2D)
         }
         mapControllerDelegate?.toggleDetailModal(withData: marker.userData as! CQLocation)
         return true
     }
+    
+    func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
+        self.currZoom = mapView.camera.zoom
+        print("map zoom is ",String(self.currZoom))
+        
+        let centerLat = mapView.camera.target.latitude as CLLocationDegrees
+        let centerLong = mapView.camera.target.longitude as CLLocationDegrees
+        let circleCenter = CLLocation(latitude: centerLat, longitude: centerLong)
+        getGeoCode(withLocation: circleCenter)
+    }
 
     func watchLocationQueues(city: String, region: String) {
+        if(self.currZoom > 10){
+            getTopQueusInCity(city: city, region: region)
+        }else{
+            getTopQueusInState(region: region)
+        }
+    }
+    
+    func getTopQueusInCity(city: String, region: String) {
         queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
-                print(error!)
+                print("watch location err: ", error!)
+                return
+            }
+            self.map!.clear()
+            self.markers = []
+            self.circles = []
+            self.queues = []
+            for doc in snap.documents {
+                let newLoc = CQLocation(
+                    name: doc.data()["name"] as! String,
+                    city: doc.data()["city"] as! String,
+                    region: doc.data()["region"] as! String,
+                    long: doc.data()["long"] as! Double,
+                    lat: doc.data()["lat"] as! Double,
+                    queueId: doc.documentID,
+                    numMembers: doc.data()["numMembers"] as! Int
+                )
+                    
+                self.queues.append(newLoc)
+            }
+            self.drawMarkers()
+            
+        })
+    }
+    
+    func getTopQueusInState(region: String) {
+        queuesInLocationRef = db?.collection("location").whereField("region", isEqualTo: region).limit(to: 10).addSnapshotListener({ (snapshot, error) in
+            guard let snap = snapshot else {
+                print("watch location err: ", error!)
                 return
             }
             self.map!.clear()
@@ -181,10 +231,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         let coder = CLGeocoder()
         coder.reverseGeocodeLocation(loc) { (marks, error) in
             guard let res = marks else {
-                print(error!)
+                print("Geo code err:", error!)
                 return
             }
             self.mapControllerDelegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
+            print("new city", res[0].locality!)
             self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
         }
     }
