@@ -75,12 +75,13 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
         self.currZoom = mapView.camera.zoom
-        print("map zoom is ",String(self.currZoom))
         
-        let centerLat = mapView.camera.target.latitude as CLLocationDegrees
-        let centerLong = mapView.camera.target.longitude as CLLocationDegrees
-        let circleCenter = CLLocation(latitude: centerLat, longitude: centerLong)
-        getGeoCode(withLocation: circleCenter)
+        let mapCenter = CLLocation(
+            latitude: mapView.camera.target.latitude,
+            longitude: mapView.camera.target.longitude
+        )
+        
+        getGeoCode(withLocation: mapCenter)
     }
 
     func watchLocationQueues(city: String, region: String) {
@@ -235,18 +236,37 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 return
             }
             self.mapControllerDelegate?.updateGeoCode(city: res[0].locality!, region: res[0].administrativeArea!)
-            print("new city", res[0].locality!)
             self.watchLocationQueues(city: res[0].locality!, region: res[0].administrativeArea!)
         }
     }
     
-    func getCoords() -> ([String : Double]) {
+    
+    
+    func getCoords() -> ([String : Any]) {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
         }
+        var currCity = ""
+        var currRegion = ""
+        
+        let currPosition = CLLocation(
+            latitude: curCoords?.latitude ?? 0,
+            longitude: curCoords?.longitude ?? 0
+        )
+        let coder = CLGeocoder()
+        coder.reverseGeocodeLocation(currPosition) { (marks, error) in
+            guard let res = marks else {
+                print("Geo code err:", error!)
+                return
+            }
+            currCity = res[0].locality!
+            currRegion = res[0].administrativeArea!
+        }
         return [
             "long": curCoords?.longitude ?? 0,
-            "lat": curCoords?.latitude ?? 0
+            "lat": curCoords?.latitude ?? 0,
+            "city": currCity,
+            "region": currRegion
         ]
     }
     
@@ -278,7 +298,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {
         let myCoords = getCoords()
-        let myLocation = CLLocation(latitude: myCoords["lat"] ?? 0, longitude: myCoords["long"] ?? 0)
+        let myLocation = CLLocation(
+            latitude: myCoords["lat"] as! CLLocationDegrees,
+            longitude: myCoords["long"] as! CLLocationDegrees
+        )
         let queueLocation = CLLocation(latitude: queue.lat, longitude: queue.long)
         return myLocation.distance(from: queueLocation)
     }

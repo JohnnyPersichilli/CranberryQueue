@@ -13,7 +13,7 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
-    func getCoords() -> ([String:Double])
+    func getCoords() -> ([String:Any])
     func setLocationEnabled(_ val: Bool)
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
@@ -347,32 +347,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         ]) { (val) in
             let id = ref!.documentID
             let coords = self.controllerMapDelegate?.getCoords()
-            
-            var currCity = ""
-            var currRegion = ""
-            
-            let currPosition = CLLocation(latitude: coords?["lat"] ?? 0, longitude: coords?["long"] ?? 0)
-            let coder = CLGeocoder()
-            coder.reverseGeocodeLocation(currPosition) { (marks, error) in
-                guard let res = marks else {
-                    print("Geo code err:", error!)
-                    return
-                }
-                currCity = res[0].locality!
-                currRegion = res[0].administrativeArea!
-                
-                self.db?.collection("location").document(id).setData([
-                        "lat" : coords?["lat"] ?? 0,
-                        "long" : coords?["long"] ?? 0,
-                        "city": currCity,
-                        "region": currRegion,
-                        "numMembers": 0,
-                        "currentSong": "",
-                        "name" : name
-                        ])
-                    let name = self.createQueueForm.queueNameTextField.text!
-                    self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
-                }
+            self.db?.collection("location").document(id).setData([
+                    "lat" : coords?["lat"] ?? 0,
+                    "long" : coords?["long"] ?? 0,
+                    "city": coords?["city"] ?? "",
+                    "region": coords?["region"] ?? "",
+                    "numMembers": 0,
+                    "currentSong": "",
+                    "name" : name
+                    ])
+                let name = self.createQueueForm.queueNameTextField.text!
+                self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
             }
     }
     
