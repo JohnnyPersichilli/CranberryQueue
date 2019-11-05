@@ -1225,7 +1225,7 @@
         <scene sceneID="6Ut-ij-0EE">
             <objects>
                 <viewController id="R6x-r1-lYn" customClass="PlaylistViewController" customModule="CranberryQueue" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ClL-au-y8n">
+                    <view key="view" clipsSubviews="YES" contentMode="scaleToFill" id="ClL-au-y8n">
                         <rect key="frame" x="0.0" y="0.0" width="319" height="486"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
