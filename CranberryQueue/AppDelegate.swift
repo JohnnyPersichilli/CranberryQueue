@@ -140,7 +140,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     }
     
     func startSession() {
-        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState]
+        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState, .userLibraryRead]
         self.sessionManager.initiateSession(with: requestedScopes, options: .default)
     }
     

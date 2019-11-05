@@ -116,8 +116,6 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             /// swap delegates with SearchController
             let vc = segue.destination as? SearchController
             vc?.delegate = self
-            vc?.queueId = queueId
-            vc?.uid = uid
             childDelegate = vc
         }
         else if segue.destination is FeaturedController {
@@ -129,6 +127,10 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             vc?.uid = uid
             vc?.db = self.db
             childDelegate = vc
+        }
+        else if segue.destination is PlaylistViewController {
+            let vc = segue.destination as? PlaylistViewController
+            vc?.delegate = self
         }
         else if false {
             
