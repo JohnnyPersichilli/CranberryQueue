@@ -122,11 +122,12 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
         }
         else if segue.destination is FeaturedController {
             let vc = segue.destination as? FeaturedController
+            vc?.delegate = self
             vc?.city = self.city
             vc?.region = self.region
-            vc?.delegate = jointDelegate
             vc?.queueId = queueId
             vc?.uid = uid
+            vc?.db = self.db
             childDelegate = vc
         }
         else if false {

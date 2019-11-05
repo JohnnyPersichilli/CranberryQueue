@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		1C45F19E235E540E0074DDA7 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */; };
 		1CAA461E236E910D00D34440 /* FeaturedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA461D236E910D00D34440 /* FeaturedController.swift */; };
-		1CAA4620236FB6C600D34440 /* FeaturedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA461F236FB6C600D34440 /* FeaturedTableViewCell.swift */; };
 		1CAA4622236FBD7D00D34440 /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAA4621236FBD7D00D34440 /* SearchTableView.swift */; };
 		4C30112B235FDAB90097CA97 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C30112A235FDAB90097CA97 /* Colors.swift */; };
 		4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4B7E782358C3C80037A86F /* QueueDetailModal.swift */; };
@@ -26,7 +25,6 @@
 		4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBD232CB8C00059C898 /* CustomObjects.swift */; };
 		4C8469D02357C1BF0098AE59 /* JoinQueueForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */; };
 		4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */; };
-		4C94F6662370B961009843FB /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6652370B961009843FB /* SearchTableView.swift */; };
 		4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */; };
 		4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC04232D4B8D007F8D38 /* SearchController.swift */; };
 		4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */; };
@@ -49,7 +47,6 @@
 /* Begin PBXFileReference section */
 		1C45F19D235E540E0074DDA7 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
 		1CAA461D236E910D00D34440 /* FeaturedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedController.swift; sourceTree = "<group>"; };
-		1CAA461F236FB6C600D34440 /* FeaturedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedTableViewCell.swift; sourceTree = "<group>"; };
 		1CAA4621236FBD7D00D34440 /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CranberryQueue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C30112A235FDAB90097CA97 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
@@ -67,7 +64,6 @@
 		4C55CCBD232CB8C00059C898 /* CustomObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObjects.swift; sourceTree = "<group>"; };
 		4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinQueueForm.xib; sourceTree = "<group>"; };
 		4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinQueueForm.swift; sourceTree = "<group>"; };
-		4C94F6652370B961009843FB /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BC04232D4B8D007F8D38 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 		4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -121,6 +117,13 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		1CAA46242370CBC600D34440 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		4C199BF52367904E00374319 /* SegmentedModal */ = {
 			isa = PBXGroup;
 			children = (
@@ -129,7 +132,6 @@
 				1CAA4621236FBD7D00D34440 /* SearchTableView.swift */,
 				1CAA461D236E910D00D34440 /* FeaturedController.swift */,
 				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
-				4C94F6652370B961009843FB /* SearchTableView.swift */,
 			);
 			path = SegmentedModal;
 			sourceTree = "<group>";
@@ -142,6 +144,7 @@
 				4CDB8453232BD2A1002559BB /* Products */,
 				EEA6493014A3F051A5A326D1 /* Pods */,
 				12547C6EDEA2690E05C9CF60 /* Frameworks */,
+				1CAA46242370CBC600D34440 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -402,12 +405,10 @@
 				4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */,
 				6E63198523667C180031FA2C /* Constants.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
-				4C94F6662370B961009843FB /* SearchTableView.swift in Sources */,
 				4CBFCF5C236672410087B66F /* SegmentedViewController.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
 				1CAA4622236FBD7D00D34440 /* SearchTableView.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,
-				1CAA4620236FB6C600D34440 /* FeaturedTableViewCell.swift in Sources */,
 				4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */,
 				4C4B7E792358C3C80037A86F /* QueueDetailModal.swift in Sources */,
 				4C4CD3D7232C60A400F17BB8 /* MapController.swift in Sources */,
