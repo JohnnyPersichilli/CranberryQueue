@@ -80,7 +80,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             latitude: mapView.camera.target.latitude,
             longitude: mapView.camera.target.longitude
         )
-        
         getGeoCode(withLocation: mapCenter)
     }
 
@@ -112,11 +111,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     queueId: doc.documentID,
                     numMembers: doc.data()["numMembers"] as! Int
                 )
-                    
                 self.queues.append(newLoc)
             }
             self.drawMarkers()
-            
         })
     }
     

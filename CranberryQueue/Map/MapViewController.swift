@@ -348,17 +348,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             let id = ref!.documentID
             let coords = self.controllerMapDelegate?.getCoords()
             self.db?.collection("location").document(id).setData([
-                    "lat" : coords?["lat"] ?? 0,
-                    "long" : coords?["long"] ?? 0,
-                    "city": coords?["city"] ?? "",
-                    "region": coords?["region"] ?? "",
-                    "numMembers": 0,
-                    "currentSong": "",
-                    "name" : name
-                    ])
-                let name = self.createQueueForm.queueNameTextField.text!
-                self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
-            }
+                "lat" : coords?["lat"] ?? 0,
+                "long" : coords?["long"] ?? 0,
+                "city": coords?["city"] ?? "",
+                "region": coords?["region"] ?? "",
+                "numMembers": 0,
+                "currentSong": "",
+                "name" : name
+            ])
+            let name = self.createQueueForm.queueNameTextField.text!
+            self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
+        }
     }
     
     // Convert state names to full name PA ~> Pennsylvania
