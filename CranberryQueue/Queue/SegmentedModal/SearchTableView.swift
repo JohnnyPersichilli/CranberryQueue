@@ -36,6 +36,13 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
       func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
           return 0
       }
+    
+      func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+          if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
+              //clear()
+              controllerDelegate?.addSongTapped(song: cell.song)
+          }
+      }
       
       func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
           let cell = dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SearchTableViewCell
@@ -81,7 +88,7 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         let indexPath : IndexPath = indexPathForRow(at: tapLocation)!
         
         if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
-            clear()
+            //clear()
             controllerDelegate?.addSongTapped(song: cell.song)
         }
     }
