@@ -49,3 +49,4 @@ DerivedData/
 # End of https://www.gitignore.io/api/xcode,cocoapods
 ##CranberryQueue/GoogleService-Info.plist
 *.xcbkptlist
+CranberryQueue/GoogleService-Info.plist
