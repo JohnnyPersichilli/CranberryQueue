@@ -16,7 +16,6 @@ struct Song {
     var votes = 0
     var uri = String()
     var next = false
-    var queueId = String()
 }
 
 struct CQLocation {
