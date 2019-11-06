@@ -234,8 +234,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         })
     }
     
-    func songTableWith(_ queueId: String) -> CollectionReference? {
-        return db?.collection("playlist").document(queueId).collection("songs")
+    func songTableWith(_ queueId: String) -> Query? {
+        return db?.collection("song").whereField("queueId", isEqualTo: queueId)
     }
     
     func setupHostListeners() {

@@ -41,7 +41,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+        songRef = db?.collection("song").whereField("queueId", isEqualTo: queueId!).order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
             var newSongs = [Song]()
             let oldSongs = self.songs
             guard let snap = snapshot else {
@@ -73,7 +73,8 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     docID: song["docID"] as! String,
                     votes: song["votes"] as! Int,
                     uri: song["uri"] as! String,
-                    next: song["next"] as! Bool
+                    next: song["next"] as! Bool,
+                    queueId: song["queueId"] as! String
                 )
                 newSongs.append(newSong)
                 
@@ -188,8 +189,13 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         if (editingStyle == .delete && isHost) {
             let song = songs[indexPath.section]
             
-            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
             self.db?.collection("song").document(song.docID).delete()
+            self.db?.collection("vote").whereField("songId", isEqualTo: song.docID).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else { return }
+                for doc in snap.documents {
+                    doc.reference.delete()
+                }
+            })
         }
     }
     
