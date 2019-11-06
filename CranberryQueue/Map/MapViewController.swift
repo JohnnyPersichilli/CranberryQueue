@@ -12,7 +12,8 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
-    func getCoords() -> ([String:Double])
+    func getCoords() -> [String:Double]
+    func getGeoCode(withLocation loc: [String:Double], completion: @escaping (String, String)->Void)
     func setLocationEnabled(_ val: Bool)
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
@@ -187,10 +188,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                     print(error!)
                     return
                 }
-                guard let oldQueueName = snap["name"] else {
+                guard let oldQueueName = snap["name"] as? String else {
                     return
                 }
-                self.name = oldQueueName as! String
+                self.name = oldQueueName
             })
             
             self.controllerMapDelegate?.setQueue(oldQueueId)
@@ -345,17 +346,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             "host": self.uid
         ]) { (val) in
             let id = ref!.documentID
-            let coords = self.controllerMapDelegate?.getCoords()
-            self.db?.collection("location").document(id).setData([
-                "lat" : coords?["lat"] ?? 0,
-                "long" : coords?["long"] ?? 0,
-                "city": self.cityLabel.text ?? "",
-                "region": self.region ?? "",
-                "numMembers": 0,
-                "currentSong": "",
-                "name" : name
+            guard let coords = self.controllerMapDelegate?.getCoords() else { return }
+            self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
+                self.db?.collection("location").document(id).setData([
+                    "lat" : coords["lat"]!,
+                    "long" : coords["long"]!,
+                    "city": city,
+                    "region": region,
+                    "numMembers": 0,
+                    "currentSong": "",
+                    "name" : name
                 ])
-            let name = self.createQueueForm.queueNameTextField.text!
+            })
             self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
         }
     }
@@ -620,6 +622,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if segue.destination is MapController {
             /// swap delegates with MapController
             let vc = segue.destination as? MapController
+            vc?.db = Firestore.firestore()
             vc?.mapControllerDelegate = self
             self.controllerMapDelegate = vc
         }
