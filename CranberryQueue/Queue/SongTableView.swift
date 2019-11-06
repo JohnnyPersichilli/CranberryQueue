@@ -76,7 +76,12 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     next: song["next"] as! Bool,
                     queueId: song["queueId"] as! String
                 )
-                newSongs.append(newSong)
+                if song["next"] as! Bool {
+                    newSongs.insert(newSong, at: 0)
+                }
+                else {
+                    newSongs.append(newSong)
+                }
                 
                 if self.songs.count <= index { }
                 else if self.songs[index].docID != newSongs[index].docID {
