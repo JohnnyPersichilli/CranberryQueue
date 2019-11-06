@@ -41,7 +41,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        songRef = db?.collection("song").whereField("queueId", isEqualTo: queueId!).order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+        songRef = db?.collection("song").whereField("votes", isGreaterThan: -100).whereField("queueId", isEqualTo: queueId!).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
             var newSongs = [Song]()
             let oldSongs = self.songs
             guard let snap = snapshot else {
