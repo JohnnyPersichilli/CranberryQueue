@@ -135,7 +135,7 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
-                self.titleLabel.text = state.track.name + " - " +  state.track.artist.name
+                self.titleLabel.text = state.track.name + " - " + state.track.artist.name
                 self.albumImageView.image = UIImage(data: data)
             }
         }
