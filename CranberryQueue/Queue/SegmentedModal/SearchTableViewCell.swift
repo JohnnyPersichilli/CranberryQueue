@@ -42,7 +42,7 @@ class SearchTableViewCell: UITableViewCell {
         let mutablePath = CGMutablePath()
         let maskLayer = CAShapeLayer()
 
-        let usableBounds = CGRect(x: contentView.frame.minX + 10, y: contentView.frame.minY + 1 , width: contentView.frame.width - 20, height: contentView.frame.height - 2)
+        let usableBounds = CGRect(x: contentView.frame.minX + 5, y: contentView.frame.minY + 1 , width: self.bounds.width + addIconImageView.bounds.width , height: contentView.frame.height - 2)
         let xOffset = CGFloat(2.3)
         let yOffset = CGFloat(4)
         let shadowOffset = CGSize(width: xOffset, height: yOffset)
@@ -71,6 +71,7 @@ class SearchTableViewCell: UITableViewCell {
         shadowLayer.mask = maskLayer
         contentView.layer.insertSublayer(shadowLayer, above: layer)
     }
+
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
