@@ -28,6 +28,8 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
     
     var queueId: String?
     var uid: String?
+    var city: String?
+    var region: String?
     var db: Firestore?
     
     override func viewDidLoad() {
@@ -116,12 +118,17 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             vc?.delegate = self
             childDelegate = vc
         }
+        else if segue.destination is FeaturedController {
+            let vc = segue.destination as? FeaturedController
+            vc?.delegate = self
+            vc?.city = self.city
+            vc?.region = self.region
+            vc?.db = self.db
+            childDelegate = vc
+        }
         else if segue.destination is PlaylistViewController {
             let vc = segue.destination as? PlaylistViewController
             vc?.delegate = self
-        }
-        else if false {
-            
         }
     }
 }
