@@ -26,21 +26,20 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var locationManager : CLLocationManager!
     var map: GMSMapView? = nil
     
+    var curCoords: CLLocationCoordinate2D? = nil
+    var currZoom: Float = 15.0
+    
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
     var circles = [GMSCircle]()
     
-    var curCoords: CLLocationCoordinate2D? = nil
     var isFirstLoad = true
     var queueId: String? = nil
-    var currZoom: Float = 15.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.layer.borderWidth = 1
-        
-        db = Firestore.firestore()
+        self.view.layer.borderWidth = 1        
     }
      
     override func viewWillDisappear(_ animated: Bool) {
@@ -64,10 +63,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
-            let curCoords2D = CLLocation(
-                latitude: curLoc.coordinate.latitude,
-                longitude: curLoc.coordinate.longitude
-            )
+            let curCoords2D = [
+                "lat": curLoc.coordinate.latitude,
+                "long": curLoc.coordinate.longitude
+            ]
             getGeoCode(withLocation: curCoords2D){ city, region in
                 self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
                 self.watchLocationQueues(city: city, region: region)
@@ -80,10 +79,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
         self.currZoom = mapView.camera.zoom
         
-        let mapCenter = CLLocation(
-            latitude: mapView.camera.target.latitude,
-            longitude: mapView.camera.target.longitude
-        )
+        let mapCenter = [
+            "lat": mapView.camera.target.latitude,
+            "long": mapView.camera.target.longitude
+        ]
         getGeoCode(withLocation: mapCenter){ city, region in
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
             self.watchLocationQueues(city: city, region: region)
@@ -99,6 +98,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func getTopQueusInCity(city: String, region: String) {
+        queuesInLocationRef?.remove()
         queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print("watch location err: ", error!)
@@ -125,6 +125,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func getTopQueusInState(region: String) {
+        queuesInLocationRef?.remove()
         queuesInLocationRef = db?.collection("location").whereField("region", isEqualTo: region).limit(to: 10).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print("watch location err: ", error!)
@@ -178,7 +179,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             marker.userData = queue
             self.markers.append(marker)
         }
-        
     }
    
     func setupMap(withCoords coords: CLLocationCoordinate2D) {
@@ -227,7 +227,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         curCoords = center
         
         setupMap(withCoords: center)
-        getGeoCode(withLocation: location!){ city, region in
+        getGeoCode(withLocation: ["lat": center.latitude, "long": center.longitude]){ city, region in
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
             self.watchLocationQueues(city: city, region: region)
         }
@@ -235,49 +235,23 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.locationManager.stopUpdatingLocation()
     }
     
-    func getGeoCode(withLocation loc: CLLocation, completion: @escaping (String, String)->Void) {
-        let coder = CLGeocoder()
-        coder.reverseGeocodeLocation(loc) { (marks, error) in
+    func getGeoCode(withLocation loc: [String : Double], completion: @escaping (String, String) -> Void) {
+        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: loc["lat"]!, longitude: loc["long"]!)) { (marks, error) in
             guard let res = marks else {
                 print("Geo code err:", error!)
                 return
             }
             completion(res[0].locality!, res[0].administrativeArea!)
-
         }
     }
-    
-    func getGeoCompletionHandler(city: String, region: String){
-        self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
-        self.watchLocationQueues(city: city, region: region)
-    }
-    
-    
-    func getCoordsAndCity() -> ([String : Any]) {
+
+    func getCoords() -> ([String : Double]) {
         if let curLoc = map?.myLocation {
             curCoords = curLoc.coordinate
         }
-        var currCity = ""
-        var currRegion = ""
-        
-        let currPosition = CLLocation(
-            latitude: curCoords?.latitude ?? 0,
-            longitude: curCoords?.longitude ?? 0
-        )
-        let coder = CLGeocoder()
-        coder.reverseGeocodeLocation(currPosition) { (marks, error) in
-            guard let res = marks else {
-                print("Geo code err:", error!)
-                return
-            }
-            currCity = res[0].locality!
-            currRegion = res[0].administrativeArea!
-        }
         return [
             "long": curCoords?.longitude ?? 0,
-            "lat": curCoords?.latitude ?? 0,
-            "city": currCity,
-            "region": currRegion
+            "lat": curCoords?.latitude ?? 0
         ]
     }
     
@@ -308,12 +282,15 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {
-        let myCoords = getCoordsAndCity()
+        let myCoords = getCoords()
         let myLocation = CLLocation(
-            latitude: myCoords["lat"] as! CLLocationDegrees,
-            longitude: myCoords["long"] as! CLLocationDegrees
+            latitude: myCoords["lat"]!,
+            longitude: myCoords["long"]!
         )
-        let queueLocation = CLLocation(latitude: queue.lat, longitude: queue.long)
+        let queueLocation = CLLocation(
+            latitude: queue.lat,
+            longitude: queue.long
+        )
         return myLocation.distance(from: queueLocation)
     }
         
