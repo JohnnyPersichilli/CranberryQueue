@@ -72,11 +72,6 @@ class SearchTableViewCell: UITableViewCell {
         contentView.layer.insertSublayer(shadowLayer, above: layer)
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        contentView.layoutSubviews()
-    }
-
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
