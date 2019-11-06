@@ -145,11 +145,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     queueId: doc.documentID,
                     numMembers: doc.data()["numMembers"] as! Int
                 )
-                    
                 self.queues.append(newLoc)
             }
             self.drawMarkers()
-            
         })
     }
     

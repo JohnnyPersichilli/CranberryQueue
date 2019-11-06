@@ -620,7 +620,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if segue.destination is MapController {
             /// swap delegates with MapController
             let vc = segue.destination as? MapController
-            vc?.db = db
+            vc?.db = Firestore.firestore()
             vc?.mapControllerDelegate = self
             self.controllerMapDelegate = vc
         }
