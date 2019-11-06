@@ -35,29 +35,32 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
     }
     
     func clear() {
-        featuredTableView.reloadData()
+        featuredTableView.clear()
     }
     
     func getFeaturedSongs(completion: @escaping ([Song]) -> Void) {
-        db?.collection("playbackArchive").whereField("city", isEqualTo: self.city).whereField("region", isEqualTo: self.region).getDocuments(completion: { (snapshot, error) in
+        guard let city = city, let region = region else {
+            return
+        }
+        db?.collection("playbackArchive").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
             var songs = [Song]()
             for doc in snap.documents {
-            let newSong = Song (
-                name: doc.data()["name"] as! String,
-                artist: doc.data()["artist"] as! String,
-                imageURL: doc.data()["imageURL"] as! String,
-                docID: "f",
-                votes: 1,
-                uri: doc.data()["uri"] as! String,
-                next: false
+                let newSong = Song(
+                    name: doc.data()["name"] as! String,
+                    artist: doc.data()["artist"] as! String,
+                    imageURL: doc.data()["imageURL"] as! String,
+                    docID: "",
+                    votes: 1,
+                    uri: doc.data()["uri"] as! String,
+                    next: false
                 )
-            songs.append(newSong)
+                songs.append(newSong)
             }
-        completion(songs)
+            completion(songs)
         })
     }
     
