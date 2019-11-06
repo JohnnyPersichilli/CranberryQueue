@@ -383,7 +383,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         ref = self.db?.collection("location").addDocument(data: [
             "numMembers": 0,
             "currentSong": "",
-            "code" : code
+            "code" : code,
+            "name": createQueueForm.queueNameTextField.text ?? ""
             ], completion: { (val) in
                 self.presentQueueScreen(queueId: ref!.documentID, name: code, code: code, isHost: true)
         })
