@@ -230,12 +230,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                     completion()
                 }
             }
-            
         })
     }
     
     func songTableWith(_ queueId: String) -> Query? {
-        return db?.collection("song").whereField("queueId", isEqualTo: queueId)
+        return db?.collection("song").whereField("votes", isGreaterThan: -100).whereField("queueId", isEqualTo: queueId)
     }
     
     func setupHostListeners() {
