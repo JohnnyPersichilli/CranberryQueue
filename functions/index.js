@@ -15,7 +15,7 @@ exports.deleteLocation = functions.firestore
         const queueId = context.params.locationId
 
         //remove subcollection in contributor, so its not orphaned
-        return db.collection('contributor').doc(queueId).collection('members').get().then((querySnapshot) => {
+        return db.collection('contributor').where("queueId", "==", queueId).get().then((querySnapshot) => {
             // this will actually trigger the other onDelete listener, so we need to set a global boolean to ignore that update
             querySnapshot.forEach((doc) => {
                 doc.ref.delete()
@@ -23,7 +23,6 @@ exports.deleteLocation = functions.firestore
         }).then(() => {
             //delete the contributor doc after
             // console.log("contributor table: " + locationId + " successfully deleted")
-            db.collection('contributor').doc(queueId).delete()
 
             //delete the playback doc
             db.collection('playback').doc(queueId).delete()
@@ -65,7 +64,7 @@ exports.deleteLocation = functions.firestore
 
 exports.addNumMembers = functions.firestore
     .document('contributor/{uid}')
-    .onUpdate((change, context) => {
+    .onWrite((change, context) => {
 
     if (!change.after.exists) {
         return 0
