@@ -35,7 +35,7 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
     }
     
     func clear() {
-        featuredTableView.clear()
+        featuredTableView.reloadData()
     }
     
     func getFeaturedSongs(completion: @escaping ([Song]) -> Void) {
