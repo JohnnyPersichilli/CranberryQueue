@@ -123,17 +123,12 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             vc?.delegate = self
             vc?.city = self.city
             vc?.region = self.region
-            vc?.queueId = queueId
-            vc?.uid = uid
             vc?.db = self.db
             childDelegate = vc
         }
         else if segue.destination is PlaylistViewController {
             let vc = segue.destination as? PlaylistViewController
             vc?.delegate = self
-        }
-        else if false {
-            
         }
     }
 }

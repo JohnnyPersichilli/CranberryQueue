@@ -39,7 +39,6 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
       func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
           if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
-              //clear()
               controllerDelegate?.addSongTapped(song: cell.song)
           }
       }
@@ -54,10 +53,6 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
           cell.artistLabel.text = songs[indexPath.section].artist
           
           cell.song = songs[indexPath.section]
-          
-          let addTap = UITapGestureRecognizer(target: self, action: #selector(addTapped(sender:)))
-          cell.addIconImageView.addGestureRecognizer(addTap)
-          cell.addIconImageView.isUserInteractionEnabled = true
           
           cell.albumImageView.image = nil
           let url = URL(string: songs[indexPath.section].imageURL)
@@ -83,13 +78,4 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    @objc func addTapped(sender : UITapGestureRecognizer) {
-        let tapLocation = sender.location(in: self)
-        let indexPath : IndexPath = indexPathForRow(at: tapLocation)!
-        
-        if let cell = cellForRow(at: indexPath) as? SearchTableViewCell {
-            //clear()
-            controllerDelegate?.addSongTapped(song: cell.song)
-        }
-    }
 }
