@@ -182,6 +182,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
             self.queueId = oldQueueId
             
+            guard let isHost = snap.documents.first?.data()["isHost"] as? Bool else { return }
+            if isHost {
+                self.playerController.isHost = true
+                self.isHost = true
+                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
+            }
+            
             self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
                     print(error!)
@@ -190,6 +197,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 guard let oldQueueName = snap["name"] as? String else {
                     return
                 }
+                
+                if let oldQueueCode = snap["code"] as? String {
+                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: oldQueueCode, isHost: isHost)
+                }
+                else {
+                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: nil, isHost: isHost)
+                }
                 self.name = oldQueueName
             })
             
@@ -197,12 +211,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.playerController.queueId = oldQueueId
             self.playerController.db = self.db
             
-            guard let isHost = snap.documents.first?.data()["isHost"] as? Bool else { return }
-            if isHost {
-                self.playerController.isHost = true
-                self.isHost = true
-                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
-            }
+            
+            
         })
     }
     
