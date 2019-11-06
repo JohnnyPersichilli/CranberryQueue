@@ -14,7 +14,7 @@ protocol SongTableDelegate: class {
 }
 
 class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, QueueCellDelegate {
-    
+
     var songs = [Song]()
     var isHost = false {
         didSet {
@@ -25,23 +25,23 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     }
     var queueId: String? = nil
     var uid: String? = nil
-    
+
     var songId: String? = nil
-    
+
     var db: Firestore? = nil
-    
+
     weak var songDelegate: SongTableDelegate? = nil
-    
+
     var songRef: ListenerRegistration? = nil
-    
+
     var upvotes = [String]()
     var downvotes = [String]()
     var pendingVotes = [Song]()
-    
+
     func watchPlaylist() {
         db = Firestore.firestore()
-        
-        songRef = db?.collection("song").whereField("votes", isGreaterThan: -100).whereField("queueId", isEqualTo: queueId!).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+
+        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
             var newSongs = [Song]()
             let oldSongs = self.songs
             guard let snap = snapshot else {
@@ -61,7 +61,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             }
             var sectionsToReload = [Int]()
             var sectionsToReloadSilently = [Int]()
-            
+
             for (index, song) in snap.documents.enumerated() {
                 if (song["name"] as? String) == nil {
                     continue
@@ -73,8 +73,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                     docID: song["docID"] as! String,
                     votes: song["votes"] as! Int,
                     uri: song["uri"] as! String,
-                    next: song["next"] as! Bool,
-                    queueId: song["queueId"] as! String
+                    next: song["next"] as! Bool
                 )
                 if song["next"] as! Bool {
                     newSongs.insert(newSong, at: 0)
@@ -82,7 +81,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 else {
                     newSongs.append(newSong)
                 }
-                
+
                 if self.songs.count <= index { }
                 else if self.songs[index].docID != newSongs[index].docID {
                     sectionsToReload.append(index)
@@ -90,7 +89,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 else if self.songs[index].votes != newSongs[index].votes {
                     sectionsToReloadSilently.append(index)
                 }
-                
+
                 self.pendingVotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
             }
             // enqueue if the table was empty
@@ -113,13 +112,13 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 self.reloadSections(IndexSet(sectionsToReload), with: .fade)
                 self.reloadSections(IndexSet(sectionsToReloadSilently), with: .none)
             }) { (_) in
-                
+
             }
-            
+
             self.songDelegate?.updateNumSongs(self.songs.count)
         })
     }
-    
+
     func voteTapped(isUpvote: Bool, song: Song) {
         var weight = isUpvote ? 1 : -1
         if isUpvote {
@@ -147,20 +146,20 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             (!isUpvote ? cell.upvoteButtonImageView : cell.downvoteButtonImageView)?.backgroundColor = UIColor.clear
         }
     }
-    
+
     func loadPreviousVotes() {
         upvotes = UserDefaults.standard.array(forKey: "\(queueId!)/upvotes") as? [String] ?? []
         downvotes = UserDefaults.standard.array(forKey: "\(queueId!)/downvotes") as? [String] ?? []
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
-    
+
     func numberOfSections(in tableView: UITableView) -> Int {
         return songs.count
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             return 90
@@ -169,41 +168,36 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             return 60
         }
     }
-    
+
     func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         (view as! UITableViewHeaderFooterView).isHidden = true
     }
-    
+
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         (view as! UITableViewHeaderFooterView).isHidden = true
     }
-    
+
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 10
     }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 5
     }
-    
+
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return indexPath.section == 0 ? false : isHost
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if (editingStyle == .delete && isHost) {
             let song = songs[indexPath.section]
-            
+
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(song.docID).delete()
             self.db?.collection("song").document(song.docID).delete()
-            self.db?.collection("vote").whereField("songId", isEqualTo: song.docID).getDocuments(completion: { (snapshot, error) in
-                guard let snap = snapshot else { return }
-                for doc in snap.documents {
-                    doc.reference.delete()
-                }
-            })
         }
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = QueueTableViewCell()
         if indexPath.section == 0 {
@@ -219,7 +213,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
             cell.shadOpacity = 0.3
             cell.removeGradient()
         }
-        
+
         UIView.animate(withDuration: 0.3, animations: {
             cell.alpha = 0
         }) { (val) in
@@ -229,7 +223,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 cell.alpha = 1
             }
         }
-        
+
         if indexPath.section >= songs.count {
             return cell
         }
@@ -238,11 +232,11 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         cell.artistLabel.text = song.artist
         cell.songId = song.docID
         cell.voteLabel.text = String(song.votes)
-        
+
         cell.song = song // need to depreciate above
         cell.delegate = self
         cell.uid = self.uid
-        
+
         if upvotes.contains(where: {$0 == song.docID}) {
             cell.upvoteButtonImageView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2410657728)
             cell.downvoteButtonImageView.backgroundColor = UIColor.clear
@@ -267,7 +261,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         else {
             cell.isUserInteractionEnabled = true
         }
-        
+
         cell.albumImageView.image = nil
         let url = URL(string: songs[indexPath.section].imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
@@ -279,13 +273,11 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 updatingCell?.albumImageView.image = UIImage(data: data)
             }
         }
-        
+
         task.resume()
 
         return cell
     }
-    
+
 
 }
-
-

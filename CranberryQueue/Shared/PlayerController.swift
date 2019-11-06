@@ -18,7 +18,7 @@ protocol PlayerDelegate: class {
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
-    
+
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -27,13 +27,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             setupHostListeners()
         }
     }
-    
+
     func swiped() {
         if queueId != nil && isHost {
             skipSong()
         }
     }
-    
+
     func playPause(isPaused: Bool){
         if(queueId != nil && isHost){
             if(isPaused){
@@ -52,33 +52,33 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 })
             }
         }else{
-            
+
         }
 
     }
-        
+
     var queueId: String? = nil
     var isHost = false
-    
+
     var remote: SPTAppRemote? = nil
     var token: String? = nil
-    
+
     var db: Firestore? = nil
-    
+
     var timer = Timer()
     var isTimerRunning = false
-    
+
     var currentUri = String()
     var duration = 200
     var position = 0
-    
+
     var isEnqueuing = false
-    
+
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
-    
+
     var guestListener: ListenerRegistration? = nil
-    
+
     static let sharedInstance = PlayerController()
 
     func setupPlayer(queueId: String?, isHost: Bool) {
@@ -104,13 +104,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             setupGuestListeners()
         }
     }
-    
+
     func runTimer() {
         timer.invalidate()
         isTimerRunning = true
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
     }
-    
+
     @objc func updateTimer () {
         if !isTimerRunning {
             return
@@ -122,7 +122,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             isTimerRunning = false
         }
     }
-    
+
     func skipSong() {
         if(queueId != nil && isHost){
             self.remote?.playerAPI?.skip(toNext: { (_, error) in
@@ -133,7 +133,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
         }
     }
-    
+
     func enqueueSongWith(_ uri: String) {
         isEnqueuing = true
         self.remote?.playerAPI?.enqueueTrackUri(uri, callback: { (response, error) in
@@ -143,7 +143,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             }
         })
     }
-    
+
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         if isEnqueuing {
             isEnqueuing = false
@@ -151,34 +151,34 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
         if queueId == nil {
             remote?.playerAPI?.unsubscribe(toPlayerState: { (value, error) in
-                
+
             })
             return
         }
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
-        
-        
+
+
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
-        
+
         duration = json["duration"] as! Int
         position = json["position"] as! Int
         let isPaused = json["isPaused"] as! Bool
-        
+
         self.mapDelegate?.updatePlayPauseUI(isPaused: isPaused, isHost: isHost)
         self.queueDelegate?.updatePlayPauseUI(isPaused: isPaused, isHost: isHost)
-        
+
         if (isPaused) {
             timer.invalidate()
-            
+
             mapDelegate?.updateTimerUI(position: position, duration: duration)
             queueDelegate?.updateTimerUI(position: position, duration: duration)
         }
         else {
             runTimer()
         }
-        
+
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
@@ -187,14 +187,14 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
         }
     }
-    
+
     func enqueueNextSong() {
         songTableWith(queueId!)?.order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            
+
             if snap.isEmpty {
                 return
             }
@@ -203,11 +203,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             let ref = doc.reference
             data["next"] = true
             ref.setData(data, merge: true)
-            
+
             self.enqueueSongWith(data["uri"] as! String)
         })
     }
-    
+
     func removeSongWith(_ uri: String, completion: @escaping ()-> Void) {
         songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
@@ -232,11 +232,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             }
         })
     }
-    
-    func songTableWith(_ queueId: String) -> Query? {
-        return db?.collection("song").whereField("votes", isGreaterThan: -100).whereField("queueId", isEqualTo: queueId)
+
+    func songTableWith(_ queueId: String) -> CollectionReference? {
+        return db?.collection("playlist").document(queueId).collection("songs")
     }
-    
+
     func setupHostListeners() {
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
@@ -249,9 +249,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 }
             })
         })
-        
+
     }
-    
+
     func setupGuestListeners() {
         guestListener = db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
@@ -263,13 +263,13 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)
-            
-            
+
+
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)
             self.duration = info.duration
             self.position = info.position + (Int(Date().timeIntervalSince1970) - info.timestamp)*1000
-            
+
             if (info.isPaused) {
                 self.timer.invalidate()
                 self.mapDelegate?.updateTimerUI(position: self.position, duration: self.duration)
@@ -280,11 +280,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             }
         })
     }
-    
+
     func showHelpText() {
-        
+
     }
-    
+
     func eventCodeFromTimestamp() -> String {
         let possibleChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/")
         var rixit = 0
@@ -298,10 +298,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         result.removeFirst(2)
         return result;
     }
-    
+
     func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {
         var imageURL = ""
-        
+
         if(playerState.track.imageIdentifier.split(separator: ":").count >= 2){
             imageURL = "https://i.scdn.co/image/\(playerState.track.imageIdentifier.split(separator: ":")[2])"
         }
@@ -309,10 +309,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             print("no track image in JSON file for:", playerState.track.name)
             imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
         }
-        
+
         return imageURL
     }
-    
+
     func playbackStateToJson(_ playerState: SPTAppRemotePlayerState) -> [String:Any] {
         var playback = [String:Any]()
         playback["name"] = playerState.track.name
@@ -325,7 +325,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         playback["uri"] = playerState.track.uri
         return playback
     }
-    
+
     func playbackJsonToInfo(json: [String:Any]) -> PlaybackInfo {
         var playback = PlaybackInfo()
         playback.name = json["name"] as! String
