@@ -243,7 +243,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     
     //removes the user from the queue
     func removeFromMembersRequest(queueId: String, uid: String) {
-        let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
+        let url = URL(string: "https://us-central1-cranberry-queues-production.cloudfunctions.net/removeFromMembers")!
          var request = URLRequest(url: url)
         let dictionary = ["queueId": queueId,"uid": uid]
         request.httpBody = try! JSONEncoder().encode(dictionary)

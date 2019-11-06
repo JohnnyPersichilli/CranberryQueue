@@ -64,10 +64,13 @@ exports.deleteLocation = functions.firestore
     })
 
 exports.addNumMembers = functions.firestore
-    .document('contributor/{queueId}/members/{uid}')
-    .onCreate((snap, context) => {
+    .document('contributor/{uid}')
+    .onUpdate((change, context) => {
 
-    const queueId = context.params.queueId;
+    if (!change.after.exists) {
+        return 0
+    }
+    const queueId = change.after.data().queueId;
 
     return db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(1)
@@ -83,7 +86,7 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
     let uid = request.body.uid
 
     //delete the uid from contributor-members collection
-    db.collection('contributor').doc(queueId).collection('members').doc(uid).delete()
+    db.collection('contributor').doc(uid).delete()
 
     //decrement the numMembers from location collection
     db.collection('location').doc(queueId).update({
