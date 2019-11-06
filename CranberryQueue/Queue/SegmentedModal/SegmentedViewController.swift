@@ -66,24 +66,20 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
     func addSongTapped(song: Song) {
         var newSong = self.songToJSON(song: song)
         var ref: DocumentReference? = nil
-        ref = db?.collection("song").addDocument(data: [
-            "queueId": self.queueId!
-            ], completion: { (val) in
-                newSong["docID"] = ref!.documentID
-                self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
-                
-                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
-                    guard let snap = snapshot else {
-                        print(error!)
-                        return
-                    }
-                    if snap.documents.count == 0 {
-                        newSong["next"] = true
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
-                    })
-                })
+        ref = db?.collection("song").addDocument(data: newSong, completion: { (val) in
+            newSong["docID"] = ref!.documentID
+            self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
+            self.db?.collection("song").whereField("queueId", isEqualTo: self.queueId!).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                if snap.documents.count == 0 {
+                    newSong["next"] = true
+                    self.db?.collection("song").document(ref!.documentID).setData(newSong)
+                }
+                self.db?.collection("vote").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+            })
         })
     }
     
@@ -95,7 +91,8 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             "docID": song.docID,
             "votes": 0,
             "uri": song.uri,
-            "next": song.next
+            "next": song.next,
+            "queueId": queueId!
         ]
     }
     
@@ -108,6 +105,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
         song.votes = json["votes"] as! Int
         song.uri = json["uri"] as! String
         song.next = json["next"] as! Bool
+        song.queueId = json["queueId"] as! String
         return song
     }
     
