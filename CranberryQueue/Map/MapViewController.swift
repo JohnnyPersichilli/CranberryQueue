@@ -461,6 +461,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
             guard let oldQueueId = snap.data()?["queueId"] as? String,
                 let isHost = snap.data()?["isHost"] as? Bool else {
+                completion(false)
                 return
             }
             completion(oldQueueId == queueId && isHost)
