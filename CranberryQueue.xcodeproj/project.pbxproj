@@ -27,7 +27,6 @@
 		4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */; };
 		4C94F6662370B961009843FB /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6652370B961009843FB /* SearchTableView.swift */; };
 		4C94F6682370CF67009843FB /* PlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6672370CF67009843FB /* PlaylistViewController.swift */; };
-		4C94F66A23734A9B009843FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4C94F66923734A9B009843FB /* GoogleService-Info.plist */; };
 		4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */; };
 		4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC04232D4B8D007F8D38 /* SearchController.swift */; };
 		4CB12C2B232EC449006EA4D0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */; };
@@ -40,6 +39,7 @@
 		4CDB845D232BD2A2002559BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845C232BD2A2002559BB /* Assets.xcassets */; };
 		4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */; };
 		4CDB8468232BD592002559BB /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CDB8467232BD592002559BB /* SpotifyiOS.framework */; };
+		4CFD140A23595639008F0A4E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4CFD140923595639008F0A4E /* GoogleService-Info.plist */; };
 		6E63198523667C180031FA2C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E63198423667C180031FA2C /* Constants.swift */; };
 		6E8F84F32339C443005C23A9 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8F84F22339C443005C23A9 /* LoginController.swift */; };
 		95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */; };
@@ -68,7 +68,6 @@
 		4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinQueueForm.swift; sourceTree = "<group>"; };
 		4C94F6652370B961009843FB /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		4C94F6672370CF67009843FB /* PlaylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewController.swift; sourceTree = "<group>"; };
-		4C94F66923734A9B009843FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BC04232D4B8D007F8D38 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 		4CB12C2A232EC449006EA4D0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -84,6 +83,7 @@
 		4CDB8461232BD2A2002559BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4CDB8467232BD592002559BB /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
 		4CDB8469232BD7A6002559BB /* CranberryQueue-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CranberryQueue-Bridging-Header.h"; sourceTree = "<group>"; };
+		4CFD140923595639008F0A4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6E63198423667C180031FA2C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		6E8F84F22339C443005C23A9 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = activityIndicatorPresenter.swift; sourceTree = "<group>"; };
@@ -166,7 +166,7 @@
 				4CDB845C232BD2A2002559BB /* Assets.xcassets */,
 				4CDB845E232BD2A2002559BB /* LaunchScreen.storyboard */,
 				4CDB8461232BD2A2002559BB /* Info.plist */,
-				4C94F66923734A9B009843FB /* GoogleService-Info.plist */,
+				4CFD140923595639008F0A4E /* GoogleService-Info.plist */,
 				4CDB8467232BD592002559BB /* SpotifyiOS.framework */,
 			);
 			path = CranberryQueue;
@@ -287,12 +287,12 @@
 			files = (
 				4CCA7613234502E4007FB121 /* PlayerView.xib in Resources */,
 				4CDB8460232BD2A2002559BB /* LaunchScreen.storyboard in Resources */,
-				4C94F66A23734A9B009843FB /* GoogleService-Info.plist in Resources */,
 				4C4CD3DD232C95BE00F17BB8 /* createQueueForm.xib in Resources */,
 				4C8469D02357C1BF0098AE59 /* JoinQueueForm.xib in Resources */,
 				4CDB845D232BD2A2002559BB /* Assets.xcassets in Resources */,
 				4C4CD3D5232C556F00F17BB8 /* style.json in Resources */,
 				4CDB845B232BD2A1002559BB /* Main.storyboard in Resources */,
+				4CFD140A23595639008F0A4E /* GoogleService-Info.plist in Resources */,
 				4C4B7E7B2358C3D40037A86F /* QueueDetailModal.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
