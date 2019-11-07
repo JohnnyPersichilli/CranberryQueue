@@ -606,6 +606,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
         alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
             /// start app remote again on retry
+            self.isWaitingForRemote = true
             let del = UIApplication.shared.delegate as? AppDelegate
             del?.startAppRemote()
         }))
