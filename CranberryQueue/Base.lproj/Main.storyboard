@@ -1378,8 +1378,8 @@
                                     <constraint firstAttribute="height" constant="25" id="Duf-bR-5fd"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Spotify Playlist's" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LsV-sF-uoE">
-                                <rect key="frame" x="15" y="15.666666666666664" width="152" height="25"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Spotify Playlists" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LsV-sF-uoE">
+                                <rect key="frame" x="15" y="15.666666666666664" width="147" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="mPG-LE-gTp"/>
                                 </constraints>
