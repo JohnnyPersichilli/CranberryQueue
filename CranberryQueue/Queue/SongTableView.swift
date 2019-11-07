@@ -87,15 +87,6 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
                 
                 self.pendingVotes.removeAll(where: {$0 == newSong && $0.votes != newSong.votes})
             }
-            // enqueue if the table was empty
-            if oldSongs.count == 0 && newSongs.count == 1 {
-                (UIApplication.shared.delegate as? AppDelegate)?.appRemote.playerAPI?.enqueueTrackUri(newSongs.first!.uri, callback: { (value, error) in
-                    if let err = error {
-                        print(err)
-                        return
-                    }
-                })
-            }
             self.songs = newSongs
             self.performBatchUpdates({
                 if newSongs.count < oldSongs.count {
