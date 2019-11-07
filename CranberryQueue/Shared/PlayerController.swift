@@ -84,7 +84,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
 
     func setupPlayer(queueId: String?, isHost: Bool) {
         let oldQueueId = self.queueId
-        let oldIsHost = self.isHost
         
         self.queueId = queueId
         self.isHost = isHost
