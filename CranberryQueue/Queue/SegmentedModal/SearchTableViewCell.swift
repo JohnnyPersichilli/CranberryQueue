@@ -25,9 +25,6 @@ class SearchTableViewCell: UITableViewCell {
     
         albumImageView.layer.cornerRadius = albumImageView.frame.height/2
         albumImageView.clipsToBounds = true
-        
-        self.layer.borderColor = UIColor.clear.cgColor
-        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
