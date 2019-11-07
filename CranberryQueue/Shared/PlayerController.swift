@@ -78,12 +78,12 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var queueDelegate: PlayerDelegate?
     
     var guestListener: ListenerRegistration? = nil
+    var hostListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
 
     func setupPlayer(queueId: String?, isHost: Bool) {
         if queueId != self.queueId || queueId == nil {
-            guestListener?.remove()
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             })
         }
@@ -92,6 +92,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
+            guestListener?.remove()
+            hostListener?.remove()
             return
         }
         self.queueId = queueId
@@ -239,6 +241,15 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupHostListeners() {
+        var lastCount = 0
+        hostListener?.remove()
+        hostListener = db?.collection("playlist").document(self.queueId!).collection("songs").limit(to: 1).addSnapshotListener({ (snapshot, error) in
+            guard let docs = snapshot?.documents else { return }
+            if docs.count == 1 && lastCount == 0 {
+                self.enqueueNextSong()
+            }
+            lastCount = docs.count
+        })
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             self.remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
@@ -254,6 +265,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupGuestListeners() {
+        guestListener?.remove()
         guestListener = db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
                 print(err)
