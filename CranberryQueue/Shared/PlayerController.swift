@@ -83,27 +83,49 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     static let sharedInstance = PlayerController()
 
     func setupPlayer(queueId: String?, isHost: Bool) {
-        if queueId != self.queueId || queueId == nil {
+        let oldQueueId = self.queueId
+        let oldIsHost = self.isHost
+        
+        self.queueId = queueId
+        self.isHost = isHost
+        db = Firestore.firestore()
+        
+        if oldQueueId == nil && queueId != nil { /// no current queue, joining new queue
+            if isHost {
+                updateConnectionStatus(connected: true)
+            }
+            else {
+                setupGuestListeners()
+            }
+        }
+        else if oldQueueId != nil && queueId == nil { /// leaving a queue to nothing
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             })
-        }
-        if queueId == nil {
             timer.invalidate()
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
-            guestListener?.remove()
             hostListener?.remove()
-            return
+            guestListener?.remove()
         }
-        self.queueId = queueId
-        self.isHost = isHost
-        db = Firestore.firestore()
-        if isHost {
-            updateConnectionStatus(connected: true)
+        else if oldQueueId != queueId { /// leaving current queue, joining new one
+            if isHost {
+                updateConnectionStatus(connected: true)
+            }
+            else {
+                setupGuestListeners()
+            }
         }
-        else {
-            setupGuestListeners()
+        else { /// rejoining same queue
+            if isHost {
+                remote?.playerAPI?.getPlayerState({ (state, error) in
+                    guard let info = state as? SPTAppRemotePlayerState else { return }
+                    self.playerStateDidChange(info)
+                })
+            }
+            else {
+                setupGuestListeners()
+            }
         }
     }
     
