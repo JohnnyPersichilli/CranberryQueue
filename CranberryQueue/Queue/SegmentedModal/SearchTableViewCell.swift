@@ -20,10 +20,6 @@ class SearchTableViewCell: UITableViewCell {
     
     var song = Song()
     
-    var shadowLayer = CALayer()
-    var gradientLayer = CAGradientLayer()
-    var shadOpacity: Float = 1
-    
     override func awakeFromNib() {
         super.awakeFromNib()
     
