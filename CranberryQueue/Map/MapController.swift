@@ -240,9 +240,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 return
             }
             guard let locality = res[0].locality else {
+                completion(String(Double(Int(loc["lat"]!*1000))/1000), String(Double(Int(loc["long"]!*1000))/1000))
                 return
             }
             guard let administrativeArea = res[0].administrativeArea else {
+                completion(String(Double(Int(loc["lat"]!*1000))/1000), String(Double(Int(loc["long"]!*1000))/1000))
                 return
             }
             completion(locality, administrativeArea)
