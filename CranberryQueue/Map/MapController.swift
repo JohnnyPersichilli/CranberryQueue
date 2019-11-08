@@ -245,13 +245,13 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             if let locality = res[0].locality {
                 city = locality
             } else {
-                city = String(Double(Int(loc["lat"]!*1000))/1000)
+                city = String(Double(Int(loc["lat"]!*100))/100)
             }
                         
             if let administrativeArea = res[0].administrativeArea {
                region = administrativeArea
             } else {
-               region = String(Double(Int(loc["long"]!*1000))/1000)
+               region = String(Double(Int(loc["long"]!*100))/100)
             }
 
             completion(city, region)
