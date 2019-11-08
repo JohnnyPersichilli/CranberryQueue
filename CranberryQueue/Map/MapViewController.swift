@@ -63,21 +63,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var isPremium = false
     var code: String? = nil
     var name: String? = nil
-    /// should open create modal when app remote connected
-    var isJoining = false
-    var isJoiningPrivate = false
+
     var privateCode: String? = nil
-    
     var region: String? = ""
+    // control bool to check if user is in the middle of creating a queue
+    var isCreating: Bool? = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScreen()
         setupGestureRecognizers()
-        
         setupFirebase()
         setupDelegates()
-
         setupObservers()
     }
 
@@ -100,7 +97,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueueTapped))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue as () -> ()))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -140,6 +137,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 return
             }
             self.uid = data.user.uid
+            //check to see if returning contributor is in a queue
+            self.checkForReturningContributor(withId: data.user.uid)
         }
     }
     
@@ -189,7 +188,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             if isHost {
                 self.playerController.isHost = true
                 self.isHost = true
-                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
+                //if app remote is not connected, connect the host
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.startSession()
+                }
             }
             
             self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
@@ -213,9 +215,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.controllerMapDelegate?.setQueue(oldQueueId)
             self.playerController.queueId = oldQueueId
             self.playerController.db = self.db
-            
-            
-            
         })
     }
     
@@ -232,7 +231,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             let alert = UIAlertController(title: "Start Music Player?", message: "Open Spotify to Create Queue", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
                 // open spotify and get token, remote is started in updateConnectionStatus later
-                self.isJoining = false
+                self.isCreating = true
                 self.startSession()
              }
             ))
@@ -247,9 +246,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func updateConnectionStatus(connected: Bool) {
         /// also called when app becomes active, so don't open modal
         if connected {
-            self.openCreateQueueModal()
+            if self.isCreating! {
+                self.openCreateQueueModal()
+            } else {
+                self.checkForReturningContributor(withId: self.uid)
+            }
         }
-        else if !isJoining {
+        else {
             showAppRemoteAlert()
         }
     }
@@ -270,26 +273,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             DispatchQueue.main.async {
                 let del = UIApplication.shared.delegate as! AppDelegate
                 del.startAppRemote()
-            }
-        }
-        else if(isJoiningPrivate) {
-            self.db?.collection("location").whereField("code", isEqualTo: self.privateCode).getDocuments(completion: { (snapshot, error) in
-                guard let snap = snapshot else {
-                    print(error!)
-                    return
-                }
-                if snap.documents.count == 0 { return }
-                let id = snap.documents[0].documentID
-                self.getIsUserHostOf(queueId: id) { (isHost) in
-                    self.presentQueueScreen(queueId: id, name: "", code: self.privateCode, isHost: isHost)
-                }
-            })
-        }
-        //for users who are just joining, they no longer are hitting updateConnectionStatus
-        else if(isJoining) {
-            let data = self.queueDetailModal.currentQueue!
-            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
             }
         }
     }
@@ -394,73 +377,28 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return result;
     }
     
-    // Join queue from queue detail modal
-    @objc func joinQueueTapped() {
-        self.joinQueue(isPrivate: false, code: "")
-    }
-    
-    // combination fn to join both private and public queues
-    func joinQueue(isPrivate: Bool, code: String) {
-        let token = (UIApplication.shared.delegate as? AppDelegate)?.token
-         
-         //alert user to ask if they would like to continue as a guest, or get a token from spotify
-         if token == "" {
-             self.isJoining = true
-                 let alert = UIAlertController(title: "Open Spotify?", message: "Open Spotify to Contribute to the Queue", preferredStyle: .alert)
-                 alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
-                     // open spotify but dont start app remote, callback from updateSessionStatus casues this user to join when token comes back
-                     self.startSession()
-                 }))
-                 alert.addAction(UIAlertAction(title: "Continue as Guest", style: .default, handler: { action in
-                    if(isPrivate) {
-                        self.db?.collection("location").whereField("code", isEqualTo: self.code).getDocuments(completion: { (snapshot, error) in
-                            guard let snap = snapshot else {
-                                print(error!)
-                                return
-                            }
-                            if snap.documents.count == 0 { return }
-                            let id = snap.documents[0].documentID
-                            self.getIsUserHostOf(queueId: id) { (isHost) in
-                                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-                            }
-                        })
-                    } else {
-                        let data = self.queueDetailModal.currentQueue!
-                        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-                            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
-                        }
-                    }
-                 }))
-                 self.present(alert, animated: true)
-
-             } else {
-                if isJoiningPrivate {
-                    self.db?.collection("location").whereField("code", isEqualTo: self.code).getDocuments(completion: { (snapshot, error) in
-                        guard let snap = snapshot else {
-                            print(error!)
-                            return
-                        }
-                        if snap.documents.count == 0 { return }
-                        let id = snap.documents[0].documentID
-                        self.getIsUserHostOf(queueId: id) { (isHost) in
-                            self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-                        }
-                    })
-                } else {
-                    let data = self.queueDetailModal.currentQueue!
-                    self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-                        self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
-                    }
-                }
-             }
+    // Join Public queue from queue detail modal
+    @objc func joinPublicQueue() {
+        let data = queueDetailModal.currentQueue!
+        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+        }
     }
 
     // Join queue from search icon
-    func joinPrivateQueue(code: String) {
-        self.isJoiningPrivate = true
-        self.privateCode = code
-        self.joinQueue(isPrivate: true, code: code)
-    }
+       func joinPrivateQueue(code: String) {
+           db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
+               guard let snap = snapshot else {
+                   print(error!)
+                   return
+               }
+               if snap.documents.count == 0 { return }
+               let id = snap.documents[0].documentID
+               self.getIsUserHostOf(queueId: id) { (isHost) in
+                   self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+               }
+           })
+       }
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
@@ -721,13 +659,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
-        let alert = UIAlertController(title: "Spotify could not connect", message: "Please close the Spotify App and try again.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
-        alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
             /// start app remote again on retry
-            self.isWaitingForRemote = true
-            let del = UIApplication.shared.delegate as? AppDelegate
-            del?.startAppRemote()
+            self.startSession()
         }))
         self.present(alert, animated: true)
     }
