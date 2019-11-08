@@ -18,9 +18,8 @@ protocol ControllerMapDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
-    
-    
+class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
+
     // Labels
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var regionLabel: UILabel!
@@ -65,7 +64,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var code: String? = nil
     var name: String? = nil
     /// should open create modal when app remote connected
-    var isWaitingForRemote = false
+    var isJoining = false
+    var isJoiningPrivate = false
+    var privateCode: String? = nil
     
     var region: String? = ""
     
@@ -81,6 +82,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
 
     func setupScreen() {
+        ///deprecate old login screen
+        self.loginContainer.isHidden = true
         self.mapOptionsView.layer.cornerRadius = 10
         self.navigationController?.isNavigationBarHidden = true
         let backgroundLayer = Colors.mapGradient
@@ -97,7 +100,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueueTapped))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -222,35 +225,78 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeDetailModal()
         self.closeJoinForm()
         /// tries to connect the app remote before opening the create queue modal
-        isWaitingForRemote = true
-        let del = UIApplication.shared.delegate as! AppDelegate
-        del.startAppRemote()
+        let connected = ((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)!
+        
+        // alert the user and ask if they would like to open spotify
+        if !connected {
+            let alert = UIAlertController(title: "Start Music Player?", message: "Open Spotify to Create Queue", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+                // open spotify and get token, remote is started in updateConnectionStatus later
+                self.isJoining = false
+                self.startSession()
+             }
+            ))
+            self.present(alert, animated: true)
+        } else {
+            // if the user is already connected, no need to reestablish remote connection or show alert
+            self.openCreateQueueModal()
+        }
     }
     
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
         /// also called when app becomes active, so don't open modal
-        if !isWaitingForRemote {
-            return
-        }
-        isWaitingForRemote = false
         if connected {
-            controllerMapDelegate?.addTapped()
-            createQueueForm.isHidden = false
-            UIView.animate(withDuration: 0.3) {
-                self.createQueueForm.alpha = 1
-            }
-            createQueueForm.queueNameTextField.becomeFirstResponder()
-            /// textfieldshouldreturn continues lifecycle
+            self.openCreateQueueModal()
         }
-        else {
+        else if !isJoining {
             showAppRemoteAlert()
         }
     }
+        
+    // open the modal to create a queue
+    func openCreateQueueModal() {
+        controllerMapDelegate?.addTapped()
+        createQueueForm.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+         self.createQueueForm.alpha = 1
+        }
+        createQueueForm.queueNameTextField.becomeFirstResponder()
+    }
+    
+    // called when the session connects or fails
+    func updateSessionStatus(connected: Bool) {
+        if(connected) {
+            DispatchQueue.main.async {
+                let del = UIApplication.shared.delegate as! AppDelegate
+                del.startAppRemote()
+            }
+        }
+        else if(isJoiningPrivate) {
+            self.db?.collection("location").whereField("code", isEqualTo: self.privateCode).getDocuments(completion: { (snapshot, error) in
+                guard let snap = snapshot else {
+                    print(error!)
+                    return
+                }
+                if snap.documents.count == 0 { return }
+                let id = snap.documents[0].documentID
+                self.getIsUserHostOf(queueId: id) { (isHost) in
+                    self.presentQueueScreen(queueId: id, name: "", code: self.privateCode, isHost: isHost)
+                }
+            })
+        }
+        //for users who are just joining, they no longer are hitting updateConnectionStatus
+        else if(isJoining) {
+            let data = self.queueDetailModal.currentQueue!
+            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+            }
+        }
+    }
+    
     
     // Helper to close create queue modal
     @objc func closeCreateForm() {
-        isWaitingForRemote = false
         controllerMapDelegate?.setQueue(nil)
         createQueueForm.queueNameTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3, animations: {
@@ -290,8 +336,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField.text == nil || textField.text == "" {
             return false
         }
+
+    
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
+            //resume music
+            let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
+            remote?.playerAPI!.resume({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
                 createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
@@ -304,12 +360,21 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
         else if textField == joinQueueForm.eventCodeTextField {
             /// join queue textfield is always private
-            joinQueue(code: textField.text!)
+            joinPrivateQueue(code: textField.text!)
             /// close the join queue modal
             closeJoinForm()
         }
+
         return true
     }
+    
+    // start session
+    func startSession() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.startSession()
+        delegate.seshDelegate = self
+    }
+    
     
     // Takes the current timestamp in decimal and returns a short string of base n
     func eventCodeFromTimestamp() -> String {
@@ -330,26 +395,71 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Join queue from queue detail modal
-    @objc func joinQueue() {
-        let data = queueDetailModal.currentQueue!
-        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
-        }
+    @objc func joinQueueTapped() {
+        self.joinQueue(isPrivate: false, code: "")
     }
     
+    // combination fn to join both private and public queues
+    func joinQueue(isPrivate: Bool, code: String) {
+        let token = (UIApplication.shared.delegate as? AppDelegate)?.token
+         
+         //alert user to ask if they would like to continue as a guest, or get a token from spotify
+         if token == "" {
+             self.isJoining = true
+                 let alert = UIAlertController(title: "Open Spotify?", message: "Open Spotify to Contribute to the Queue", preferredStyle: .alert)
+                 alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+                     // open spotify but dont start app remote, callback from updateSessionStatus casues this user to join when token comes back
+                     self.startSession()
+                 }))
+                 alert.addAction(UIAlertAction(title: "Continue as Guest", style: .default, handler: { action in
+                    if(isPrivate) {
+                        self.db?.collection("location").whereField("code", isEqualTo: self.code).getDocuments(completion: { (snapshot, error) in
+                            guard let snap = snapshot else {
+                                print(error!)
+                                return
+                            }
+                            if snap.documents.count == 0 { return }
+                            let id = snap.documents[0].documentID
+                            self.getIsUserHostOf(queueId: id) { (isHost) in
+                                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+                            }
+                        })
+                    } else {
+                        let data = self.queueDetailModal.currentQueue!
+                        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+                        }
+                    }
+                 }))
+                 self.present(alert, animated: true)
+
+             } else {
+                if isJoiningPrivate {
+                    self.db?.collection("location").whereField("code", isEqualTo: self.code).getDocuments(completion: { (snapshot, error) in
+                        guard let snap = snapshot else {
+                            print(error!)
+                            return
+                        }
+                        if snap.documents.count == 0 { return }
+                        let id = snap.documents[0].documentID
+                        self.getIsUserHostOf(queueId: id) { (isHost) in
+                            self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+                        }
+                    })
+                } else {
+                    let data = self.queueDetailModal.currentQueue!
+                    self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                        self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+                    }
+                }
+             }
+    }
+
     // Join queue from search icon
-    func joinQueue(code: String) {
-        db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            if snap.documents.count == 0 { return }
-            let id = snap.documents[0].documentID
-            self.getIsUserHostOf(queueId: id) { (isHost) in
-                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-            }
-        })
+    func joinPrivateQueue(code: String) {
+        self.isJoiningPrivate = true
+        self.privateCode = code
+        self.joinQueue(isPrivate: true, code: code)
     }
     
     // Create queue from add icon
@@ -485,7 +595,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeDetailModal()
         self.closeCreateForm()
         if(code != nil){
-            joinQueue(code: code!)
+            joinPrivateQueue(code: code!)
         }else if(queueId != nil && name != nil){
             self.getIsUserHostOf(queueId: queueId!) { (isHost) in
                 self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
@@ -578,6 +688,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
+    
     // Called by location manager with an updated location authorization # MapDelegate
     func setLocationEnabled(status: Bool) {
         /// if disallowed escape first time users else show error
@@ -626,6 +737,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return .lightContent
     }
     
+
     // Called to prepare embedded child View Controllers before mounting them to view hierarchy
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.destination is MapController {

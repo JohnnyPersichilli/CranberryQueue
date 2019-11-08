@@ -39,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
             let tokenRefreshURL = URL(string: "https://cranberryqueue.herokuapp.com/api/refresh_token") {
             self.configuration.tokenSwapURL = tokenSwapURL
             self.configuration.tokenRefreshURL = tokenRefreshURL
-            self.configuration.playURI = ""
+            self.configuration.playURI = nil
         }
         let manager = SPTSessionManager(configuration: self.configuration, delegate: self)
         return manager
