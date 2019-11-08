@@ -522,7 +522,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
         self.region = region
-        regionLabel.text = self.convertToFullRegionName(region: region)
+        if let state = self.convertToFullRegionName(region: region) {
+            regionLabel.text = state
+        } else {
+            regionLabel.text = region
+        }
     }
     
     // Called when map marker was tapped with location doc data # MapDelegate
