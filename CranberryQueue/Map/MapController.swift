@@ -239,15 +239,22 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("Geo code err:", error!)
                 return
             }
-            guard let locality = res[0].locality else {
-                completion(String(Double(Int(loc["lat"]!*1000))/1000), String(Double(Int(loc["long"]!*1000))/1000))
-                return
+            var city = String()
+            var region = String()
+            
+            if let locality = res[0].locality {
+                city = locality
+            } else {
+                city = String(Double(Int(loc["lat"]!*1000))/1000)
             }
-            guard let administrativeArea = res[0].administrativeArea else {
-                completion(String(Double(Int(loc["lat"]!*1000))/1000), String(Double(Int(loc["long"]!*1000))/1000))
-                return
+                        
+            if let administrativeArea = res[0].administrativeArea {
+               region = administrativeArea
+            } else {
+               region = String(Double(Int(loc["long"]!*1000))/1000)
             }
-            completion(locality, administrativeArea)
+
+            completion(city, region)
         }
     }
 
