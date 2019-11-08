@@ -15,7 +15,7 @@ exports.deleteLocation = functions.firestore
         const queueId = context.params.locationId
 
         //remove subcollection in contributor, so its not orphaned
-        return db.collection('contributor').doc(queueId).collection('members').get().then((querySnapshot) => {
+        return db.collection('contributor').where("queueId", "==", queueId).get().then((querySnapshot) => {
             // this will actually trigger the other onDelete listener, so we need to set a global boolean to ignore that update
             querySnapshot.forEach((doc) => {
                 doc.ref.delete()
@@ -23,7 +23,6 @@ exports.deleteLocation = functions.firestore
         }).then(() => {
             //delete the contributor doc after
             // console.log("contributor table: " + locationId + " successfully deleted")
-            db.collection('contributor').doc(queueId).delete()
 
             //delete the playback doc
             db.collection('playback').doc(queueId).delete()
@@ -64,10 +63,13 @@ exports.deleteLocation = functions.firestore
     })
 
 exports.addNumMembers = functions.firestore
-    .document('contributor/{queueId}/members/{uid}')
-    .onCreate((snap, context) => {
+    .document('contributor/{uid}')
+    .onWrite((change, context) => {
 
-    const queueId = context.params.queueId;
+    if (!change.after.exists) {
+        return 0
+    }
+    const queueId = change.after.data().queueId;
 
     return db.collection('location').doc(queueId).update({
         numMembers: admin.firestore.FieldValue.increment(1)
@@ -83,7 +85,7 @@ exports.removeFromMembers = functions.https.onRequest((request, response) => {
     let uid = request.body.uid
 
     //delete the uid from contributor-members collection
-    db.collection('contributor').doc(queueId).collection('members').doc(uid).delete()
+    db.collection('contributor').doc(uid).delete()
 
     //decrement the numMembers from location collection
     db.collection('location').doc(queueId).update({
