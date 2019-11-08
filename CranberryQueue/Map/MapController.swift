@@ -239,7 +239,13 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("Geo code err:", error!)
                 return
             }
-            completion(res[0].locality!, res[0].administrativeArea!)
+            guard let locality = res[0].locality else {
+                return
+            }
+            guard let administrativeArea = res[0].administrativeArea else {
+                return
+            }
+            completion(locality, administrativeArea)
         }
     }
 
