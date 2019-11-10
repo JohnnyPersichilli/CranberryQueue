@@ -30,7 +30,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     
     @IBOutlet weak var leaveQueueImageView: UIImageView!
     @IBOutlet var songTableView: SongTableView!
-    @IBOutlet var searchIconImageView: UIImageView!
+    
+    @IBOutlet weak var plusIconImageView: UIImageView!
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var numMembersLabel: UILabel!
     @IBOutlet var numSongsLabel: UILabel!
@@ -68,11 +69,6 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
             
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if (UIApplication.shared.delegate as! AppDelegate).token == "" {
-            searchIconImageView.isUserInteractionEnabled = false
-        }
-        
         watchLocationDoc()
         setupSongTableView()
     }

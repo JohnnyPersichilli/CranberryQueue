@@ -522,8 +522,8 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="166.66666666666666" width="28" height="28"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="plus" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
+                                <rect key="frame" x="316" y="169" width="28" height="24.000000000000014"/>
                                 <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
@@ -573,7 +573,7 @@
                         <outlet property="numMembersLabel" destination="rlb-aE-c6W" id="69g-Cl-boB"/>
                         <outlet property="numSongsLabel" destination="1By-Ce-MQF" id="1Ww-Am-68V"/>
                         <outlet property="playerView" destination="mRc-5P-hj1" id="e8Z-N8-3TO"/>
-                        <outlet property="searchIconImageView" destination="c0c-J5-2qe" id="FdD-tT-slW"/>
+                        <outlet property="plusIconImageView" destination="c0c-J5-2qe" id="57a-kw-mt5"/>
                         <outlet property="segmentedContainerView" destination="wSF-8f-4OK" id="cMj-wP-YJw"/>
                         <outlet property="songTableView" destination="ZLZ-9b-5m8" id="3w7-Kq-bAT"/>
                     </connections>

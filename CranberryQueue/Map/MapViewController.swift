@@ -386,19 +386,19 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
 
     // Join queue from search icon
-       func joinPrivateQueue(code: String) {
-           db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
-               guard let snap = snapshot else {
-                   print(error!)
-                   return
-               }
-               if snap.documents.count == 0 { return }
-               let id = snap.documents[0].documentID
-               self.getIsUserHostOf(queueId: id) { (isHost) in
-                   self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-               }
-           })
-       }
+    func joinPrivateQueue(code: String) {
+       db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
+           guard let snap = snapshot else {
+               print(error!)
+               return
+           }
+           if snap.documents.count == 0 { return }
+           let id = snap.documents[0].documentID
+           self.getIsUserHostOf(queueId: id) { (isHost) in
+               self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+           }
+       })
+    }
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
