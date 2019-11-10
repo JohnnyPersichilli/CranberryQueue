@@ -17,8 +17,7 @@ protocol QueueSegmentedDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
-class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDelegate {
-
+class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, SegmentedJointDelegate, SongTableDelegate {
     var queueName: String? = nil
     var queueId: String? = nil
     var uid: String? = nil
@@ -53,6 +52,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     override func viewDidLoad() {        
         playerView.delegate = playerController
         playerController.queueDelegate = playerView
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.appQueueDelegate = self
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
         
         setupGestureRecognizers()
@@ -175,6 +176,35 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         self.navigateToRoot()
     }
     
+    func updateConnectionStatus(connected: Bool) {
+        if !connected {
+            self.showAppRemoteAlert()
+        }
+    }
+    
+    func updateSessionStatus(connected: Bool) {}
+    
+    // Helper shows app remote not connected alert
+    func showAppRemoteAlert() {
+        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
+        // if host has bad app remote and chooses cancel, then they will be directed back to the mapscreen
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+            self.globeTapped()
+        }))
+        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+            /// start app remote again on retry
+            self.startSession()
+        }))
+        self.present(alert, animated: true)
+    }
+    
+    // start session
+    func startSession() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.startSession()
+        delegate.seshDelegate = self
+    }
+    
     @objc func globeTapped() {
         mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil, name: !isPrivate ? self.nameLabel.text : nil)
         self.navigateToRoot()
@@ -217,7 +247,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         if (UIApplication.shared.delegate as? AppDelegate)?.token == "" {
             let alert = UIAlertController(title: "Open Spotify?", message: "Login to Spotify to Contribute", preferredStyle: .alert)
                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-                    
+                    return
                    }))
                    alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
                        /// start app remote again on retry
@@ -237,12 +267,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
             }
         }
     }
-    
-    // start session
-    func startSession() {
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.startSession()
-    }
+
     
     func addSongTapped(song: Song) {
         songTableView.voteTapped(isUpvote: true, song: song)

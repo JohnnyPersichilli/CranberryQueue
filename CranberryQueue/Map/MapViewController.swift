@@ -380,6 +380,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @objc func joinPublicQueue() {
         let data = queueDetailModal.currentQueue!
         self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+            if isHost {
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.showAppRemoteAlert()
+                    return
+                }
+            }
             self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
         }
     }
@@ -394,7 +400,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
            if snap.documents.count == 0 { return }
            let id = snap.documents[0].documentID
            self.getIsUserHostOf(queueId: id) { (isHost) in
-               self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+            if isHost {
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.showAppRemoteAlert()
+                    return
+                }
+            }
+            self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
            }
        })
     }
