@@ -347,7 +347,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             /// close the join queue modal
             closeJoinForm()
         }
-
         return true
     }
     
@@ -402,6 +401,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
+        self.isCreating = false
         guard let coords = self.controllerMapDelegate?.getCoords() else { return }
         self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
             var ref : DocumentReference? = nil
