@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     weak var appPlayerDelegate: RemoteDelegate?
     weak var appMapDelegate: RemoteDelegate?
+    weak var appQueueDelegate: RemoteDelegate?
     weak var seshDelegate: SessionDelegate?
     
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
@@ -39,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
             let tokenRefreshURL = URL(string: "https://cranberryqueue.herokuapp.com/api/refresh_token") {
             self.configuration.tokenSwapURL = tokenSwapURL
             self.configuration.tokenRefreshURL = tokenRefreshURL
-            self.configuration.playURI = ""
+            self.configuration.playURI = nil
         }
         let manager = SPTSessionManager(configuration: self.configuration, delegate: self)
         return manager
@@ -98,6 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("connected")
+        appQueueDelegate?.updateConnectionStatus(connected: true)
         appPlayerDelegate?.updateConnectionStatus(connected: true)
         appMapDelegate?.updateConnectionStatus(connected: true)
     }
@@ -109,6 +111,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("failed")
         /// player controller does not need to be notified of failure
+        appQueueDelegate?.updateConnectionStatus(connected: false)
         appMapDelegate?.updateConnectionStatus(connected: false)
     }
     

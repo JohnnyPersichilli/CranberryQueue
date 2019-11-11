@@ -268,6 +268,12 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         ]
     }
     
+    func recenterMap() {
+        let myCoords = getCoords()
+        let camera = GMSCameraPosition.camera(withLatitude: myCoords["lat"]! ,longitude: myCoords["long"]! , zoom: 15.0)
+        map!.animate(to: camera)
+    }
+    
     func addTapped() {
         markers = []
         circles = []

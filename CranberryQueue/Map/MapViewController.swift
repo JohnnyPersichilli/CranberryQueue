@@ -12,15 +12,15 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
+    func recenterMap()
     func getCoords() -> [String:Double]
     func getGeoCode(withLocation loc: [String:Double], completion: @escaping (String, String)->Void)
     func setLocationEnabled(_ val: Bool)
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
-    
-    
+class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
+
     // Labels
     @IBOutlet var cityLabel: UILabel!
     @IBOutlet var regionLabel: UILabel!
@@ -64,23 +64,24 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var isPremium = false
     var code: String? = nil
     var name: String? = nil
-    /// should open create modal when app remote connected
-    var isWaitingForRemote = false
-    
+
+    var privateCode: String? = nil
     var region: String? = ""
+    // control bool to check if user is in the middle of creating a queue
+    var isCreating: Bool? = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScreen()
         setupGestureRecognizers()
-        
         setupFirebase()
         setupDelegates()
-
         setupObservers()
     }
 
     func setupScreen() {
+        ///deprecate old login screen
+        self.loginContainer.isHidden = true
         self.mapOptionsView.layer.cornerRadius = 10
         self.navigationController?.isNavigationBarHidden = true
         let backgroundLayer = Colors.mapGradient
@@ -97,7 +98,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue as () -> ()))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -117,8 +118,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
 
-        let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
-        backToQueueIconImageView.addGestureRecognizer(homeTap)
+        let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
+        backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
         
         let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
@@ -137,6 +138,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 return
             }
             self.uid = data.user.uid
+            //check to see if returning contributor is in a queue
+            self.checkForReturningContributor(withId: data.user.uid)
         }
     }
     
@@ -186,7 +189,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             if isHost {
                 self.playerController.isHost = true
                 self.isHost = true
-                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
+                //if app remote is not connected, connect the host
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.startSession()
+                }
             }
             
             self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
@@ -210,10 +216,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.controllerMapDelegate?.setQueue(oldQueueId)
             self.playerController.queueId = oldQueueId
             self.playerController.db = self.db
-            
-            
-            
         })
+    }
+    
+    @objc func recenterMapTapped() {
+        self.controllerMapDelegate?.recenterMap()
     }
     
     // Called when "+" icon tapped
@@ -222,35 +229,62 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeDetailModal()
         self.closeJoinForm()
         /// tries to connect the app remote before opening the create queue modal
-        isWaitingForRemote = true
-        let del = UIApplication.shared.delegate as! AppDelegate
-        del.startAppRemote()
+        let connected = ((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)!
+        
+        // alert the user and ask if they would like to open spotify
+        if !connected {
+            let alert = UIAlertController(title: "Start Music Player?", message: "Open Spotify to Create Queue", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+                // open spotify and get token, remote is started in updateConnectionStatus later
+                self.isCreating = true
+                self.startSession()
+             }
+            ))
+            self.present(alert, animated: true)
+        } else {
+            // if the user is already connected, no need to reestablish remote connection or show alert
+            self.openCreateQueueModal()
+        }
     }
     
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
         /// also called when app becomes active, so don't open modal
-        if !isWaitingForRemote {
-            return
-        }
-        isWaitingForRemote = false
         if connected {
-            controllerMapDelegate?.addTapped()
-            createQueueForm.isHidden = false
-            UIView.animate(withDuration: 0.3) {
-                self.createQueueForm.alpha = 1
+            if self.isCreating! {
+                self.openCreateQueueModal()
+            } else {
+                self.checkForReturningContributor(withId: self.uid)
             }
-            createQueueForm.queueNameTextField.becomeFirstResponder()
-            /// textfieldshouldreturn continues lifecycle
         }
         else {
             showAppRemoteAlert()
         }
     }
+        
+    // open the modal to create a queue
+    func openCreateQueueModal() {
+        controllerMapDelegate?.addTapped()
+        createQueueForm.isHidden = false
+        UIView.animate(withDuration: 0.3) {
+         self.createQueueForm.alpha = 1
+        }
+        createQueueForm.queueNameTextField.becomeFirstResponder()
+    }
+    
+    // called when the session connects or fails
+    func updateSessionStatus(connected: Bool) {
+        if(connected) {
+            DispatchQueue.main.async {
+                let del = UIApplication.shared.delegate as! AppDelegate
+                del.startAppRemote()
+            }
+        }
+    }
+    
     
     // Helper to close create queue modal
     @objc func closeCreateForm() {
-        isWaitingForRemote = false
         controllerMapDelegate?.setQueue(nil)
         createQueueForm.queueNameTextField.resignFirstResponder()
         UIView.animate(withDuration: 0.3, animations: {
@@ -290,8 +324,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField.text == nil || textField.text == "" {
             return false
         }
+
+    
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
+            //resume music
+            let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
+            remote?.playerAPI!.resume({ (response, error) in
+                if let err = error {
+                    print(err)
+                    return
+                }
+            })
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
                 createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
@@ -304,12 +348,20 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
         else if textField == joinQueueForm.eventCodeTextField {
             /// join queue textfield is always private
-            joinQueue(code: textField.text!)
+            joinPrivateQueue(code: textField.text!)
             /// close the join queue modal
             closeJoinForm()
         }
         return true
     }
+    
+    // start session
+    func startSession() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.startSession()
+        delegate.seshDelegate = self
+    }
+    
     
     // Takes the current timestamp in decimal and returns a short string of base n
     func eventCodeFromTimestamp() -> String {
@@ -329,35 +381,48 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return result;
     }
     
-    // Join queue from queue detail modal
-    @objc func joinQueue() {
+    // Join Public queue from queue detail modal
+    @objc func joinPublicQueue() {
         if(queueDetailModal.inRange){
             let data = queueDetailModal.currentQueue!
             self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                if isHost {
+                    if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                        self.showAppRemoteAlert()
+                        return
+                    }
+                }
                 self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
             }
         }else{
             queueDetailModal.flashDistance()
         }
     }
-    
+
     // Join queue from search icon
-    func joinQueue(code: String) {
-        db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
+    func joinPrivateQueue(code: String) {
+       db?.collection("location").whereField("code", isEqualTo: code).getDocuments(completion: { (snapshot, error) in
+           guard let snap = snapshot else {
+               print(error!)
+               return
+           }
+           if snap.documents.count == 0 { return }
+           let id = snap.documents[0].documentID
+           self.getIsUserHostOf(queueId: id) { (isHost) in
+            if isHost {
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.showAppRemoteAlert()
+                    return
+                }
             }
-            if snap.documents.count == 0 { return }
-            let id = snap.documents[0].documentID
-            self.getIsUserHostOf(queueId: id) { (isHost) in
-                self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
-            }
-        })
+            self.presentQueueScreen(queueId: id, name: "", code: code, isHost: isHost)
+           }
+       })
     }
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
+        self.isCreating = false
         guard let coords = self.controllerMapDelegate?.getCoords() else { return }
         self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
             var ref : DocumentReference? = nil
@@ -489,7 +554,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.closeDetailModal()
         self.closeCreateForm()
         if(code != nil){
-            joinQueue(code: code!)
+            joinPrivateQueue(code: code!)
         }else if(queueId != nil && name != nil){
             self.getIsUserHostOf(queueId: queueId!) { (isHost) in
                 self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
@@ -582,6 +647,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
+    
     // Called by location manager with an updated location authorization # MapDelegate
     func setLocationEnabled(status: Bool) {
         /// if disallowed escape first time users else show error
@@ -614,13 +680,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
-        let alert = UIAlertController(title: "Spotify could not connect", message: "Please close the Spotify App and try again.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
-        alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
             /// start app remote again on retry
-            self.isWaitingForRemote = true
-            let del = UIApplication.shared.delegate as? AppDelegate
-            del?.startAppRemote()
+            self.startSession()
         }))
         self.present(alert, animated: true)
     }
@@ -630,6 +694,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return .lightContent
     }
     
+
     // Called to prepare embedded child View Controllers before mounting them to view hierarchy
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.destination is MapController {
