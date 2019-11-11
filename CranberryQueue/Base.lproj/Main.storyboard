@@ -135,10 +135,10 @@
                                 </connections>
                             </containerView>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LyX-Sf-sNH" customClass="QueueDetailModal" customModule="CranberryQueue" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="812" width="375" height="130"/>
+                                <rect key="frame" x="0.0" y="812" width="375" height="132"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="130" id="7gN-0p-Tec"/>
+                                    <constraint firstAttribute="height" constant="132" id="7gN-0p-Tec"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p3f-Yz-L3V" customClass="JoinQueueForm" customModule="CranberryQueue" customModuleProvider="target">
