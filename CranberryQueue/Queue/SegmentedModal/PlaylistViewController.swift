@@ -32,7 +32,9 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         playlistTableView.delegate = self
         playlistTableView.dataSource = self
-        getPlaylists()
+        if token != "" {
+            getPlaylists()
+        }
         songTableView.delegate = songTableView
         songTableView.dataSource = songTableView
         songTableView.controllerDelegate = self

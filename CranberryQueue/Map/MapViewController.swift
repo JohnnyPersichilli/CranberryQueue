@@ -12,6 +12,7 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
+    func recenterMap()
     func getCoords() -> [String:Double]
     func getGeoCode(withLocation loc: [String:Double], completion: @escaping (String, String)->Void)
     func setLocationEnabled(_ val: Bool)
@@ -117,8 +118,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
 
-        let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
-        backToQueueIconImageView.addGestureRecognizer(homeTap)
+        let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
+        backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
         
         let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
@@ -162,7 +163,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func dismissLoginContainer(isPremium: Bool) {
         self.isPremium = isPremium
         if isPremium {
-            self.checkForReturningHost(withId: self.uid)
+            self.checkForReturningContributor(withId: self.uid)
         }
         DispatchQueue.main.async {
             self.loginContainer.isHidden = true
@@ -171,17 +172,23 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Helper checks contributor database for user hosted queues and conditionally sets their local data
-    func checkForReturningHost(withId id: String) {
-        db?.collection("contributor").whereField("host", isEqualTo: id).getDocuments(completion: { (snapshot, error) in
+    func checkForReturningContributor(withId id: String) {
+        db?.collection("contributor").whereField("id", isEqualTo: id).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            guard let oldQueueId = snap.documents.first?.documentID else {
+            guard let oldQueueId = snap.documents.first?.data()["queueId"] as? String else {
                 return
             }
-            self.isHost = true
             self.queueId = oldQueueId
+            
+            guard let isHost = snap.documents.first?.data()["isHost"] as? Bool else { return }
+            if isHost {
+                self.playerController.isHost = true
+                self.isHost = true
+                (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
+            }
             
             self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
                 guard let snap = snapshot else {
@@ -191,16 +198,24 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 guard let oldQueueName = snap["name"] as? String else {
                     return
                 }
+                
+                if let oldQueueCode = snap["code"] as? String {
+                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: oldQueueCode, isHost: isHost)
+                }
+                else {
+                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: nil, isHost: isHost)
+                }
                 self.name = oldQueueName
             })
             
             self.controllerMapDelegate?.setQueue(oldQueueId)
-            
             self.playerController.queueId = oldQueueId
-            self.playerController.isHost = true
             self.playerController.db = self.db
-            (UIApplication.shared.delegate as? AppDelegate)?.startAppRemote()
         })
+    }
+    
+    @objc func recenterMapTapped() {
+        self.controllerMapDelegate?.recenterMap()
     }
     
     // Called when "+" icon tapped
@@ -341,25 +356,21 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
-        var ref : DocumentReference? = nil
-        ref = db?.collection("contributor").addDocument(data: [
-            "host": self.uid
-        ]) { (val) in
-            let id = ref!.documentID
-            guard let coords = self.controllerMapDelegate?.getCoords() else { return }
-            self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
-                self.db?.collection("location").document(id).setData([
-                    "lat" : coords["lat"]!,
-                    "long" : coords["long"]!,
-                    "city": city,
-                    "region": region,
-                    "numMembers": 0,
-                    "currentSong": "",
-                    "name" : name
-                ])
+        guard let coords = self.controllerMapDelegate?.getCoords() else { return }
+        self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
+            var ref : DocumentReference? = nil
+            ref = self.db?.collection("location").addDocument(data: [
+                "lat" : coords["lat"]!,
+                "long" : coords["long"]!,
+                "city": city,
+                "region": region,
+                "numMembers": 0,
+                "currentSong": "",
+                "name" : name
+                ], completion: { (val) in
+                    self.presentQueueScreen(queueId: ref!.documentID, name: name, code: nil, isHost: true)
             })
-            self.presentQueueScreen(queueId: id, name: name, code: nil, isHost: true)
-        }
+        })
     }
     
     // Convert state names to full name PA ~> Pennsylvania
@@ -371,17 +382,14 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func createPrivateQueue(withCode code: String) {
         self.closeDetailModal()
         var ref : DocumentReference? = nil
-        ref = db?.collection("contributor").addDocument(data: [
-            "host": self.uid
-        ]) { (val) in
-            let id = ref!.documentID
-            self.db?.collection("location").document(id).setData([
-                "numMembers": 0,
-                "currentSong": "",
-                "code" : code
-                ])
-            self.presentQueueScreen(queueId: id, name: code, code: code, isHost: true)
-        }
+        ref = self.db?.collection("location").addDocument(data: [
+            "numMembers": 0,
+            "currentSong": "",
+            "code" : code,
+            "name": createQueueForm.queueNameTextField.text ?? ""
+            ], completion: { (val) in
+                self.presentQueueScreen(queueId: ref!.documentID, name: code, code: code, isHost: true)
+        })
     }
     
     // Helper presents the Queue View Controller with options
@@ -408,7 +416,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.leaveCurrentQueue()
         }
 
-        self.db?.collection("contributor").document(queueId).collection("members").document(self.uid).setData([:])
+        self.db?.collection("contributor").document(self.uid).setData([
+            "id": self.uid,
+            "queueId": queueId,
+            "isHost": isHost
+        ])
         vc.isHost = isHost
         vc.mapDelegate = self
         vc.db = db
@@ -445,19 +457,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Checks if user is host of any queues by querying contributor table
     func getIsUserHostOf(queueId: String, completion: @escaping (Bool) -> Void) {
-        db?.collection("contributor").document(queueId).getDocument(completion: { (snapshot, error) in
+        db?.collection("contributor").document(self.uid).getDocument(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            if let host = snap["host"] as? String {
-                if self.uid == host {
-                    completion(true)
-                }
-                else {
-                    completion(false)
-                }
+            guard let oldQueueId = snap.data()?["queueId"] as? String,
+                let isHost = snap.data()?["isHost"] as? Bool else {
+                completion(false)
+                return
             }
+            completion(oldQueueId == queueId && isHost)
         })
     }
     
@@ -514,7 +524,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
         self.region = region
-        regionLabel.text = self.convertToFullRegionName(region: region)
+        regionLabel.text = self.convertToFullRegionName(region: region) ?? region
     }
     
     // Called when map marker was tapped with location doc data # MapDelegate
@@ -606,6 +616,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
         alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { action in
             /// start app remote again on retry
+            self.isWaitingForRemote = true
             let del = UIApplication.shared.delegate as? AppDelegate
             del?.startAppRemote()
         }))

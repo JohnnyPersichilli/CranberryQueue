@@ -78,30 +78,53 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var queueDelegate: PlayerDelegate?
     
     var guestListener: ListenerRegistration? = nil
+    var hostListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
 
     func setupPlayer(queueId: String?, isHost: Bool) {
-        if queueId != self.queueId || queueId == nil {
-            guestListener?.remove()
+        let oldQueueId = self.queueId
+        
+        self.queueId = queueId
+        self.isHost = isHost
+        db = Firestore.firestore()
+        
+        if oldQueueId == nil && queueId != nil { /// no current queue, joining new queue
+            if isHost {
+                updateConnectionStatus(connected: true)
+            }
+            else {
+                setupGuestListeners()
+            }
+        }
+        else if oldQueueId != nil && queueId == nil { /// leaving a queue to nothing
             remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             })
-        }
-        if queueId == nil {
             timer.invalidate()
             position = 0
             mapDelegate?.clear()
             queueDelegate?.clear()
-            return
+            hostListener?.remove()
+            guestListener?.remove()
         }
-        self.queueId = queueId
-        self.isHost = isHost
-        db = Firestore.firestore()
-        if isHost {
-            updateConnectionStatus(connected: true)
+        else if oldQueueId != queueId { /// leaving current queue, joining new one
+            if isHost {
+                updateConnectionStatus(connected: true)
+            }
+            else {
+                setupGuestListeners()
+            }
         }
-        else {
-            setupGuestListeners()
+        else { /// rejoining same queue
+            if isHost {
+                remote?.playerAPI?.getPlayerState({ (state, error) in
+                    guard let info = state as? SPTAppRemotePlayerState else { return }
+                    self.playerStateDidChange(info)
+                })
+            }
+            else {
+                setupGuestListeners()
+            }
         }
     }
     
@@ -239,6 +262,15 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupHostListeners() {
+        var lastCount = 0
+        hostListener?.remove()
+        hostListener = db?.collection("playlist").document(self.queueId!).collection("songs").limit(to: 1).addSnapshotListener({ (snapshot, error) in
+            guard let docs = snapshot?.documents else { return }
+            if docs.count == 1 && lastCount == 0 {
+                self.enqueueNextSong()
+            }
+            lastCount = docs.count
+        })
         remote?.playerAPI?.delegate = self
         remote?.playerAPI?.unsubscribe(toPlayerState: { (val, error) in
             self.remote?.playerAPI?.subscribe(toPlayerState: { (result, error) in
@@ -254,6 +286,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func setupGuestListeners() {
+        guestListener?.remove()
         guestListener = db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
                 print(err)

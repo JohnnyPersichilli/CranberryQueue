@@ -239,7 +239,22 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("Geo code err:", error!)
                 return
             }
-            completion(res[0].locality!, res[0].administrativeArea!)
+            var city = String()
+            var region = String()
+            
+            if let locality = res[0].locality {
+                city = locality
+            } else {
+                city = String(Double(Int(loc["lat"]!*100))/100)
+            }
+                        
+            if let administrativeArea = res[0].administrativeArea {
+               region = administrativeArea
+            } else {
+               region = String(Double(Int(loc["long"]!*100))/100)
+            }
+
+            completion(city, region)
         }
     }
 
@@ -251,6 +266,12 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             "long": curCoords?.longitude ?? 0,
             "lat": curCoords?.latitude ?? 0
         ]
+    }
+    
+    func recenterMap() {
+        let myCoords = getCoords()
+        let camera = GMSCameraPosition.camera(withLatitude: myCoords["lat"]! ,longitude: myCoords["long"]! , zoom: 15.0)
+        map!.animate(to: camera)
     }
     
     func addTapped() {

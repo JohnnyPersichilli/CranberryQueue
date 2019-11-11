@@ -135,7 +135,7 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
-                self.titleLabel.text = state.track.artist.name + " - " + state.track.name
+                self.titleLabel.text = state.track.name + " - " + state.track.artist.name
                 self.albumImageView.image = UIImage(data: data)
             }
         }
@@ -151,7 +151,7 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
-                self.titleLabel.text = info.artist + " - " + info.name
+                self.titleLabel.text = info.name + " - " + info.artist
                 self.albumImageView.image = UIImage(data: data)
             }
         }
