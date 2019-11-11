@@ -331,9 +331,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Join queue from queue detail modal
     @objc func joinQueue() {
-        let data = queueDetailModal.currentQueue!
-        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+        if(queueDetailModal.inRange){
+            let data = queueDetailModal.currentQueue!
+            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+            }
+        }else{
+            queueDetailModal.flashDistance()
         }
     }
     
