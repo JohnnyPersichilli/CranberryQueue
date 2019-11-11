@@ -12,6 +12,7 @@ import Firebase
 protocol ControllerMapDelegate: class {
     func addTapped()
     func setQueue(_ queueId: String?)
+    func recenterMap()
     func getCoords() -> [String:Double]
     func getGeoCode(withLocation loc: [String:Double], completion: @escaping (String, String)->Void)
     func setLocationEnabled(_ val: Bool)
@@ -117,8 +118,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
 
-        let homeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
-        backToQueueIconImageView.addGestureRecognizer(homeTap)
+        let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
+        backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
         
         let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
@@ -210,10 +211,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.controllerMapDelegate?.setQueue(oldQueueId)
             self.playerController.queueId = oldQueueId
             self.playerController.db = self.db
-            
-            
-            
         })
+    }
+    
+    @objc func recenterMapTapped() {
+        self.controllerMapDelegate?.recenterMap()
     }
     
     // Called when "+" icon tapped
