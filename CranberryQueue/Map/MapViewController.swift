@@ -89,8 +89,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
 
     func setupGestureRecognizers() {
-        let addTap = UITapGestureRecognizer(target: self, action: #selector(addTapped))
-        createIconImageView.addGestureRecognizer(addTap)
+        let createQueueTap = UITapGestureRecognizer(target: self, action: #selector(createQueueTapped))
+        createIconImageView.addGestureRecognizer(createQueueTap)
         createIconImageView.isUserInteractionEnabled = true
 
         let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
@@ -217,7 +217,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Called when "+" icon tapped
-    @objc func addTapped() {
+    @objc func createQueueTapped() {
+        recenterMapTapped()
         createQueueForm.queueNameTextField.text = ""
         self.closeDetailModal()
         self.closeJoinForm()
