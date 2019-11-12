@@ -69,6 +69,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var region: String? = ""
     // control bool to check if user is in the middle of creating a queue
     var isCreating: Bool? = false
+    var shouldPlayMusic = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -189,6 +190,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             if isHost {
                 self.playerController.isHost = true
                 self.isHost = true
+                self.shouldPlayMusic = true
                 //if app remote is not connected, connect the host
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
                     self.startSession()
@@ -238,6 +240,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
                 // open spotify and get token, remote is started in updateConnectionStatus later
                 self.isCreating = true
+                self.shouldPlayMusic = true
                 self.startSession()
              }
             ))
@@ -359,7 +362,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // start session
     func startSession() {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.startSession()
+        delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
     }
     
@@ -490,6 +493,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             "isHost": isHost
         ])
         vc.isHost = isHost
+        vc.shouldPlayMusic = isHost
         vc.mapDelegate = self
         vc.db = db
         self.present(vc, animated:true, completion:{
@@ -544,6 +548,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.code = privateCode
         self.queueId = queueId
         self.isHost = isHost
+        self.shouldPlayMusic = isHost
         self.name = name
         self.controllerMapDelegate?.setQueue(queueId)
         self.controllerMapDelegate?.setLocationEnabled(true)
@@ -584,7 +589,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.playerController.setupPlayer(queueId: nil, isHost: false)
         }
         isHost = false
-        
+        shouldPlayMusic = false
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
     }
     

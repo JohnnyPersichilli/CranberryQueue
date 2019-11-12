@@ -27,6 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     weak var appQueueDelegate: RemoteDelegate?
     weak var seshDelegate: SessionDelegate?
     
+    var token = ""
+    
     let SpotifyClientID = "02294b5911c543599eb7fb37d1ed2d39"
     let SpotifyRedirectURL = URL(string: "CranberryQueue://spotify-login-callback")!
     
@@ -40,40 +42,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
             let tokenRefreshURL = URL(string: "https://cranberryqueue.herokuapp.com/api/refresh_token") {
             self.configuration.tokenSwapURL = tokenSwapURL
             self.configuration.tokenRefreshURL = tokenRefreshURL
-            self.configuration.playURI = ""
         }
         let manager = SPTSessionManager(configuration: self.configuration, delegate: self)
         return manager
     }()
-    
-    var token = ""
     
     lazy var appRemote: SPTAppRemote = {
         let appRemote = SPTAppRemote(configuration: configuration, logLevel: .debug)
         appRemote.delegate = self
         return appRemote
     }()
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        UIApplication.shared.isIdleTimerDisabled = true
-        
-        FirebaseApp.configure()
-        GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
-        return true
-    }
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        self.sessionManager.application(app, open: url, options: options)
-        
-        return true
-    }
-    
-    func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
-        token = session.accessToken
-        
-        seshDelegate?.updateSessionStatus(connected: true)
-    }
     
     func startAppRemote() {
         DispatchQueue.main.async {
@@ -86,6 +64,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     func pauseAndDisconnectAppRemote() {
         self.appRemote.playerAPI?.pause()
         self.appRemote.disconnect()
+    }
+    
+    func startSession(shouldPlayMusic: Bool) {
+        self.configuration.playURI = shouldPlayMusic ? "" : nil
+        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState, .userLibraryRead]
+        self.sessionManager.initiateSession(with: requestedScopes, options: .default)
+    }
+    
+    func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+        token = session.accessToken
+        seshDelegate?.updateSessionStatus(connected: true)
     }
     
     func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
@@ -115,6 +104,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
         appMapDelegate?.updateConnectionStatus(connected: false)
     }
     
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        UIApplication.shared.isIdleTimerDisabled = true
+        FirebaseApp.configure()
+        GMSServices.provideAPIKey("AIzaSyAlD1H2m8hoYKp8wIzLLEN6AJtPqwhrOs0")
+        return true
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        self.sessionManager.application(app, open: url, options: options)
+        return true
+    }
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -140,11 +141,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
                 self.appRemote.connect()
             }
         }
-    }
-    
-    func startSession() {
-        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState, .userLibraryRead]
-        self.sessionManager.initiateSession(with: requestedScopes, options: .default)
     }
     
     func applicationWillTerminate(_ application: UIApplication) {

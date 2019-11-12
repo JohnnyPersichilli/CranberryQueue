@@ -22,6 +22,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     var queueId: String? = nil
     var uid: String? = nil
     var isHost = false
+    var shouldPlayMusic = false
     var shouldHideContents = false
     var isPrivate = false
     var city: String? = nil
@@ -201,7 +202,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     // start session
     func startSession() {
         let delegate = UIApplication.shared.delegate as! AppDelegate
-        delegate.startSession()
+        delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
     }
     
