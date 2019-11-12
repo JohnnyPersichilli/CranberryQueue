@@ -135,10 +135,10 @@
                                 </connections>
                             </containerView>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LyX-Sf-sNH" customClass="QueueDetailModal" customModule="CranberryQueue" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="812" width="375" height="127"/>
+                                <rect key="frame" x="0.0" y="812" width="375" height="132"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="127" id="7gN-0p-Tec"/>
+                                    <constraint firstAttribute="height" constant="132" id="7gN-0p-Tec"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p3f-Yz-L3V" customClass="JoinQueueForm" customModule="CranberryQueue" customModuleProvider="target">
@@ -152,7 +152,7 @@
                         <constraints>
                             <constraint firstItem="VLf-l2-j7u" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="2Fi-OW-no7"/>
                             <constraint firstAttribute="trailing" secondItem="LyX-Sf-sNH" secondAttribute="trailing" id="4KP-zd-u5Q"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="LyX-Sf-sNH" secondAttribute="bottom" id="4mx-OM-ud7"/>
+                            <constraint firstAttribute="bottom" secondItem="LyX-Sf-sNH" secondAttribute="bottom" id="4mx-OM-ud7"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="centerY" secondItem="7k1-xL-an5" secondAttribute="centerY" id="BMP-Ev-hlF"/>
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="EuK-Dd-aRw"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="FKM-if-PYx"/>

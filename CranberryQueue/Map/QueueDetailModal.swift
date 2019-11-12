@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AudioToolbox
 
 class QueueDetailModal: UIView {
 
@@ -29,6 +30,7 @@ class QueueDetailModal: UIView {
     @IBOutlet var closeIconImageView: UIImageView!
     
     var currentQueue: CQLocation? = nil
+    var inRange: Bool = false
         
     var distance: Double = 0 {
         didSet {
@@ -68,13 +70,30 @@ class QueueDetailModal: UIView {
         //can set this as the radius if we are letting users do that or an arbitrary number like 500m
         let maxDistance = 500.0
         if(distance > maxDistance){
-            joinButton.isEnabled = false
+            inRange = false
+            distanceLabel.textColor = UIColor.red.withAlphaComponent(0.6)
             joinButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
             joinButton.isOpaque = true
         }else{
-            joinButton.isEnabled = true
+            inRange = true
+            distanceLabel.textColor = UIColor.white
             joinButton.backgroundColor = joinGreen
             joinButton.isOpaque = false
+        }
+    }
+    
+    func flashDistance() {
+        //create vibration
+        AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        
+        UIView.transition(with: self.distanceLabel, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.distanceLabel.textColor = .white
+                self.distanceLabel.font = UIFont.boldSystemFont(ofSize: self.distanceLabel.font.pointSize)
+        }) { (_) in
+            UIView.transition(with: self.distanceLabel, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                self.distanceLabel.textColor = UIColor.red.withAlphaComponent(0.6)
+                    self.distanceLabel.font = UIFont.systemFont(ofSize: self.distanceLabel.font.pointSize)
+                })
         }
     }
     

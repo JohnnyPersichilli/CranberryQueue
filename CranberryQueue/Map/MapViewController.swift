@@ -384,15 +384,19 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Join Public queue from queue detail modal
     @objc func joinPublicQueue() {
-        let data = queueDetailModal.currentQueue!
-        self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-            if isHost {
-                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
-                    self.showAppRemoteAlert()
-                    return
+        if(queueDetailModal.inRange){
+            let data = queueDetailModal.currentQueue!
+            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
+                if isHost {
+                    if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                        self.showAppRemoteAlert()
+                        return
+                    }
                 }
+                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
             }
-            self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
+        } else {
+            queueDetailModal.flashDistance()
         }
     }
 
