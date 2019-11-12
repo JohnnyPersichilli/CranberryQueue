@@ -38,12 +38,16 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allow location services when in use to see and join nearby queues!</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow location services when in use to see and join nearby queues!</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Allow location services when in use to see and join nearby queues!</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow location services when in use to see and join nearby queues!</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import AVFoundation
 
 protocol ControllerMapDelegate: class {
     func addTapped()
@@ -78,6 +79,15 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         setupDelegates()
 
         setupObservers()
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .allowAirPlay])
+            print("Playback OK")
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("Session is Active")
+        } catch {
+            print(error)
+        }
     }
 
     func setupScreen() {
