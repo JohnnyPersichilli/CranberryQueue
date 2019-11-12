@@ -39,10 +39,7 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
     }
     
     func getFeaturedSongs(completion: @escaping ([Song]) -> Void) {
-        guard let city = city, let region = region else {
-            return
-        }
-        db?.collection("playbackArchive").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).limit(to: 25).getDocuments(completion: { (snapshot, error) in
+        db?.collection("topSongs").order(by: "count", descending: true).limit(to: 25).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return

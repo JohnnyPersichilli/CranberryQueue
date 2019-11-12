@@ -142,11 +142,41 @@ exports.collectPlaybackAnalytics = functions.firestore
                 time: admin.firestore.FieldValue.serverTimestamp()
             })
             .then(() => {
+                updateTopSong(after, data)
                 return 0
             })
 
         })
     })
+
+    function updateTopSong(after, data){
+        db.collection('topSongs').doc(after.uri).get()
+        .then(doc => {
+            var time = admin.firestore.FieldValue.serverTimestamp()
+            if (!doc.exists) {
+                db.collection('topSongs').doc(after.uri).set({
+                    artist: after.artist,
+                    name: after.name,
+                    uri: after.uri,
+                    imageURL: after.imageURL,
+                    city: data.city,
+                    region: data.region,
+                    time: time,
+                    count: 0
+                })
+                .then(() => {
+                    return 0
+                })
+            }else{
+                return db.collection("topSongs").doc(doc.id).update({
+                    count: admin.firestore.FieldValue.increment(1),
+                })
+                .then(() => {
+                    return 0
+                })
+            }
+        })
+    }
 
 exports.updateNetVotes = functions.firestore
     .document('song/{songId}/upvoteUsers/{uid}')
