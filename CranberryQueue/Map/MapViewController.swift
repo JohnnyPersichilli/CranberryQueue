@@ -394,7 +394,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 }
                 self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
             }
-        }else{
+        } else {
             queueDetailModal.flashDistance()
         }
     }
