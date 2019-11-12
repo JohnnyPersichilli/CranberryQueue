@@ -62,7 +62,7 @@ class LoginController: UIViewController, SessionDelegate, activityIndicatorPrese
         }
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.seshDelegate = self
-        delegate.startSession()
+        //delegate.startSession()
     }
 
     
