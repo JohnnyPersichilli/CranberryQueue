@@ -64,8 +64,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var isPremium = false
     var code: String? = nil
     var name: String? = nil
+    var city = String()
+    var region = String()
 
-    var region: String? = ""
     // state enum determines who is calling updateConnectionStatus
     var connectionStatusInvoker: ConnectionStatusInvoker = .none
     var shouldPlayMusic = false
@@ -443,6 +444,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func createPublicQueue(withName name: String) {
         guard let coords = self.controllerMapDelegate?.getCoords() else { return }
         self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
+            self.region = region
+            self.city = city
             var ref : DocumentReference? = nil
             ref = self.db?.collection("location").addDocument(data: [
                 "lat" : coords["lat"]!,
@@ -491,7 +494,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
-        vc.city = self.cityLabel.text
+        vc.city = self.city
         vc.region = self.region
         vc.queueName = isPrivate ? code : name
         vc.queueId = queueId
@@ -611,7 +614,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
-        self.region = region
         regionLabel.text = self.convertToFullRegionName(region: region) ?? region
     }
     
