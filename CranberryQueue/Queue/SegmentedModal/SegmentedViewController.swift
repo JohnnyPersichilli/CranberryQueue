@@ -49,6 +49,10 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
         default:
             newConstant = -2*self.view.frame.size.width
         }
+        /// clears search table when you navigate away
+        if control.selectedSegmentIndex != 0 {
+            childDelegate?.clear()
+        }
         UIView.animate(withDuration: 0.3, animations: {
             self.stackHorizontalConstraint.constant = newConstant
             self.view.layoutIfNeeded()
@@ -124,7 +128,6 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             vc?.city = self.city
             vc?.region = self.region
             vc?.db = self.db
-            childDelegate = vc
         }
         else if segue.destination is PlaylistViewController {
             let vc = segue.destination as? PlaylistViewController
