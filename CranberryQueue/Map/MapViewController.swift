@@ -65,10 +65,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var code: String? = nil
     var name: String? = nil
 
-    var privateCode: String? = nil
     var region: String? = ""
-    // control bool to check if user is in the middle of creating a queue
-    var isCreating: Bool? = false
+    // state enum determines who is calling updateConnectionStatus
+    var connectionStatusInvoker: ConnectionStatusInvoker = .none
     var shouldPlayMusic = false
     
     override func viewDidLoad() {
@@ -188,35 +187,31 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             
             guard let isHost = snap.documents.first?.data()["isHost"] as? Bool else { return }
             if isHost {
-                self.playerController.isHost = true
                 self.isHost = true
                 self.shouldPlayMusic = true
                 //if app remote is not connected, connect the host
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.connectionStatusInvoker = .returningHost
                     self.startSession()
                 }
             }
-            
-            self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
-                guard let snap = snapshot else {
-                    print(error!)
-                    return
-                }
-                guard let oldQueueName = snap["name"] as? String else {
-                    return
-                }
-                
-                if let oldQueueCode = snap["code"] as? String {
-                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: oldQueueCode, isHost: isHost)
-                }
-                else {
-                    self.presentQueueScreen(queueId: oldQueueId, name: oldQueueName, code: nil, isHost: isHost)
-                }
-                self.name = oldQueueName
-            })
+            else {
+                self.db?.collection("location").document(oldQueueId).getDocument(completion: { (snapshot, error) in
+                    guard let snap = snapshot else { return }
+                    guard let oldQueueName = snap["name"] as? String else { return }
+                    self.name = oldQueueName
+                    self.presentQueueScreen(
+                        queueId: oldQueueId,
+                        name: oldQueueName,
+                        code: snap["code"] as? String,
+                        isHost: self.isHost
+                    )
+                })
+            }
             
             self.controllerMapDelegate?.setQueue(oldQueueId)
             self.playerController.queueId = oldQueueId
+            self.playerController.isHost = isHost
             self.playerController.db = self.db
         })
     }
@@ -239,7 +234,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             let alert = UIAlertController(title: "Start Music Player?", message: "Open Spotify to Create Queue", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
                 // open spotify and get token, remote is started in updateConnectionStatus later
-                self.isCreating = true
+                self.connectionStatusInvoker = .queueCreation
                 self.shouldPlayMusic = true
                 self.startSession()
              }
@@ -253,16 +248,36 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
-        /// also called when app becomes active, so don't open modal
-        if connected {
-            if self.isCreating! {
+        /// branched lifecycle depending on why the app remote was connected
+        switch connectionStatusInvoker {
+        case .queueCreation:
+            if connected {
                 self.openCreateQueueModal()
-            } else {
-                self.checkForReturningContributor(withId: self.uid)
             }
-        }
-        else {
-            showAppRemoteAlert()
+            else {
+                showAppRemoteAlert()
+            }
+        case .returningHost:
+            if connected {
+                self.db?.collection("location").document(queueId!).getDocument(completion: { (snapshot, error) in
+                    guard let snap = snapshot else { return }
+                    guard let oldQueueName = snap["name"] as? String else { return }
+                    self.name = oldQueueName
+                    self.presentQueueScreen(
+                        queueId: self.queueId!,
+                        name: oldQueueName,
+                        code: snap["code"] as? String,
+                        isHost: self.isHost
+                    )
+                })
+            }
+            else {
+                showAppRemoteAlert()
+            }
+        case .none:
+            if !connected {
+                print("Lost connection to Spotify")
+            }
         }
     }
         
@@ -426,7 +441,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Create queue from add icon
     func createPublicQueue(withName name: String) {
-        self.isCreating = false
         guard let coords = self.controllerMapDelegate?.getCoords() else { return }
         self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
             var ref : DocumentReference? = nil
@@ -472,6 +486,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.code = nil
         }
         
+        self.connectionStatusInvoker = .none
         self.controllerMapDelegate?.setQueue(queueId)
         
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
@@ -687,7 +702,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
         let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
+        alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in
+            self.connectionStatusInvoker = .none
+        }))
         alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
             /// start app remote again on retry
             self.startSession()
@@ -723,5 +740,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         NotificationCenter.default.removeObserver(self)
     }
 
+    enum ConnectionStatusInvoker {
+        case queueCreation
+        case returningHost
+        case none
+    }
 }
 
