@@ -70,6 +70,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // control bool to check if user is in the middle of creating a queue
     var isCreating: Bool? = false
     var shouldPlayMusic = false
+    var shouldRequestSpotifyClosed = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -191,6 +192,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 self.playerController.isHost = true
                 self.isHost = true
                 self.shouldPlayMusic = true
+                self.shouldRequestSpotifyClosed = false
                 //if app remote is not connected, connect the host
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
                     self.startSession()
@@ -241,6 +243,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 // open spotify and get token, remote is started in updateConnectionStatus later
                 self.isCreating = true
                 self.shouldPlayMusic = true
+                self.shouldRequestSpotifyClosed = false
                 self.startSession()
              }
             ))
@@ -686,12 +689,27 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
-        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in }))
-        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
-            /// start app remote again on retry
-            self.startSession()
-        }))
+        let alert = UIAlertController(
+            title: "Spotify could not connect",
+            message: shouldRequestSpotifyClosed ? "Please close Spotify and try again" : "Open Spotify to Connect",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: "Continue",
+            style: .cancel,
+            handler: { action in
+                self.shouldRequestSpotifyClosed = false
+            })
+        )
+        alert.addAction(UIAlertAction(
+            title: "Open Spotify",
+            style: .default,
+            handler: { action in
+                /// start session + app remote lifecycle again on retry
+                self.shouldRequestSpotifyClosed = true
+                self.startSession()
+            })
+        )
         self.present(alert, animated: true)
     }
     
