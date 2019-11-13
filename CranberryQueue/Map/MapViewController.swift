@@ -627,6 +627,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         queueDetailModal.distance = distance ?? 0
         queueDetailModal.currentQueue = data
         /// Setup listener closure to update current song
+        var shouldOpenModal = true
         playbackRef = db?.collection("playback").document(data.queueId).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
@@ -635,7 +636,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             /// Closes when doc is deleted
             if let doc = snap.data() {
                 self.queueDetailModal.updateWithPlaybackDoc(doc: doc)
-                self.showDetailModal()
+                if shouldOpenModal {
+                    self.showDetailModal()
+                    shouldOpenModal = false
+                }
             }
             else {
                 self.closeDetailModal()
