@@ -65,10 +65,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var code: String? = nil
     var name: String? = nil
 
-    var privateCode: String? = nil
     var region: String? = ""
-    // control bool to check if user is in the middle of creating a queue
-    var connectionStatusHandler: ConnectionStatusHandler = .none
+    // state enum determines who is calling updateConnectionStatus
+    var connectionStatusInvoker: ConnectionStatusInvoker = .none
     var shouldPlayMusic = false
     
     override func viewDidLoad() {
@@ -192,7 +191,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 self.shouldPlayMusic = true
                 //if app remote is not connected, connect the host
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
-                    self.connectionStatusHandler = .returningHost
+                    self.connectionStatusInvoker = .returningHost
                     self.startSession()
                 }
             }
@@ -235,7 +234,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             let alert = UIAlertController(title: "Start Music Player?", message: "Open Spotify to Create Queue", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
                 // open spotify and get token, remote is started in updateConnectionStatus later
-                self.connectionStatusHandler = .queueCreation
+                self.connectionStatusInvoker = .queueCreation
                 self.shouldPlayMusic = true
                 self.startSession()
              }
@@ -250,7 +249,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
         /// branched lifecycle depending on why the app remote was connected
-        switch connectionStatusHandler {
+        switch connectionStatusInvoker {
         case .queueCreation:
             if connected {
                 self.openCreateQueueModal()
@@ -487,7 +486,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             self.code = nil
         }
         
-        self.connectionStatusHandler = .none
+        self.connectionStatusInvoker = .none
         self.controllerMapDelegate?.setQueue(queueId)
         
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
@@ -704,7 +703,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func showAppRemoteAlert() {
         let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in
-            self.connectionStatusHandler = .none
+            self.connectionStatusInvoker = .none
         }))
         alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
             /// start app remote again on retry
@@ -741,7 +740,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         NotificationCenter.default.removeObserver(self)
     }
 
-    enum ConnectionStatusHandler {
+    enum ConnectionStatusInvoker {
         case queueCreation
         case returningHost
         case none
