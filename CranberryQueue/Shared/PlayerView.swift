@@ -11,7 +11,9 @@ import UIKit
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
+    func likeTapped()
 }
+
 
 class PlayerView: UIView, PlayerDelegate {
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
@@ -54,13 +56,13 @@ class PlayerView: UIView, PlayerDelegate {
     
     @IBOutlet var timeLabel: UILabel!
     
+    @IBOutlet weak var likeIconImageView: UIImageView!
+    
     @IBOutlet var helpLabel: UILabel!
     @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
     @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
-    
-    
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -97,6 +99,10 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.addGestureRecognizer(skipSongTap)
         skipSongImage.isUserInteractionEnabled = true
         
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
+        likeIconImageView.addGestureRecognizer(likeTapGesture)
+        likeIconImageView.isUserInteractionEnabled = true
+        
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
         playPauseImage.isUserInteractionEnabled = true
@@ -109,6 +115,36 @@ class PlayerView: UIView, PlayerDelegate {
     @objc func skipSongTapped() {
         delegate?.swiped()
     }
+    
+    @objc func likeTapped() {
+        if #available(iOS 13.0, *) {
+            likeIconImageView.image = UIImage(systemName: "heart.fill")!
+            likeIconImageView.tintColor = UIColor.red
+            delegate?.likeTapped()
+            
+        } else {
+            // Fallback on earlier versions
+            return
+        }
+        likeIconImageView.gestureRecognizers?.removeAll()
+        let unlikeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.unlikeTapped))
+        likeIconImageView.addGestureRecognizer(unlikeTapGesture)
+        likeIconImageView.isUserInteractionEnabled = true
+    }
+    
+     @objc func unlikeTapped() {
+        if #available(iOS 13.0, *) {
+            likeIconImageView.image = UIImage(systemName: "heart")!
+            likeIconImageView.tintColor = UIColor.white
+        } else {
+            // Fallback on earlier versions
+            return
+        }
+        likeIconImageView.gestureRecognizers?.removeAll()
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
+        likeIconImageView.addGestureRecognizer(likeTapGesture)
+        likeIconImageView.isUserInteractionEnabled = true
+     }
     
     //Same function as player controller
     func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {

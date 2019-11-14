@@ -34,6 +34,29 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
     }
     
+    func stripIdFromCurrentUri() -> String? {
+        let index = self.currentUri.index(self.currentUri.startIndex, offsetBy: 13)
+        let range = self.currentUri.index(after: index)..<self.currentUri.endIndex
+        return String(self.currentUri[range])
+    }
+    
+    func likeTapped() {
+        let id = stripIdFromCurrentUri()!
+        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "PUT"
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            print(response)
+            if let err = error {
+                print(err)
+            }
+        }
+        task.resume()
+    }
+    
     func playPause(isPaused: Bool){
         if(queueId != nil && isHost){
             if(isPaused){
