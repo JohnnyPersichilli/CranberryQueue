@@ -88,17 +88,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     
     static let sharedInstance = PlayerController()
     
-    func populateLikeIcon(completion: () -> ()) {
-     completion()
-    }
-    
     func likeTapped() {
         let id = stripIdFromCurrentUri()!
         let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
         var request = URLRequest(url: url)
-
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        print(delegate.token)
         request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "PUT"
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
@@ -115,9 +108,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let id = stripIdFromCurrentUri()!
         let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
         var request = URLRequest(url: url)
-
-        let delegate = UIApplication.shared.delegate as! AppDelegate
-        print(delegate.token)
         request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "DELETE"
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
@@ -226,6 +216,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
             return
         }
+        
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
@@ -253,9 +244,49 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
+            // will prepopulate the like icon to be already liked or not
+            self.populateLikeIcon()
             removeSongWith(uri, completion: {
                 self.enqueueNextSong()
             })
+        }
+    }
+    
+    func populateLikeIcon() {
+        if let id = stripIdFromCurrentUri() {
+            let url = URL(string: "https://api.spotify.com/v1/me/tracks/contains?ids=\(id)")!
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+            request.httpMethod = "GET"
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+               if let httpResponse = response as? HTTPURLResponse {
+                   print("STATUS")
+                   print(httpResponse.statusCode)
+               }
+                guard let data = data else {
+                     return
+                }
+
+                do {
+                    let jsonRes = try JSONSerialization.jsonObject(with: data, options: []) as! NSArray
+                    let value = jsonRes.firstObject as! Int
+                    if value == 1 {
+                        print("contains like")
+                    } else {
+                        print("does not contain like")
+                    }
+                }
+                catch {
+                    print("error")
+                }
+
+               if let err = error {
+                   print(err)
+               }
+            }
+            task.resume()
         }
     }
     

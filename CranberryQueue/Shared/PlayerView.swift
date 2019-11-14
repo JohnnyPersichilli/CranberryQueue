@@ -13,7 +13,6 @@ protocol PlayerControllerDelegate: class {
     func playPause(isPaused: Bool)
     func likeTapped()
     func unlikeTapped()
-    func populateLikeIcon(completion: () -> ())
 }
 
 
@@ -165,9 +164,6 @@ class PlayerView: UIView, PlayerDelegate {
         helpLabel.isHidden = true
         inactiveHostLabel.isHidden = true
         let url = URL( string: getURLFrom(state) )
-        delegate?.populateLikeIcon{() -> () in
-            self.populateLikeIconImageView()
-        }
         
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
@@ -181,9 +177,6 @@ class PlayerView: UIView, PlayerDelegate {
         task.resume()
     }
     
-    func populateLikeIconImageView() {
-        
-    }
     
     func updateSongUI(withInfo info: PlaybackInfo) {
         helpLabel.isHidden = true
