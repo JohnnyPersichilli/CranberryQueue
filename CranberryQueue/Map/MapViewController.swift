@@ -64,11 +64,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     var isPremium = false
     var code: String? = nil
     var name: String? = nil
+    var city = String()
+    var region = String()
 
-    var region: String? = ""
     // state enum determines who is calling updateConnectionStatus
     var connectionStatusInvoker: ConnectionStatusInvoker = .none
     var shouldPlayMusic = false
+    var shouldRequestSpotifyClosed = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -189,6 +191,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             if isHost {
                 self.isHost = true
                 self.shouldPlayMusic = true
+                self.shouldRequestSpotifyClosed = false
                 //if app remote is not connected, connect the host
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
                     self.connectionStatusInvoker = .returningHost
@@ -236,6 +239,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 // open spotify and get token, remote is started in updateConnectionStatus later
                 self.connectionStatusInvoker = .queueCreation
                 self.shouldPlayMusic = true
+                self.shouldRequestSpotifyClosed = false
                 self.startSession()
              }
             ))
@@ -443,6 +447,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func createPublicQueue(withName name: String) {
         guard let coords = self.controllerMapDelegate?.getCoords() else { return }
         self.controllerMapDelegate?.getGeoCode(withLocation: coords, completion: { (city, region) in
+            self.region = region
+            self.city = city
             var ref : DocumentReference? = nil
             ref = self.db?.collection("location").addDocument(data: [
                 "lat" : coords["lat"]!,
@@ -491,7 +497,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "queueViewController") as! QueueViewController
-        vc.city = self.cityLabel.text
+        vc.city = self.city
         vc.region = self.region
         vc.queueName = isPrivate ? code : name
         vc.queueId = queueId
@@ -611,7 +617,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when geocode has been set by location manager # MapDelegate
     func updateGeoCode(city: String, region: String) {
         cityLabel.text = city
-        self.region = region
         regionLabel.text = self.convertToFullRegionName(region: region) ?? region
     }
     
@@ -705,14 +710,28 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
-        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Continue", style: .cancel, handler: { action in
-            self.connectionStatusInvoker = .none
-        }))
-        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
-            /// start app remote again on retry
-            self.startSession()
-        }))
+        let alert = UIAlertController(
+            title: "Spotify could not connect",
+            message: shouldRequestSpotifyClosed ? "Please close Spotify and try again" : "Open Spotify to Connect",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(
+            title: "Continue",
+            style: .cancel,
+            handler: { action in
+                self.shouldRequestSpotifyClosed = false
+                self.connectionStatusInvoker = .none
+            })
+        )
+        alert.addAction(UIAlertAction(
+            title: "Open Spotify",
+            style: .default,
+            handler: { action in
+                /// start session + app remote lifecycle again on retry
+                self.shouldRequestSpotifyClosed = true
+                self.startSession()
+            })
+        )
         self.present(alert, animated: true)
     }
     
