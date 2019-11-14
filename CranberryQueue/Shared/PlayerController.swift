@@ -302,7 +302,11 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)
             self.duration = info.duration
-            self.position = info.position + (Int(Date().timeIntervalSince1970) - info.timestamp)*1000
+            if (Int(Date().timeIntervalSince1970) - info.timestamp) < 0 {
+                 self.position = info.position
+            } else {
+                self.position = info.position + (Int(Date().timeIntervalSince1970) - info.timestamp)*1000
+            }
             
             if (info.isPaused) {
                 self.timer.invalidate()
