@@ -17,12 +17,12 @@ protocol QueueSegmentedDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
-class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDelegate {
-
+class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, SegmentedJointDelegate, SongTableDelegate {
     var queueName: String? = nil
     var queueId: String? = nil
     var uid: String? = nil
     var isHost = false
+    var shouldPlayMusic = false
     var shouldHideContents = false
     var isPrivate = false
     var city: String? = nil
@@ -30,7 +30,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     
     @IBOutlet weak var leaveQueueImageView: UIImageView!
     @IBOutlet var songTableView: SongTableView!
-    @IBOutlet var searchIconImageView: UIImageView!
+    
+    @IBOutlet weak var plusIconImageView: UIImageView!
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var numMembersLabel: UILabel!
     @IBOutlet var numSongsLabel: UILabel!
@@ -52,6 +53,8 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
     override func viewDidLoad() {        
         playerView.delegate = playerController
         playerController.queueDelegate = playerView
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.appQueueDelegate = self
         playerController.setupPlayer(queueId: queueId!, isHost: isHost)
         
         setupGestureRecognizers()
@@ -68,11 +71,6 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
             
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if (UIApplication.shared.delegate as! AppDelegate).token == "" {
-            searchIconImageView.isUserInteractionEnabled = false
-        }
-        
         watchLocationDoc()
         setupSongTableView()
     }
@@ -127,9 +125,9 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         globeIcon.addGestureRecognizer(globeTapGesture)
         globeIcon.isUserInteractionEnabled = true
         
-        let searchTap = UITapGestureRecognizer(target: self, action: #selector(self.searchTapped))
-        searchIconImageView.addGestureRecognizer(searchTap)
-        searchIconImageView.isUserInteractionEnabled = true
+        let plusTap = UITapGestureRecognizer(target: self, action: #selector(self.plusTapped))
+        plusIconImageView.addGestureRecognizer(plusTap)
+        plusIconImageView.isUserInteractionEnabled = true
         
         let leaveQueueTap = UITapGestureRecognizer(target: self, action: #selector(self.leaveQueueTapped))
         leaveQueueImageView.addGestureRecognizer(leaveQueueTap)
@@ -179,6 +177,35 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         self.navigateToRoot()
     }
     
+    func updateConnectionStatus(connected: Bool) {
+        if !connected {
+            self.showAppRemoteAlert()
+        }
+    }
+    
+    func updateSessionStatus(connected: Bool) {}
+    
+    // Helper shows app remote not connected alert
+    func showAppRemoteAlert() {
+        let alert = UIAlertController(title: "Spotify could not connect", message: "Open Spotify to Connect", preferredStyle: .alert)
+        // if host has bad app remote and chooses cancel, then they will be directed back to the mapscreen
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+            self.globeTapped()
+        }))
+        alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+            /// start app remote again on retry
+            self.startSession()
+        }))
+        self.present(alert, animated: true)
+    }
+    
+    // start session
+    func startSession() {
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        delegate.startSession(shouldPlayMusic: shouldPlayMusic)
+        delegate.seshDelegate = self
+    }
+    
     @objc func globeTapped() {
         mapDelegate?.update(queueId: queueId, isHost: isHost, privateCode: isPrivate ? self.nameLabel.text : nil, name: !isPrivate ? self.nameLabel.text : nil)
         self.navigateToRoot()
@@ -217,18 +244,31 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         }
     }
     
-    @objc func searchTapped() {
-        queueSegmentedDelegate?.searchTapped(shouldHideContents: !segmentedContainerView.isHidden)
-        if(segmentedContainerView.isHidden) {
-            searchIconImageView.image = UIImage(named: "xIcon")!
-            presentSegmentedContainerViewAnimation()
+    @objc func plusTapped() {
+        if (UIApplication.shared.delegate as? AppDelegate)?.token == "" {
+            let alert = UIAlertController(title: "Open Spotify?", message: "Login to Spotify to Contribute", preferredStyle: .alert)
+                   alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+                    return
+                   }))
+                   alert.addAction(UIAlertAction(title: "Open Spotify", style: .default, handler: { action in
+                       /// start app remote again on retry
+                       self.startSession()
+                   }))
+                   self.present(alert, animated: true)
         } else {
-            if #available(iOS 13.0, *) {
-                searchIconImageView.image = UIImage(systemName: "plus")!
+            queueSegmentedDelegate?.searchTapped(shouldHideContents: !segmentedContainerView.isHidden)
+            if(segmentedContainerView.isHidden) {
+                plusIconImageView.image = UIImage(named: "xIcon")!
+                presentSegmentedContainerViewAnimation()
+            } else {
+                if #available(iOS 13.0, *) {
+                    plusIconImageView.image = UIImage(systemName: "plus")!
+                }
+                dismissSegmentedContainerViewAnimation()
             }
-            dismissSegmentedContainerViewAnimation()
         }
     }
+
     
     func addSongTapped(song: Song) {
         songTableView.voteTapped(isUpvote: true, song: song)
@@ -236,7 +276,7 @@ class QueueViewController: UIViewController, SegmentedJointDelegate, SongTableDe
         self.nextUpLabel.isHidden = false
         self.songTableView.isHidden = false
         if #available(iOS 13.0, *) {
-            searchIconImageView.image = UIImage(systemName: "plus")!
+            plusIconImageView.image = UIImage(systemName: "plus")!
         }
         dismissSegmentedContainerViewAnimation()
     }

@@ -93,7 +93,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         if(self.currZoom > 10){
             getTopQueusInCity(city: city, region: region)
         }else{
-            getTopQueusInState(region: region)
+            getTopQueusInState(region: region, zoom: self.currZoom)
         }
     }
     
@@ -124,9 +124,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         })
     }
     
-    func getTopQueusInState(region: String) {
+    func getTopQueusInState(region: String, zoom: Float) {
+        let queueLimitFromZoom = (1/zoom)*150
         queuesInLocationRef?.remove()
-        queuesInLocationRef = db?.collection("location").whereField("region", isEqualTo: region).limit(to: 10).addSnapshotListener({ (snapshot, error) in
+        queuesInLocationRef = db?.collection("location").whereField("numMembers", isGreaterThan: 0).whereField("region", isEqualTo: region).order(by: "numMembers", descending: true).limit(to: Int(queueLimitFromZoom)).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
                 print("watch location err: ", error!)
                 return

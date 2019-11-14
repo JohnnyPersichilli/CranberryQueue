@@ -135,10 +135,10 @@
                                 </connections>
                             </containerView>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LyX-Sf-sNH" customClass="QueueDetailModal" customModule="CranberryQueue" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="812" width="375" height="127"/>
+                                <rect key="frame" x="0.0" y="812" width="375" height="132"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="127" id="7gN-0p-Tec"/>
+                                    <constraint firstAttribute="height" constant="132" id="7gN-0p-Tec"/>
                                 </constraints>
                             </view>
                             <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p3f-Yz-L3V" customClass="JoinQueueForm" customModule="CranberryQueue" customModuleProvider="target">
@@ -152,7 +152,7 @@
                         <constraints>
                             <constraint firstItem="VLf-l2-j7u" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="2Fi-OW-no7"/>
                             <constraint firstAttribute="trailing" secondItem="LyX-Sf-sNH" secondAttribute="trailing" id="4KP-zd-u5Q"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="LyX-Sf-sNH" secondAttribute="bottom" id="4mx-OM-ud7"/>
+                            <constraint firstAttribute="bottom" secondItem="LyX-Sf-sNH" secondAttribute="bottom" id="4mx-OM-ud7"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="centerY" secondItem="7k1-xL-an5" secondAttribute="centerY" id="BMP-Ev-hlF"/>
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="EuK-Dd-aRw"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="FKM-if-PYx"/>
@@ -522,8 +522,8 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="searchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="166.66666666666666" width="28" height="28"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="plus" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
+                                <rect key="frame" x="316" y="169" width="28" height="24.000000000000014"/>
                                 <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
@@ -573,7 +573,7 @@
                         <outlet property="numMembersLabel" destination="rlb-aE-c6W" id="69g-Cl-boB"/>
                         <outlet property="numSongsLabel" destination="1By-Ce-MQF" id="1Ww-Am-68V"/>
                         <outlet property="playerView" destination="mRc-5P-hj1" id="e8Z-N8-3TO"/>
-                        <outlet property="searchIconImageView" destination="c0c-J5-2qe" id="FdD-tT-slW"/>
+                        <outlet property="plusIconImageView" destination="c0c-J5-2qe" id="57a-kw-mt5"/>
                         <outlet property="segmentedContainerView" destination="wSF-8f-4OK" id="cMj-wP-YJw"/>
                         <outlet property="songTableView" destination="ZLZ-9b-5m8" id="3w7-Kq-bAT"/>
                     </connections>
