@@ -12,6 +12,8 @@ protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
     func likeTapped()
+    func unlikeTapped()
+    func populateLikeIcon(completion: () -> ())
 }
 
 
@@ -99,9 +101,6 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.addGestureRecognizer(skipSongTap)
         skipSongImage.isUserInteractionEnabled = true
         
-        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
-        likeIconImageView.addGestureRecognizer(likeTapGesture)
-        likeIconImageView.isUserInteractionEnabled = true
         
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
@@ -117,6 +116,7 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     @objc func likeTapped() {
+        likeIconImageView.gestureRecognizers?.removeAll()
         if #available(iOS 13.0, *) {
             likeIconImageView.image = UIImage(systemName: "heart.fill")!
             likeIconImageView.tintColor = UIColor.red
@@ -126,21 +126,21 @@ class PlayerView: UIView, PlayerDelegate {
             // Fallback on earlier versions
             return
         }
-        likeIconImageView.gestureRecognizers?.removeAll()
         let unlikeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.unlikeTapped))
         likeIconImageView.addGestureRecognizer(unlikeTapGesture)
         likeIconImageView.isUserInteractionEnabled = true
     }
     
      @objc func unlikeTapped() {
+        likeIconImageView.gestureRecognizers?.removeAll()
         if #available(iOS 13.0, *) {
             likeIconImageView.image = UIImage(systemName: "heart")!
             likeIconImageView.tintColor = UIColor.white
+            delegate?.unlikeTapped()
         } else {
             // Fallback on earlier versions
             return
         }
-        likeIconImageView.gestureRecognizers?.removeAll()
         let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
         likeIconImageView.addGestureRecognizer(likeTapGesture)
         likeIconImageView.isUserInteractionEnabled = true
@@ -165,6 +165,9 @@ class PlayerView: UIView, PlayerDelegate {
         helpLabel.isHidden = true
         inactiveHostLabel.isHidden = true
         let url = URL( string: getURLFrom(state) )
+        delegate?.populateLikeIcon{() -> () in
+            self.populateLikeIconImageView()
+        }
         
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
@@ -176,6 +179,10 @@ class PlayerView: UIView, PlayerDelegate {
             }
         }
         task.resume()
+    }
+    
+    func populateLikeIconImageView() {
+        
     }
     
     func updateSongUI(withInfo info: PlaybackInfo) {

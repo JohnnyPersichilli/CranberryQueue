@@ -18,7 +18,7 @@ protocol PlayerDelegate: class {
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
-    
+
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -38,23 +38,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let index = self.currentUri.index(self.currentUri.startIndex, offsetBy: 13)
         let range = self.currentUri.index(after: index)..<self.currentUri.endIndex
         return String(self.currentUri[range])
-    }
-    
-    func likeTapped() {
-        let id = stripIdFromCurrentUri()!
-        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
-        var request = URLRequest(url: url)
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.httpMethod = "PUT"
-        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            print(response)
-            if let err = error {
-                print(err)
-            }
-        }
-        task.resume()
     }
     
     func playPause(isPaused: Bool){
@@ -104,6 +87,48 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var hostListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
+    
+    func populateLikeIcon(completion: () -> ()) {
+     completion()
+    }
+    
+    func likeTapped() {
+        let id = stripIdFromCurrentUri()!
+        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
+        var request = URLRequest(url: url)
+
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        print(delegate.token)
+        request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "PUT"
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let err = error {
+                print(err)
+            }
+        }
+        task.resume()
+    }
+    
+    func unlikeTapped() {
+        let id = stripIdFromCurrentUri()!
+        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
+        var request = URLRequest(url: url)
+
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        print(delegate.token)
+        request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "DELETE"
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let err = error {
+                print(err)
+            }
+        }
+        task.resume()
+    }
 
     func setupPlayer(queueId: String?, isHost: Bool) {
         let oldQueueId = self.queueId
