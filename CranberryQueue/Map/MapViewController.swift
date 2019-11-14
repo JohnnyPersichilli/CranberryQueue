@@ -51,6 +51,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
     @IBOutlet var bottomDetailModalConstraint: NSLayoutConstraint!
     
+    @IBOutlet var helpIconImageView: UIImageView!
+    
+    @IBOutlet weak var helpView: UIView!
+    
     // Personal delegates
     weak var controllerMapDelegate: ControllerMapDelegate?
     
@@ -97,6 +101,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let settingsTap = UITapGestureRecognizer(target: self, action: #selector(settingsTapped))
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
+        
+        let helpTap = UITapGestureRecognizer(target: self, action: #selector(helpTapped))
+        helpIconImageView.addGestureRecognizer(helpTap)
+        helpIconImageView.isUserInteractionEnabled = true
         
         let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinQueue as () -> ()))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
@@ -505,6 +513,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let vc = storyBoard.instantiateViewController(withIdentifier: "settingsVC") as! SettingsViewController
         vc.mapDelegate = self
         self.present(vc, animated:true, completion:nil)
+    }
+    
+    // Called when help icon is tapped
+    @objc func helpTapped() {
+        
+        helpView.isHidden = false
+        
     }
     
     // Called when logout is tapped from settings # SettingsMapDelegate
