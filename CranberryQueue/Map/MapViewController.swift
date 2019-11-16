@@ -603,7 +603,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when logout is tapped from settings # SettingsMapDelegate
     func logoutTapped() {
-        loginContainer.isHidden = false
+        leaveCurrentQueue()
         isPremium = false
         if isHost {
             (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
