@@ -91,8 +91,7 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.image = nil
         
         inactiveHostLabel.isHidden = true
-        self.likeIconImageView.isHidden = true
-
+        
         setupGestureRecognizers()
     }
     
@@ -100,6 +99,7 @@ class PlayerView: UIView, PlayerDelegate {
         let skipSongTap = UITapGestureRecognizer(target: self, action: #selector(skipSongTapped))
         skipSongImage.addGestureRecognizer(skipSongTap)
         skipSongImage.isUserInteractionEnabled = true
+        
         
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
@@ -158,35 +158,6 @@ class PlayerView: UIView, PlayerDelegate {
         }
         
         return imageURL
-    }
-    
-    func initLikeUI(liked: Bool) {
-        DispatchQueue.main.async {
-            self.likeIconImageView.gestureRecognizers?.removeAll()
-            if liked {
-              let unlikeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.unlikeTapped))
-                self.likeIconImageView.addGestureRecognizer(unlikeTapGesture)
-                self.likeIconImageView.isUserInteractionEnabled = true
-              if #available(iOS 13.0, *) {
-                self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
-              } else {
-                  // Fallback on earlier versions
-              }
-                self.likeIconImageView.tintColor = UIColor.red
-                self.likeIconImageView.isHidden = false
-            } else {
-              let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
-                self.likeIconImageView.addGestureRecognizer(likeTapGesture)
-                self.likeIconImageView.isUserInteractionEnabled = true
-              if #available(iOS 13.0, *) {
-                self.likeIconImageView.image = UIImage(systemName: "heart")!
-              } else {
-                  // Fallback on earlier versions
-              }
-                self.likeIconImageView.tintColor = UIColor.white
-                self.likeIconImageView.isHidden = false
-            }
-        }
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
@@ -267,7 +238,6 @@ class PlayerView: UIView, PlayerDelegate {
         timeLabel.text = nil
         helpLabel.isHidden = false
         inactiveHostLabel.isHidden = true
-        likeIconImageView.isHidden = true
     }
 
 }

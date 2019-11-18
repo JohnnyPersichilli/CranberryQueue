@@ -14,7 +14,6 @@ protocol PlayerDelegate: class {
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool)
-    func initLikeUI(liked: Bool)
     func clear()
 }
 
@@ -263,7 +262,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
 
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                if let httpResponse = response as? HTTPURLResponse {
-                   //print(httpResponse.statusCode) ~> 200 OK
+                   print("STATUS")
+                   print(httpResponse.statusCode)
                }
                 guard let data = data else {
                      return
@@ -273,11 +273,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                     let jsonRes = try JSONSerialization.jsonObject(with: data, options: []) as! NSArray
                     let value = jsonRes.firstObject as! Int
                     if value == 1 {
-                        self.mapDelegate?.initLikeUI(liked: true)
-                        self.queueDelegate?.initLikeUI(liked: true)
+                        print("contains like")
                     } else {
-                        self.mapDelegate?.initLikeUI(liked: false)
-                        self.queueDelegate?.initLikeUI(liked: false)
+                        print("does not contain like")
                     }
                 }
                 catch {
