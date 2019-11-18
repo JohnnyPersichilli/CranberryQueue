@@ -68,11 +68,11 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
     }
     
     func addSongTapped(song: Song) {
-        var newSong = self.songToJSON(song: song)
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
             "queueId": self.queueId!
             ], completion: { (val) in
+                var newSong = self.songToJSON(song: song)
                 newSong["docID"] = ref!.documentID
                 self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
                 
@@ -84,6 +84,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
                     if snap.documents.count == 0 {
                         newSong["next"] = true
                     }
+                    newSong["timestamp"] = FieldValue.serverTimestamp()
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
                     })
@@ -99,7 +100,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             "docID": song.docID,
             "votes": 0,
             "uri": song.uri,
-            "next": song.next
+            "next": song.next,
         ]
     }
     
