@@ -141,11 +141,21 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc func logoutTapped() {
-        mapDelegate?.logoutTapped()
-        setDefaultInfo()
-        self.presentingViewController?.dismiss(animated:true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
+        let alert = UIAlertController(title: "Are you sure want to sign out of Spotify?", message: "Signing out of Spotify will delete or leave your current queue.", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Sign Out", style: .default, handler: { action in
+            self.mapDelegate?.logoutTapped()
+            self.setDefaultInfo()
+            self.presentingViewController?.dismiss(animated:true, completion: {
+                self.navigationController?.popToRootViewController(animated: true)
+            })
+         }
+        ))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+        }
+        ))
+        self.present(alert, animated: true)
     }
     
     @objc func globeTapped() {
