@@ -592,9 +592,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
 
     }
     
+    func playbackDocToPlaylist(doc: [String:Any]) -> [String:Any]{
+        return [
+            "artist": doc["artist"],
+            "imageURL": doc["imageURL"],
+            "name": doc["name"],
+            "uri": doc["uri"]
+        ]
+    }
+    
     // Called when add song icon is tapped in the Queue Detail Modal
     @objc func addSongFromDetail() {
-        var newSong = queueDetailModal.currPlaybackDoc
+        var newSong = playbackDocToPlaylist(doc: queueDetailModal.currPlaybackDoc)
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
             "queueId": self.queueId!
@@ -607,6 +616,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                     }
                     if snap.documents.count == 0 {
                         newSong["next"] = true
+                        self.playerController.self.enqueueSongWith(newSong["uri"] as! String)
+                    }else{
+                        newSong["next"] = false
                     }
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
