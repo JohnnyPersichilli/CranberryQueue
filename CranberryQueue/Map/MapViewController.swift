@@ -523,15 +523,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Helper removes user from their current queue or deletes the queue if they are the host
-    func leaveCurrentQueue() {
-        guard let queueId = queueId else {
-            return
-        }
-        if isHost {
-            self.db?.collection("location").document(queueId).delete()
-            return
-        }
+    func removeUserHelper() {
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
         var request = URLRequest(url: url)
         let dictionary = ["queueId":queueId,"uid":self.uid]
@@ -546,6 +538,20 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
         task.resume()
+    }
+    
+    // Helper removes user from their current queue or deletes the queue if they are the host
+    func leaveCurrentQueue() {
+        guard let queueId = queueId else {
+            return
+        }
+        if isHost {
+            self.db?.collection("location").document(queueId).delete()
+            removeUserHelper()
+            return
+        }else{
+            removeUserHelper()
+        }
     }
     
     // Checks if user is host of any queues by querying contributor table
