@@ -27,7 +27,6 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     var isPrivate = false
     var city: String? = nil
     var region: String? = nil
-    var didLikeSong: Bool? = false
     
     @IBOutlet weak var leaveQueueImageView: UIImageView!
     @IBOutlet var songTableView: SongTableView!

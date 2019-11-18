@@ -35,7 +35,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
     }
     
-    func stripIdFromCurrentUri() -> String? {
+    func getIdFromCurrentUri() -> String? {
         let index = self.currentUri.index(self.currentUri.startIndex, offsetBy: 13)
         let range = self.currentUri.index(after: index)..<self.currentUri.endIndex
         return String(self.currentUri[range])
@@ -90,7 +90,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     static let sharedInstance = PlayerController()
     
     func likeTapped() {
-        let id = stripIdFromCurrentUri()!
+        let id = getIdFromCurrentUri()!
         let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
@@ -106,7 +106,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func unlikeTapped() {
-        let id = stripIdFromCurrentUri()!
+        let id = getIdFromCurrentUri()!
         let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
@@ -254,7 +254,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     }
     
     func populateLikeIcon() {
-        if let id = stripIdFromCurrentUri() {
+        if let id = getIdFromCurrentUri() {
             let url = URL(string: "https://api.spotify.com/v1/me/tracks/contains?ids=\(id)")!
             var request = URLRequest(url: url)
             request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
