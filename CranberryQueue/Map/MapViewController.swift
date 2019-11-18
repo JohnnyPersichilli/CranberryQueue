@@ -108,6 +108,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         queueDetailModal.closeIconImageView.addGestureRecognizer(closeModalTap)
         queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
         
+        let addSongFromDetailTap = UITapGestureRecognizer(target: self, action: #selector(addSongFromDetail))
+        queueDetailModal.addIconImageView.addGestureRecognizer(addSongFromDetailTap)
+        queueDetailModal.addIconImageView.isUserInteractionEnabled = true
+        
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
         privateSearchIconImageView.addGestureRecognizer(searchTap)
         privateSearchIconImageView.isUserInteractionEnabled = true
@@ -305,7 +309,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
-    
     // Helper to close create queue modal
     @objc func closeCreateForm() {
         controllerMapDelegate?.setQueue(nil)
@@ -347,7 +350,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField.text == nil || textField.text == "" {
             return false
         }
-
     
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
@@ -588,6 +590,36 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
 
+    }
+    
+    // Called when add song icon is tapped in the Queue Detail Modal
+    @objc func addSongFromDetail() {
+        var newSong = queueDetailModal.currPlaybackDoc
+        var ref: DocumentReference? = nil
+        ref = db?.collection("song").addDocument(data: [
+            "queueId": self.queueId!
+            ], completion: { (val) in
+                newSong["docID"] = ref!.documentID
+                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
+                    guard let snap = snapshot else {
+                        print(error!)
+                        return
+                    }
+                    if snap.documents.count == 0 {
+                        newSong["next"] = true
+                    }
+                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
+                            let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { action in
+                                    
+                                 }
+                                ))
+                                self.present(alert, animated: true)
+                            })
+                        })
+                })
+        })
     }
     
     // Called when settings icon is tapped
