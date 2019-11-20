@@ -61,17 +61,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
 
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
-        if let curLoc = map?.myLocation {
-            curCoords = curLoc.coordinate
-            let curCoords2D = [
-                "lat": curLoc.coordinate.latitude,
-                "long": curLoc.coordinate.longitude
-            ]
-            getGeoCode(withLocation: curCoords2D){ city, region in
-                self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
-                self.watchLocationQueues(city: city, region: region)
-            }
-        }
         mapControllerDelegate?.toggleDetailModal(withData: marker.userData as! CQLocation)
         return true
     }
