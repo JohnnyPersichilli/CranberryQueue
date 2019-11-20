@@ -523,7 +523,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    func removeUserHelper() {
+    func removeUser() {
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
         var request = URLRequest(url: url)
         let dictionary = ["queueId":queueId,"uid":self.uid]
@@ -547,11 +547,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
         if isHost {
             self.db?.collection("location").document(queueId).delete()
-            removeUserHelper()
             return
-        }else{
-            removeUserHelper()
         }
+        removeUser()
     }
     
     // Checks if user is host of any queues by querying contributor table

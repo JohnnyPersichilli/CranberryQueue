@@ -152,9 +152,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
          }
         ))
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-        }
-        ))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         self.present(alert, animated: true)
     }
     
