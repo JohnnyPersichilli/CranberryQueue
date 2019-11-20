@@ -25,7 +25,6 @@
 		4C55CCBE232CB8C00059C898 /* CustomObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C55CCBD232CB8C00059C898 /* CustomObjects.swift */; };
 		4C8469D02357C1BF0098AE59 /* JoinQueueForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */; };
 		4C8469D22357C1D40098AE59 /* JoinQueueForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */; };
-		4C94F6662370B961009843FB /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6652370B961009843FB /* SearchTableView.swift */; };
 		4C94F6682370CF67009843FB /* PlaylistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C94F6672370CF67009843FB /* PlaylistViewController.swift */; };
 		4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */; };
 		4CA5BC05232D4B8D007F8D38 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BC04232D4B8D007F8D38 /* SearchController.swift */; };
@@ -43,6 +42,7 @@
 		6E63198523667C180031FA2C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E63198423667C180031FA2C /* Constants.swift */; };
 		6E8F84F32339C443005C23A9 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8F84F22339C443005C23A9 /* LoginController.swift */; };
 		95B7D4FB1BC6065321205A0B /* Pods_CranberryQueue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41B22B05D79F3560668D2715 /* Pods_CranberryQueue.framework */; };
+		BA3A370D237E17720013E512 /* HelpController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA3A370C237E17720013E512 /* HelpController.swift */; };
 		BA4DA89423426D7700DCE8E3 /* activityIndicatorPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +86,7 @@
 		4CFD140923595639008F0A4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6E63198423667C180031FA2C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		6E8F84F22339C443005C23A9 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		BA3A370C237E17720013E512 /* HelpController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpController.swift; sourceTree = "<group>"; };
 		BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = activityIndicatorPresenter.swift; sourceTree = "<group>"; };
 		C11A89E70D668D8D136B8985 /* Pods-CranberryQueue.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.release.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.release.xcconfig"; sourceTree = "<group>"; };
 		FF8680CDC734AC1CC305B32B /* Pods-CranberryQueue.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CranberryQueue.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CranberryQueue/Pods-CranberryQueue.debug.xcconfig"; sourceTree = "<group>"; };
@@ -191,6 +192,7 @@
 		4CED2E07232DB0F6008C6DAA /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				BA3A370C237E17720013E512 /* HelpController.swift */,
 				6E8F84F22339C443005C23A9 /* LoginController.swift */,
 				4C55CCBD232CB8C00059C898 /* CustomObjects.swift */,
 				BA4DA89323426D7700DCE8E3 /* activityIndicatorPresenter.swift */,
@@ -405,6 +407,7 @@
 				6E63198523667C180031FA2C /* Constants.swift in Sources */,
 				4C4CD3DB232C959100F17BB8 /* createQueueForm.swift in Sources */,
 				4CBFCF5C236672410087B66F /* SegmentedViewController.swift in Sources */,
+				BA3A370D237E17720013E512 /* HelpController.swift in Sources */,
 				4C4CD3D9232C6C5B00F17BB8 /* PlayerController.swift in Sources */,
 				1CAA4622236FBD7D00D34440 /* SearchTableView.swift in Sources */,
 				4CA5BC03232D48D0007F8D38 /* SearchTableViewCell.swift in Sources */,

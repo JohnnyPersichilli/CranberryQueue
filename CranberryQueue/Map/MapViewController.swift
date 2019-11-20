@@ -19,7 +19,8 @@ protocol ControllerMapDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
+class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, HelpMapDelegate {
+    
 
     // Labels
     @IBOutlet var cityLabel: UILabel!
@@ -33,13 +34,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @IBOutlet weak var createIconImageView: UIImageView!
     @IBOutlet weak var privateSearchIconImageView: UIImageView!
     @IBOutlet weak var backToQueueIconImageView: UIImageView!
+    @IBOutlet weak var helpIconImageView: UIImageView!
     
     // Forms
     @IBOutlet var createQueueForm: createQueueForm!
     @IBOutlet var joinQueueForm: JoinQueueForm!
 
-    // Login Container
+    // Login and Help Containers
     @IBOutlet weak var loginContainer: UIView!
+    
+    @IBOutlet weak var helpContainer: UIView!
+    
 
     // Playback view and controller
     @IBOutlet var playerView: PlayerView!
@@ -100,6 +105,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
+        let helpTap = UITapGestureRecognizer(target: self, action: #selector(helpTapped))
+        helpIconImageView.addGestureRecognizer(helpTap)
+        helpIconImageView.isUserInteractionEnabled = true
+        
         let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue as () -> ()))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
@@ -127,6 +136,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
         playerView.addGestureRecognizer(playerHomeTap)
         playerView.isUserInteractionEnabled = true
+        
+        let helpCloseTap = UITapGestureRecognizer(target: self, action: #selector(helpCloseTapped))
+        helpContainer.addGestureRecognizer(helpCloseTap)
+        helpContainer.isUserInteractionEnabled = true
+        
     }
     
     func setupFirebase() {
@@ -221,6 +235,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     @objc func recenterMapTapped() {
         self.controllerMapDelegate?.recenterMap()
+    }
+    
+    @objc func helpCloseTapped() {
+        self.helpContainer.isHidden = true
     }
     
     // Called when "+" icon tapped
@@ -588,6 +606,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
 
+    }
+    
+    // Called when help icon is tapped
+    @objc func helpTapped() {
+        helpContainer.isHidden = false
+        print("help tapped ran")
     }
     
     // Called when settings icon is tapped
