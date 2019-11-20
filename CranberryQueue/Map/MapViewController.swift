@@ -616,7 +616,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                     }
                     if snap.documents.count == 0 {
                         newSong["next"] = true
-                        self.playerController.self.enqueueSongWith(newSong["uri"] as! String)
+                        self.playerController.enqueueSongWith(newSong["uri"] as! String)
                     }else{
                         newSong["next"] = false
                     }
