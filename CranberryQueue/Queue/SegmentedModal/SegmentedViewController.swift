@@ -71,24 +71,15 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
             "queueId": self.queueId!
-            ], completion: { (val) in
-                var newSong = self.songToJSON(song: song)
-                newSong["docID"] = ref!.documentID
-                self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
-                
-                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
-                    guard let snap = snapshot else {
-                        print(error!)
-                        return
-                    }
-                    if snap.documents.count == 0 {
-                        newSong["next"] = true
-                    }
-                    newSong["timestamp"] = FieldValue.serverTimestamp()
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
-                    })
-                })
+        ], completion: { (val) in
+            var newSong = self.songToJSON(song: song)
+            newSong["docID"] = ref!.documentID
+            newSong["timestamp"] = FieldValue.serverTimestamp()
+            self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
+            
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                ref?.collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+            })
         })
     }
     
