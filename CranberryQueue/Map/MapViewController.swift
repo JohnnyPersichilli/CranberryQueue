@@ -594,10 +594,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     func playbackDocToPlaylist(doc: [String:Any]) -> [String:Any]{
         return [
-            "artist": doc["artist"],
-            "imageURL": doc["imageURL"],
-            "name": doc["name"],
-            "uri": doc["uri"]
+            "artist": doc["artist"]!,
+            "imageURL": doc["imageURL"]!,
+            "name": doc["name"]!,
+            "uri": doc["uri"]!
         ]
     }
     
@@ -623,11 +623,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                     self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
                             let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
-                                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { action in
-                                    
-                                 }
-                                ))
-                                self.present(alert, animated: true)
+                            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler:nil
+                            ))
+                            self.present(alert, animated: true)
                             })
                         })
                 })
