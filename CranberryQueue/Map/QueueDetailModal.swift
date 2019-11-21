@@ -31,6 +31,7 @@ class QueueDetailModal: UIView {
     
     var currentQueue: CQLocation? = nil
     var inRange: Bool = false
+    var currPlaybackDoc: [String: Any] = [:]
         
     var distance: Double = 0 {
         didSet {
@@ -98,6 +99,7 @@ class QueueDetailModal: UIView {
     }
     
     func updateWithPlaybackDoc(doc: [String:Any]) {
+        currPlaybackDoc = doc
         let currSong = doc["name"] as? String ?? ""
         let currArtist = doc["artist"] as? String ?? ""
         let songImage = doc["imageURL"] as? String ?? ""
