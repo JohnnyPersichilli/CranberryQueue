@@ -614,22 +614,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             "queueId": queueId
             ], completion: { (val) in
                 newSong["docID"] = ref!.documentID
-                self.db?.collection("playlist").document(queueId).collection("songs").getDocuments(completion: { (snapshot, error) in
-                    guard let snap = snapshot else {
-                        print(error!)
-                        return
-                    }
-                    if snap.documents.count == 0 {
-                        newSong["next"] = true
-                    }
-                    self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
-                            let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil
-                            ))
-                            self.present(alert, animated: true)
-                            })
-                        })
+                self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                    self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
+                        let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil))
+                        self.present(alert, animated: true)
+                    })
                 })
         })
     }
