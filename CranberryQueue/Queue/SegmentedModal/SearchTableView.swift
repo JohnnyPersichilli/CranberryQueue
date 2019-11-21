@@ -8,10 +8,15 @@
 
 import UIKit
 
+protocol TableSegmentedDelegate: class {
+    func addSongTapped(song: Song)
+    func requestAdditionalData(fromIndex index: Int, limit: Int)
+}
+
 class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
 
     var songs = [Song]()
-    weak var controllerDelegate: SegmentedJointDelegate?
+    weak var controllerDelegate: TableSegmentedDelegate?
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
           return 1
@@ -70,6 +75,13 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
 
           return cell
       }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let endIndex = songs.count - 1
+        if indexPath.section == endIndex {
+            controllerDelegate?.requestAdditionalData(fromIndex: endIndex, limit: 20)
+        }
+    }
     
     func clear() {
         songs = []
