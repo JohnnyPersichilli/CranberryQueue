@@ -524,6 +524,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     func removeUser() {
+        guard let queueId = queueId else {
+            return
+        }
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
         var request = URLRequest(url: url)
         let dictionary = ["queueId":queueId,"uid":self.uid]
@@ -547,6 +550,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
         if isHost {
             self.db?.collection("location").document(queueId).delete()
+            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
             return
         }
         removeUser()
@@ -609,10 +613,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func logoutTapped() {
         leaveCurrentQueue()
         isPremium = false
-        if isHost {
-            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
-            self.playerController.setupPlayer(queueId: nil, isHost: false)
-        }
+        (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+        self.playerController.setupPlayer(queueId: nil, isHost: false)
+        self.queueId = nil
         isHost = false
         shouldPlayMusic = false
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
