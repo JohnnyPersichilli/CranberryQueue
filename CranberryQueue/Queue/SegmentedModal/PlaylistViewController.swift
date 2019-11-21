@@ -56,7 +56,6 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
             )
         ]
         getPlaylists(fromIndex: 0, limit: 20, completion: { playlists in
-            print("we tried and got \(playlists.count)")
             self.playlists += playlists
             DispatchQueue.main.async {
                 self.playlistTableView.reloadData()
