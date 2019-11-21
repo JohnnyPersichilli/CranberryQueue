@@ -605,13 +605,16 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when add song icon is tapped in the Queue Detail Modal
     @objc func addSongFromDetail() {
+        guard let queueId = queueId else {
+            return
+        }
         var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
-            "queueId": self.queueId!
+            "queueId": queueId
             ], completion: { (val) in
                 newSong["docID"] = ref!.documentID
-                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
+                self.db?.collection("playlist").document(queueId).collection("songs").getDocuments(completion: { (snapshot, error) in
                     guard let snap = snapshot else {
                         print(error!)
                         return
@@ -619,7 +622,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                     if snap.documents.count == 0 {
                         newSong["next"] = true
                     }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                    self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
                         self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
                             let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil
