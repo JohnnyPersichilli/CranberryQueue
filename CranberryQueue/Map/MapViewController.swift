@@ -592,43 +592,29 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
 
     }
     
-    func playbackDocToPlaylist(doc: [String:Any]) -> [String:Any]{
+    func playbackDocToSongDoc(doc: [String:Any]) -> [String:Any] {
         return [
             "artist": doc["artist"]!,
             "imageURL": doc["imageURL"]!,
             "name": doc["name"]!,
-            "uri": doc["uri"]!
+            "uri": doc["uri"]!,
+            "votes": 0,
+            "next": false
         ]
     }
     
     // Called when add song icon is tapped in the Queue Detail Modal
     @objc func addSongFromDetail() {
-        var newSong = playbackDocToPlaylist(doc: queueDetailModal.currPlaybackDoc)
+        var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
             "queueId": self.queueId!
-            ], completion: { (val) in
-                newSong["docID"] = ref!.documentID
-                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
-                    guard let snap = snapshot else {
-                        print(error!)
-                        return
-                    }
-                    if snap.documents.count == 0 {
-                        newSong["next"] = true
-                        self.playerController.enqueueSongWith(newSong["uri"] as! String)
-                    }else{
-                        newSong["next"] = false
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
-                            let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler:nil
-                            ))
-                            self.present(alert, animated: true)
-                            })
-                        })
+        ], completion: { (val) in
+            newSong["docID"] = ref!.documentID
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
                 })
+            })
         })
     }
     
