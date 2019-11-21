@@ -134,6 +134,15 @@
                                     <segue destination="jvF-CY-HCu" kind="embed" id="f2r-Al-LjY"/>
                                 </connections>
                             </containerView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Join Private Queue - " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aw2-wc-xsV" userLabel="Settings -">
+                                <rect key="frame" x="107" y="395" width="161" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="CUQ-qb-9fR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="highlightedColor" cocoaTouchSystemColor="lightTextColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -1572,6 +1581,7 @@
                             <constraint firstItem="qyA-19-cKx" firstAttribute="top" secondItem="eFv-lv-mPr" secondAttribute="topMargin" constant="12" id="opf-V6-CEm"/>
                             <constraint firstAttribute="bottom" secondItem="dM8-Es-W9B" secondAttribute="bottom" constant="315" id="z8K-UD-kmO"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="aZt-61-K9x"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gYv-iM-j7g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
