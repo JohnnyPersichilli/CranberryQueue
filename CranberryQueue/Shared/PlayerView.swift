@@ -114,35 +114,32 @@ class PlayerView: UIView, PlayerDelegate {
         delegate?.swiped()
     }
     
-    @objc func likeTapped() {
-        likeIconImageView.gestureRecognizers?.removeAll()
-        if #available(iOS 13.0, *) {
-            likeIconImageView.image = UIImage(systemName: "heart.fill")!
-            likeIconImageView.tintColor = UIColor.red
-            delegate?.likeTapped()
-            
+     @objc func likeIconTapped() {
+        // an likeImageView tag of 0 means that it is currently not clicked / hollow like button
+        if likeIconImageView.tag == 0 {
+            // set the heart to be filled
+            if #available(iOS 13.0, *) {
+                likeIconImageView.image = UIImage(systemName: "heart.fill")!
+                likeIconImageView.tintColor = UIColor.red
+                // set the tag to be in the liked state
+                likeIconImageView.tag = 1
+                delegate?.likeTapped()
+            } else {
+                // Fallback on earlier versions
+                return
+            }
         } else {
-            // Fallback on earlier versions
-            return
+            if #available(iOS 13.0, *) {
+                likeIconImageView.image = UIImage(systemName: "heart")!
+                likeIconImageView.tintColor = UIColor.white
+                // set the tag to be in the hollow state
+                likeIconImageView.tag = 0
+                delegate?.unlikeTapped()
+            } else {
+                // Fallback on earlier versions
+                return
+            }
         }
-        let unlikeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.unlikeTapped))
-        likeIconImageView.addGestureRecognizer(unlikeTapGesture)
-        likeIconImageView.isUserInteractionEnabled = true
-    }
-    
-     @objc func unlikeTapped() {
-        likeIconImageView.gestureRecognizers?.removeAll()
-        if #available(iOS 13.0, *) {
-            likeIconImageView.image = UIImage(systemName: "heart")!
-            likeIconImageView.tintColor = UIColor.white
-            delegate?.unlikeTapped()
-        } else {
-            // Fallback on earlier versions
-            return
-        }
-        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
-        likeIconImageView.addGestureRecognizer(likeTapGesture)
-        likeIconImageView.isUserInteractionEnabled = true
      }
     
     //Same function as player controller
@@ -163,28 +160,33 @@ class PlayerView: UIView, PlayerDelegate {
     func initLikeUI(liked: Bool) {
         DispatchQueue.main.async {
             self.likeIconImageView.gestureRecognizers?.removeAll()
+            let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeIconTapped))
+            self.likeIconImageView.addGestureRecognizer(likeTapGesture)
+            self.likeIconImageView.isUserInteractionEnabled = true
+            
+            // if the incoming song is already in your library
             if liked {
-              let unlikeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.unlikeTapped))
-                self.likeIconImageView.addGestureRecognizer(unlikeTapGesture)
-                self.likeIconImageView.isUserInteractionEnabled = true
-              if #available(iOS 13.0, *) {
-                self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
-              } else {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
+                    self.likeIconImageView.tintColor = UIColor.red
+                    //set the tag to the liked state
+                    self.likeIconImageView.tag = 1
+                    self.likeIconImageView.isHidden = false
+                } else {
                   // Fallback on earlier versions
-              }
-                self.likeIconImageView.tintColor = UIColor.red
-                self.likeIconImageView.isHidden = false
+                }
+                
             } else {
-              let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeTapped))
-                self.likeIconImageView.addGestureRecognizer(likeTapGesture)
-                self.likeIconImageView.isUserInteractionEnabled = true
-              if #available(iOS 13.0, *) {
-                self.likeIconImageView.image = UIImage(systemName: "heart")!
-              } else {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart")!
+                    self.likeIconImageView.tintColor = UIColor.white
+                    //set the tag to the hollow state
+                    self.likeIconImageView.tag = 0
+                    self.likeIconImageView.isHidden = false
+                } else {
                   // Fallback on earlier versions
-              }
-                self.likeIconImageView.tintColor = UIColor.white
-                self.likeIconImageView.isHidden = false
+                }
+                
             }
         }
     }
