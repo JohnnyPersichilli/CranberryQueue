@@ -14,7 +14,6 @@ protocol PlayerControllerDelegate: class {
     func toggleLikeRequest()
 }
 
-
 class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var contentView: UIView!
     
@@ -86,7 +85,6 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
      @objc func likeIconTapped() {
-        // an likeImageView tag of 0 means that it is currently not clicked / hollow like button
         delegate?.toggleLikeRequest()
      }
     
@@ -101,7 +99,6 @@ class PlayerView: UIView, PlayerDelegate {
             print("no track image in JSON file for:", playerState.track.name)
             imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
         }
-        
         return imageURL
     }
     
@@ -131,9 +128,7 @@ class PlayerView: UIView, PlayerDelegate {
             skipSongImage.image = nil
             playPauseImage.isUserInteractionEnabled = false
             skipSongImage.isUserInteractionEnabled = false
-            
         }
-
     }
     
     func updateLikeUI(liked: Bool) {
@@ -143,8 +138,6 @@ class PlayerView: UIView, PlayerDelegate {
                 if #available(iOS 13.0, *) {
                     self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
                     self.likeIconImageView.tintColor = UIColor.red
-                    //set the tag to the liked state
-
                     self.likeIconImageView.isHidden = false
                 } else {
                   // Fallback on earlier versions
@@ -154,7 +147,6 @@ class PlayerView: UIView, PlayerDelegate {
                 if #available(iOS 13.0, *) {
                     self.likeIconImageView.image = UIImage(systemName: "heart")!
                     self.likeIconImageView.tintColor = UIColor.white
-                    //set the tag to the hollow state
                     self.likeIconImageView.isHidden = false
                 } else {
                   // Fallback on earlier versions
@@ -180,7 +172,6 @@ class PlayerView: UIView, PlayerDelegate {
         }
         task.resume()
     }
-    
     
     func updateSongUI(withInfo info: PlaybackInfo) {
         helpLabel.isHidden = true
