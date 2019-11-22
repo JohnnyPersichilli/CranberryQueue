@@ -255,7 +255,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 guard let data = data else {
                      return
                 }
-
                 do {
                     let jsonRes = try JSONSerialization.jsonObject(with: data, options: []) as! NSArray
                     let value = jsonRes.firstObject as! Int
