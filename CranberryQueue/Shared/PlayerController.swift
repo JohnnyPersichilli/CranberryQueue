@@ -19,7 +19,6 @@ protocol PlayerDelegate: class {
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
-
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
