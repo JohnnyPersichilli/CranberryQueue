@@ -202,7 +202,7 @@ class PlayerView: UIView, PlayerDelegate {
                 }else{
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
                 }
-                
+                self.inactiveHostLabel.isHidden = false
             }
             return
         }
@@ -225,8 +225,6 @@ class PlayerView: UIView, PlayerDelegate {
         albumImageView.image = nil
         titleLabel.text = nil
         timeLabel.text = nil
-        helpLabel.isHidden = false
-        inactiveHostLabel.isHidden = true
         likeIconImageView.isHidden = true
     }
 }
