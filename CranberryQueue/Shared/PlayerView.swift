@@ -16,7 +16,8 @@ protocol PlayerControllerDelegate: class {
 class PlayerView: UIView, PlayerDelegate {
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
         if(isHost){
-            bottomGuestTimeLabelConstraint.constant = 7.5
+            titleLabel.trailingAnchor.constraint(equalTo: playPauseImage.trailingAnchor, constant: 8).isActive = false
+            timeLabel.trailingAnchor.constraint(equalTo: playPauseImage.trailingAnchor, constant: 8).isActive = false
             self.isPaused = isPaused
             skipSongImage.image = UIImage(named: "ios-skip-forward-white")
             if(isPaused){
@@ -35,14 +36,13 @@ class PlayerView: UIView, PlayerDelegate {
             playPauseImage.isUserInteractionEnabled = true
             skipSongImage.isUserInteractionEnabled = true
         }else{
-            bottomGuestTimeLabelConstraint.constant = 25
+            titleLabel.trailingAnchor.constraint(equalTo: playPauseImage.trailingAnchor, constant: 8).isActive = true
+            timeLabel.trailingAnchor.constraint(equalTo: playPauseImage.trailingAnchor, constant: 8).isActive = true
             playPauseImage.image = nil
             skipSongImage.image = nil
             playPauseImage.isUserInteractionEnabled = false
             skipSongImage.isUserInteractionEnabled = false
-            
         }
-
     }
     
     
@@ -55,12 +55,9 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var timeLabel: UILabel!
     
     @IBOutlet var helpLabel: UILabel!
-    @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
-    @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
-    
-    
+    @IBOutlet weak var likedSongImage: UIImageView!
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -86,8 +83,7 @@ class PlayerView: UIView, PlayerDelegate {
         timeLabel.text = nil
         playPauseImage.image = nil
         skipSongImage.image = nil
-        
-        inactiveHostLabel.isHidden = true
+        likedSongImage.image = nil
         
         setupGestureRecognizers()
     }
@@ -126,8 +122,6 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
-        helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
         let url = URL( string: getURLFrom(state) )
         
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
@@ -135,24 +129,34 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
+                if #available(iOS 13.0, *) {
+                    self.likedSongImage.image = UIImage(systemName: "heart")
+                } else {
+                    //can import non system icon here if we decide to release for < iOS 13
+                }
                 self.titleLabel.text = state.track.name + " - " + state.track.artist.name
                 self.albumImageView.image = UIImage(data: data)
+                self.helpLabel.isHidden = true
             }
         }
         task.resume()
     }
     
     func updateSongUI(withInfo info: PlaybackInfo) {
-        helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
         let url = URL(string: info.imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
+                if #available(iOS 13.0, *) {
+                    self.likedSongImage.image = UIImage(systemName: "heart")
+                } else {
+                    //can import non system icon here if we decide to release for < iOS 13
+                }
                 self.titleLabel.text = info.name + " - " + info.artist
                 self.albumImageView.image = UIImage(data: data)
+                self.helpLabel.isHidden = true
             }
         }
         task.resume()
@@ -165,19 +169,17 @@ class PlayerView: UIView, PlayerDelegate {
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
-                self.inactiveHostLabel.isHidden = false
+                self.helpLabel.isHidden = true
                 self.playPauseImage.image = nil
                 self.skipSongImage.image = nil
-                self.albumImageView.image = nil
-                self.titleLabel.text = nil
-                self.timeLabel.text = nil
-                self.helpLabel.isHidden = true
-                if(posMinutes == durMinutes){
-                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
+                //1 hour = 1000msec * 60sec * 60min
+                if( position - duration > (60*60*1000)){
+                    self.timeLabel.text = "Host has been inactive for over an hour"
+                }else if(posMinutes == durMinutes){
+                    self.timeLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
                 }else{
-                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
+                    self.timeLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
                 }
-                
             }
             return
         }
@@ -201,7 +203,7 @@ class PlayerView: UIView, PlayerDelegate {
         titleLabel.text = nil
         timeLabel.text = nil
         helpLabel.isHidden = false
-        inactiveHostLabel.isHidden = true
+        likedSongImage.image = nil
     }
 
 }

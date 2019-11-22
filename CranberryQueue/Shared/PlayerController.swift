@@ -298,10 +298,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             }
             let info = self.playbackJsonToInfo(json: contents)
             
-            
-            self.mapDelegate?.updateSongUI(withInfo: info)
-            self.queueDelegate?.updateSongUI(withInfo: info)
-            self.duration = info.duration
             if (Int(Date().timeIntervalSince1970) - info.timestamp) < 0 {
                  self.position = info.position
             } else {
@@ -316,6 +312,12 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             else {
                 self.runTimer()
             }
+            
+            self.mapDelegate?.updateSongUI(withInfo: info)
+            self.queueDelegate?.updateSongUI(withInfo: info)
+            self.mapDelegate?.updatePlayPauseUI(isPaused: false, isHost: false)
+            self.queueDelegate?.updatePlayPauseUI(isPaused: false, isHost: false)
+            self.duration = info.duration
         })
     }
     

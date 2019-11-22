@@ -1540,9 +1540,9 @@
         <image name="location.fill" catalog="system" width="64" height="56"/>
         <image name="magnifyingglass" catalog="system" width="64" height="56"/>
         <image name="peopleIcon" width="512" height="512"/>
+        <image name="plus" catalog="system" width="64" height="56"/>
         <image name="plus.circle" catalog="system" width="64" height="60"/>
         <image name="plus.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="searchIcon" width="503" height="503"/>
         <image name="settingsIcon" width="720" height="720"/>
         <image name="spotifyLogout" width="75.666664123535156" height="14.333333015441895"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="62" height="64"/>
