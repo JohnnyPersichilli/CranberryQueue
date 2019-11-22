@@ -16,38 +16,6 @@ protocol PlayerControllerDelegate: class {
 
 
 class PlayerView: UIView, PlayerDelegate {
-    func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
-        if(isHost){
-            bottomGuestTimeLabelConstraint.constant = 7.5
-            self.isPaused = isPaused
-            skipSongImage.image = UIImage(named: "ios-skip-forward-white")
-            if(isPaused){
-                if #available(iOS 13.0, *) {
-                    playPauseImage.image = UIImage(systemName: "play.fill")
-                }else{
-                    playPauseImage.image = UIImage(named: "whitePlayIcon")
-                }
-            }else{
-                if #available(iOS 13.0, *) {
-                    playPauseImage.image = UIImage(systemName: "pause.fill")
-                }else{
-                    playPauseImage.image = UIImage(named: "ios-pause-white")
-                }
-            }
-            playPauseImage.isUserInteractionEnabled = true
-            skipSongImage.isUserInteractionEnabled = true
-        }else{
-            bottomGuestTimeLabelConstraint.constant = 25
-            playPauseImage.image = nil
-            skipSongImage.image = nil
-            playPauseImage.isUserInteractionEnabled = false
-            skipSongImage.isUserInteractionEnabled = false
-            
-        }
-
-    }
-    
-    
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
@@ -135,6 +103,37 @@ class PlayerView: UIView, PlayerDelegate {
         }
         
         return imageURL
+    }
+    
+    func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
+        if(isHost){
+            bottomGuestTimeLabelConstraint.constant = 7.5
+            self.isPaused = isPaused
+            skipSongImage.image = UIImage(named: "ios-skip-forward-white")
+            if(isPaused){
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "play.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "whitePlayIcon")
+                }
+            }else{
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "pause.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "ios-pause-white")
+                }
+            }
+            playPauseImage.isUserInteractionEnabled = true
+            skipSongImage.isUserInteractionEnabled = true
+        }else{
+            bottomGuestTimeLabelConstraint.constant = 25
+            playPauseImage.image = nil
+            skipSongImage.image = nil
+            playPauseImage.isUserInteractionEnabled = false
+            skipSongImage.isUserInteractionEnabled = false
+            
+        }
+
     }
     
     func updateLikeUI(liked: Bool) {
