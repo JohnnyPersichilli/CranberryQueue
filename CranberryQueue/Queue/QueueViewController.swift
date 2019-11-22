@@ -32,6 +32,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     @IBOutlet var songTableView: SongTableView!
     
     @IBOutlet weak var plusIconImageView: UIImageView!
+    
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var numMembersLabel: UILabel!
     @IBOutlet var numSongsLabel: UILabel!
