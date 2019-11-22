@@ -14,7 +14,7 @@ protocol PlayerDelegate: class {
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool)
-    func initLikeUI(liked: Bool)
+    func updateLikeUI(liked: Bool)
     func clear()
 }
 
@@ -80,6 +80,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var position = 0
     
     var isEnqueuing = false
+    var isSongLiked: Bool = false
     
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
@@ -89,38 +90,25 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     
     static let sharedInstance = PlayerController()
     
-    func likeTapped() {
+    func toggleLikeRequest() {
         let id = getIdFromCurrentUri()!
         let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
-        request.httpMethod = "PUT"
+        request.httpMethod = isSongLiked ? "DELETE" : "PUT"
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let err = error {
-                print(err)
+                return
             }
+            self.isSongLiked.toggle()
+            self.mapDelegate?.updateLikeUI(liked: self.isSongLiked)
+            self.queueDelegate?.updateLikeUI(liked: self.isSongLiked)
         }
         task.resume()
     }
     
-    func unlikeTapped() {
-        let id = getIdFromCurrentUri()!
-        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
-        var request = URLRequest(url: url)
-        request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
-        request.httpMethod = "DELETE"
-        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let err = error {
-                print(err)
-            }
-        }
-        task.resume()
-    }
-
     func setupPlayer(queueId: String?, isHost: Bool) {
         let oldQueueId = self.queueId
         
@@ -246,14 +234,14 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         if currentUri != uri {
             currentUri = uri
             // will prepopulate the like icon to be already liked or not
-            self.populateLikeIcon()
+            self.updateLikeIcon()
             removeSongWith(uri, completion: {
                 self.enqueueNextSong()
             })
         }
     }
     
-    func populateLikeIcon() {
+    func updateLikeIcon() {
         if let id = getIdFromCurrentUri() {
             let url = URL(string: "https://api.spotify.com/v1/me/tracks/contains?ids=\(id)")!
             var request = URLRequest(url: url)
@@ -272,13 +260,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 do {
                     let jsonRes = try JSONSerialization.jsonObject(with: data, options: []) as! NSArray
                     let value = jsonRes.firstObject as! Int
-                    if value == 1 {
-                        self.mapDelegate?.initLikeUI(liked: true)
-                        self.queueDelegate?.initLikeUI(liked: true)
-                    } else {
-                        self.mapDelegate?.initLikeUI(liked: false)
-                        self.queueDelegate?.initLikeUI(liked: false)
-                    }
+                    self.mapDelegate?.updateLikeUI(liked: value == 1)
+                    self.queueDelegate?.updateLikeUI(liked: value == 1)
+                    self.isSongLiked = value == 1
                 }
                 catch {
                     print("error")

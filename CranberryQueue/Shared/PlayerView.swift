@@ -11,8 +11,7 @@ import UIKit
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
-    func likeTapped()
-    func unlikeTapped()
+    func toggleLikeRequest()
 }
 
 
@@ -104,6 +103,10 @@ class PlayerView: UIView, PlayerDelegate {
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
         playPauseImage.isUserInteractionEnabled = true
+        
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeIconTapped))
+        self.likeIconImageView.addGestureRecognizer(likeTapGesture)
+        self.likeIconImageView.isUserInteractionEnabled = true
     }
     
     @objc func playPauseTapped(){
@@ -116,30 +119,7 @@ class PlayerView: UIView, PlayerDelegate {
     
      @objc func likeIconTapped() {
         // an likeImageView tag of 0 means that it is currently not clicked / hollow like button
-        if likeIconImageView.tag == 0 {
-            // set the heart to be filled
-            if #available(iOS 13.0, *) {
-                likeIconImageView.image = UIImage(systemName: "heart.fill")!
-                likeIconImageView.tintColor = UIColor.red
-                // set the tag to be in the liked state
-                likeIconImageView.tag = 1
-                delegate?.likeTapped()
-            } else {
-                // Fallback on earlier versions
-                return
-            }
-        } else {
-            if #available(iOS 13.0, *) {
-                likeIconImageView.image = UIImage(systemName: "heart")!
-                likeIconImageView.tintColor = UIColor.white
-                // set the tag to be in the hollow state
-                likeIconImageView.tag = 0
-                delegate?.unlikeTapped()
-            } else {
-                // Fallback on earlier versions
-                return
-            }
-        }
+        delegate?.toggleLikeRequest()
      }
     
     //Same function as player controller
@@ -157,20 +137,15 @@ class PlayerView: UIView, PlayerDelegate {
         return imageURL
     }
     
-    func initLikeUI(liked: Bool) {
+    func updateLikeUI(liked: Bool) {
         DispatchQueue.main.async {
-            self.likeIconImageView.gestureRecognizers?.removeAll()
-            let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeIconTapped))
-            self.likeIconImageView.addGestureRecognizer(likeTapGesture)
-            self.likeIconImageView.isUserInteractionEnabled = true
-            
             // if the incoming song is already in your library
             if liked {
                 if #available(iOS 13.0, *) {
                     self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
                     self.likeIconImageView.tintColor = UIColor.red
                     //set the tag to the liked state
-                    self.likeIconImageView.tag = 1
+
                     self.likeIconImageView.isHidden = false
                 } else {
                   // Fallback on earlier versions
@@ -181,7 +156,6 @@ class PlayerView: UIView, PlayerDelegate {
                     self.likeIconImageView.image = UIImage(systemName: "heart")!
                     self.likeIconImageView.tintColor = UIColor.white
                     //set the tag to the hollow state
-                    self.likeIconImageView.tag = 0
                     self.likeIconImageView.isHidden = false
                 } else {
                   // Fallback on earlier versions
@@ -232,13 +206,7 @@ class PlayerView: UIView, PlayerDelegate {
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
-                self.inactiveHostLabel.isHidden = false
-                self.playPauseImage.image = nil
-                self.skipSongImage.image = nil
-                self.albumImageView.image = nil
-                self.titleLabel.text = nil
-                self.timeLabel.text = nil
-                self.helpLabel.isHidden = true
+                self.clear()
                 if(posMinutes == durMinutes){
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
                 }else{
@@ -271,5 +239,4 @@ class PlayerView: UIView, PlayerDelegate {
         inactiveHostLabel.isHidden = true
         likeIconImageView.isHidden = true
     }
-
 }
