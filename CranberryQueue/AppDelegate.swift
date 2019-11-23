@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SPTSessionManagerDelegate
     
     func startSession(shouldPlayMusic: Bool) {
         self.configuration.playURI = shouldPlayMusic ? "" : nil
-        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState, .userLibraryRead]
+        let requestedScopes: SPTScope = [.appRemoteControl, .userModifyPlaybackState, .userLibraryRead, .userLibraryModify]
         self.sessionManager.initiateSession(with: requestedScopes, options: .default)
     }
     

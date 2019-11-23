@@ -32,6 +32,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     @IBOutlet var songTableView: SongTableView!
     
     @IBOutlet weak var plusIconImageView: UIImageView!
+    
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var numMembersLabel: UILabel!
     @IBOutlet var numSongsLabel: UILabel!
@@ -172,6 +173,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     
     func handleLeaveQueueActions() {
         self.queueId = nil
+        (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
         self.navigateToRoot()

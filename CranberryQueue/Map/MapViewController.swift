@@ -108,6 +108,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         queueDetailModal.closeIconImageView.addGestureRecognizer(closeModalTap)
         queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
         
+        let addSongFromDetailTap = UITapGestureRecognizer(target: self, action: #selector(addSongFromDetail))
+        queueDetailModal.addIconImageView.addGestureRecognizer(addSongFromDetailTap)
+        queueDetailModal.addIconImageView.isUserInteractionEnabled = true
+        
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
         privateSearchIconImageView.addGestureRecognizer(searchTap)
         privateSearchIconImageView.isUserInteractionEnabled = true
@@ -305,7 +309,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
-    
     // Helper to close create queue modal
     @objc func closeCreateForm() {
         controllerMapDelegate?.setQueue(nil)
@@ -347,7 +350,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField.text == nil || textField.text == "" {
             return false
         }
-
     
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
@@ -523,13 +525,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Helper removes user from their current queue or deletes the queue if they are the host
-    func leaveCurrentQueue() {
+    func removeUser() {
         guard let queueId = queueId else {
-            return
-        }
-        if isHost {
-            self.db?.collection("location").document(queueId).delete()
             return
         }
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
@@ -546,6 +543,19 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
         task.resume()
+    }
+    
+    // Helper removes user from their current queue or deletes the queue if they are the host
+    func leaveCurrentQueue() {
+        guard let queueId = queueId else {
+            return
+        }
+        if isHost {
+            self.db?.collection("location").document(queueId).delete()
+            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+            return
+        }
+        removeUser()
     }
     
     // Checks if user is host of any queues by querying contributor table
@@ -590,6 +600,38 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
 
     }
     
+    func playbackDocToSongDoc(doc: [String:Any]) -> [String:Any]{
+        return [
+            "artist": doc["artist"]!,
+            "imageURL": doc["imageURL"]!,
+            "name": doc["name"]!,
+            "uri": doc["uri"]!,
+            "votes": 0,
+            "next": false,
+        ]
+    }
+    
+    // Called when add song icon is tapped in the Queue Detail Modal
+    @objc func addSongFromDetail() {
+        guard let queueId = queueId else {
+            return
+        }
+        var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
+        var ref: DocumentReference? = nil
+        ref = db?.collection("song").addDocument(data: [
+            "queueId": queueId
+            ], completion: { (val) in
+                newSong["docID"] = ref!.documentID
+                self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                    self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
+                        let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil))
+                        self.present(alert, animated: true)
+                    })
+                })
+        })
+    }
+    
     // Called when settings icon is tapped
     @objc func settingsTapped() {
         self.closeDetailModal()
@@ -603,12 +645,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when logout is tapped from settings # SettingsMapDelegate
     func logoutTapped() {
-        loginContainer.isHidden = false
+        leaveCurrentQueue()
         isPremium = false
-        if isHost {
-            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
-            self.playerController.setupPlayer(queueId: nil, isHost: false)
-        }
+        (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+        self.playerController.setupPlayer(queueId: nil, isHost: false)
+        self.queueId = nil
         isHost = false
         shouldPlayMusic = false
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
