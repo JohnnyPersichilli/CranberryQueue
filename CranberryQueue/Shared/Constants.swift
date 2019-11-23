@@ -69,7 +69,7 @@ struct Constants {
     ]
     
     static func aboutUsBlurb() -> NSAttributedString {
-        let topText = NSAttributedString(
+        let text0 = NSAttributedString(
             string: "\n\nDeveloped by four Engineers at Villanova University.\n\n",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
@@ -78,7 +78,7 @@ struct Constants {
         )
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
-        let middleText = NSAttributedString(
+        let text1 = NSAttributedString(
             string: "\n\nCarl Reiser\nJohnny Persichilli\nMatt Innocenzo\nRolf Locher\n\n\n",
             attributes: [
                 .paragraphStyle: paragraph,
@@ -86,14 +86,14 @@ struct Constants {
                 .foregroundColor: UIColor.white
             ]
         )
-        let bottomText = NSAttributedString(
+        let text2 = NSAttributedString(
             string: "Enjoy using our senior Capstone to explore music in your community and around the world. We hope you find the app as useful as we do when listening to music with friends.",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor.white
             ]
         )
-        let text0 = NSAttributedString(
+        let text3 = NSAttributedString(
             string: "Built with Spotify SDK 1.0.2, Google Maps SDK 3.6.0, and Firebase SDK 6.13.0",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
@@ -102,10 +102,10 @@ struct Constants {
         )
         let result = NSMutableAttributedString()
         
-        result.append(topText)
-        result.append(bottomText)
-        result.append(middleText)
         result.append(text0)
+        result.append(text2)
+        result.append(text1)
+        result.append(text3)
         
         return result
     }
