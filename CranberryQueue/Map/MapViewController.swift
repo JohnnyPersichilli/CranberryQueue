@@ -593,9 +593,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if(code != nil){
             joinPrivateQueue(code: code!)
         }else if(queueId != nil && name != nil){
-            self.getIsUserHostOf(queueId: queueId!) { (isHost) in
-                self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
-            }
+            queueDetailModal.distance = 0
+            var fakeQueue = CQLocation()
+            fakeQueue.queueId = queueId!
+            fakeQueue.name = name!
+            queueDetailModal.currentQueue = fakeQueue
+            joinPublicQueue()
         }
 
     }
