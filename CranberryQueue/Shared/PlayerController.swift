@@ -342,7 +342,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 }
             })
         })
-        
     }
     
     func setupGuestListeners() {

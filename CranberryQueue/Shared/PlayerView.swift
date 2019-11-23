@@ -23,14 +23,18 @@ class PlayerView: UIView, PlayerDelegate {
             skipSongImage.image = UIImage(named: "ios-skip-forward-white")
             if(isPaused){
                 if #available(iOS 13.0, *) {
+                    playPauseImage.isHidden = false
                     playPauseImage.image = UIImage(systemName: "play.fill")
                 }else{
+                    playPauseImage.isHidden = false
                     playPauseImage.image = UIImage(named: "whitePlayIcon")
                 }
             }else{
                 if #available(iOS 13.0, *) {
+                    playPauseImage.isHidden = false
                     playPauseImage.image = UIImage(systemName: "pause.fill")
                 }else{
+                    playPauseImage.isHidden = false
                     playPauseImage.image = UIImage(named: "ios-pause-white")
                 }
             }
