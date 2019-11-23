@@ -16,6 +16,7 @@ protocol TableSegmentedDelegate: class {
 class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
 
     var songs = [Song]()
+    var shouldStopRequestingSongs = false
     weak var controllerDelegate: TableSegmentedDelegate?
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -77,6 +78,7 @@ class SearchTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
       }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if shouldStopRequestingSongs { return }
         let endIndex = songs.count - 1
         if indexPath.section == endIndex {
             controllerDelegate?.requestAdditionalData(fromIndex: endIndex, limit: 20)

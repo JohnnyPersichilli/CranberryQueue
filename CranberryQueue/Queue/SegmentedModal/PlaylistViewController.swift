@@ -21,6 +21,7 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
     
     var playlists = [Playlist]()
     var selectedTrackURL: String? = nil
+    var shouldStopRequestingPlaylists = false
     
     var token: String {
         get {
@@ -56,7 +57,6 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
             )
         ]
         getPlaylists(fromIndex: 0, limit: 20, completion: { playlists in
-            print("we tried and got \(playlists.count)")
             self.playlists += playlists
             DispatchQueue.main.async {
                 self.playlistTableView.reloadData()
@@ -156,6 +156,10 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
     func requestAdditionalData(fromIndex index: Int, limit: Int) {
         guard let url = selectedTrackURL else { return }
         getTracksFrom(url: url, fromIndex: index-1, limit: 20) { (songs) in
+            if songs.count == 0 {
+                self.songTableView.shouldStopRequestingSongs = true
+                return
+            }
             DispatchQueue.main.async {
                 self.songTableView.songs += songs
                 self.songTableView.reloadData()
@@ -171,6 +175,7 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         guard let cell = playlistTableView.cellForRow(at: indexPath) as? PlaylistCell else { return }
         let tracksURL = cell.tracksURL
         selectedTrackURL = tracksURL
+        songTableView.shouldStopRequestingSongs = false
         getTracksFrom(url: tracksURL, fromIndex: 0, limit: 20) { (songs) in
             DispatchQueue.main.async {
                 self.songTableView.songs = songs
@@ -205,9 +210,14 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if shouldStopRequestingPlaylists { return }
         let endIndex = playlists.count - 1
         if indexPath.section == endIndex {
             getPlaylists(fromIndex: endIndex, limit: 20) { (playlists) in
+                if playlists.count == 0 {
+                    self.shouldStopRequestingPlaylists = true
+                    return
+                }
                 self.playlists += playlists
                 DispatchQueue.main.async {
                     self.playlistTableView.reloadData()
