@@ -13,7 +13,7 @@
                 <outlet property="albumImageView" destination="igS-h2-awn" id="jFQ-Iw-wUf"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Svh-za-1zX"/>
                 <outlet property="helpLabel" destination="gAR-Ux-jFY" id="7bz-cj-T6k"/>
-                <outlet property="likedSongImage" destination="3tK-Vh-LuF" id="el8-Ny-Lzo"/>
+                <outlet property="likeIconImageView" destination="3tK-Vh-LuF" id="Zv2-yr-jqa"/>
                 <outlet property="playPauseImage" destination="9XD-Fr-R0L" id="Hri-kO-igs"/>
                 <outlet property="skipSongImage" destination="cbC-VW-lMN" id="i2i-xG-D3o"/>
                 <outlet property="timeLabel" destination="vj7-cZ-fDJ" id="epW-pN-Keo"/>
@@ -107,7 +107,7 @@
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
-            <point key="canvasLocation" x="137.59999999999999" y="152.58620689655174"/>
+            <point key="canvasLocation" x="97.599999999999994" y="161.45320197044336"/>
         </view>
     </objects>
     <resources>

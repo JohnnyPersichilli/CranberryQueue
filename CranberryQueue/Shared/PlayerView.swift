@@ -11,6 +11,7 @@ import UIKit
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
+    func toggleLikeRequest()
 }
 
 class PlayerView: UIView, PlayerDelegate {
@@ -49,15 +50,12 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
-    
     @IBOutlet var titleLabel: UILabel!
-    
     @IBOutlet var timeLabel: UILabel!
-    
+    @IBOutlet weak var likeIconImageView: UIImageView!
     @IBOutlet var helpLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
-    @IBOutlet weak var likedSongImage: UIImageView!
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -83,8 +81,8 @@ class PlayerView: UIView, PlayerDelegate {
         timeLabel.text = nil
         playPauseImage.image = nil
         skipSongImage.image = nil
-        likedSongImage.image = nil
-        
+        likeIconImageView.isHidden = true
+
         setupGestureRecognizers()
     }
     
@@ -96,6 +94,10 @@ class PlayerView: UIView, PlayerDelegate {
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
         playPauseImage.isUserInteractionEnabled = true
+        
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeIconTapped))
+        self.likeIconImageView.addGestureRecognizer(likeTapGesture)
+        self.likeIconImageView.isUserInteractionEnabled = true
     }
     
     @objc func playPauseTapped(){
@@ -105,6 +107,10 @@ class PlayerView: UIView, PlayerDelegate {
     @objc func skipSongTapped() {
         delegate?.swiped()
     }
+    
+     @objc func likeIconTapped() {
+        delegate?.toggleLikeRequest()
+     }
     
     //Same function as player controller
     func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {
@@ -117,8 +123,31 @@ class PlayerView: UIView, PlayerDelegate {
             print("no track image in JSON file for:", playerState.track.name)
             imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
         }
-        
         return imageURL
+    }
+    
+    func updateLikeUI(liked: Bool) {
+        DispatchQueue.main.async {
+            // if the incoming song is already in your library
+            if liked {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
+                    self.likeIconImageView.tintColor = UIColor.red
+                    self.likeIconImageView.isHidden = false
+                } else {
+                  // Fallback on earlier versions
+                }
+                
+            } else {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart")!
+                    self.likeIconImageView.tintColor = UIColor.white
+                    self.likeIconImageView.isHidden = false
+                } else {
+                  // Fallback on earlier versions
+                }
+            }
+        }
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
@@ -129,11 +158,6 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
-                if #available(iOS 13.0, *) {
-                    self.likedSongImage.image = UIImage(systemName: "heart")
-                } else {
-                    //can import non system icon here if we decide to release for < iOS 13
-                }
                 self.titleLabel.text = state.track.name + " - " + state.track.artist.name
                 self.albumImageView.image = UIImage(data: data)
                 self.helpLabel.isHidden = true
@@ -149,11 +173,6 @@ class PlayerView: UIView, PlayerDelegate {
                 print(error!)
                 return }
             DispatchQueue.main.async() {
-                if #available(iOS 13.0, *) {
-                    self.likedSongImage.image = UIImage(systemName: "heart")
-                } else {
-                    //can import non system icon here if we decide to release for < iOS 13
-                }
                 self.titleLabel.text = info.name + " - " + info.artist
                 self.albumImageView.image = UIImage(data: data)
                 self.helpLabel.isHidden = true
@@ -203,7 +222,6 @@ class PlayerView: UIView, PlayerDelegate {
         titleLabel.text = nil
         timeLabel.text = nil
         helpLabel.isHidden = false
-        likedSongImage.image = nil
+        likeIconImageView.isHidden = true
     }
-
 }
