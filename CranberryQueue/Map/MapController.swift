@@ -12,6 +12,7 @@ import Firebase
 
 protocol MapControllerDelegate: class {
     func updateGeoCode(city: String, region: String)
+    func updateCanRecenter(val: Bool)
     func toggleDetailModal(withData data: CQLocation)
     func setLocationEnabled(status: Bool)
 }
@@ -27,7 +28,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var map: GMSMapView? = nil
     
     var curCoords: CLLocationCoordinate2D? = nil
-    var currZoom: Float = 15.0
+    var curZoom: Float = 15.0
     
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
@@ -66,7 +67,17 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-        self.currZoom = mapView.camera.zoom
+        curZoom = mapView.camera.zoom
+        
+        if let curCoords = curCoords {
+            let recenterThreshold = 400.0
+            let curCameraCoords = mapView.camera.target
+            let canRecenter = getDistanceBetween(coordA: curCameraCoords, coordB: curCoords) > recenterThreshold
+            mapControllerDelegate?.updateCanRecenter(val: canRecenter)
+        }
+        else {
+            mapControllerDelegate?.updateCanRecenter(val: false)
+        }
         
         let mapCenter = [
             "lat": mapView.camera.target.latitude,
@@ -79,10 +90,10 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
 
     func watchLocationQueues(city: String, region: String) {
-        if(self.currZoom > 10){
+        if(self.curZoom > 10){
             getTopQueusInCity(city: city, region: region)
         }else{
-            getTopQueusInState(region: region, zoom: self.currZoom)
+            getTopQueusInState(region: region, zoom: self.curZoom)
         }
     }
     
@@ -301,6 +312,12 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             longitude: queue.long
         )
         return myLocation.distance(from: queueLocation)
+    }
+    
+    func getDistanceBetween(coordA: CLLocationCoordinate2D, coordB: CLLocationCoordinate2D) -> Double {
+        let locA = CLLocation(latitude: coordA.latitude, longitude: coordA.longitude)
+        let locB = CLLocation(latitude: coordB.latitude, longitude: coordB.longitude)
+        return locA.distance(from: locB)
     }
         
 }

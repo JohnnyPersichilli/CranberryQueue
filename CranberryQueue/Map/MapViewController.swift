@@ -693,6 +693,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
+    // Called on idle camera with boolean to highlight map recenter icon # MapDelegate
+    func updateCanRecenter(val: Bool) {
+        if #available(iOS 13.0, *) {
+            backToQueueIconImageView.image = UIImage(systemName: val ? "location" : "location.fill")
+        }
+    }
+    
     // Helper animates queue detail modal open
     func showDetailModal() {
         self.queueDetailModal.isHidden = false
