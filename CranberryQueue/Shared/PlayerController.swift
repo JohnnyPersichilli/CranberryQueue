@@ -15,7 +15,7 @@ protocol PlayerDelegate: class {
     func updateTimerUI(position: Int, duration: Int)
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool)
     func updateLikeUI(liked: Bool)
-    func clear()
+    func showHelpLabel()
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
@@ -128,8 +128,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
             timer.invalidate()
             position = 0
-            mapDelegate?.clear()
-            queueDelegate?.clear()
+            mapDelegate?.showHelpLabel()
+            queueDelegate?.showHelpLabel()
             hostListener?.remove()
             guestListener?.remove()
         }
@@ -167,7 +167,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         position += 1000
         mapDelegate?.updateTimerUI(position: position, duration: duration)
         queueDelegate?.updateTimerUI(position: position, duration: duration)
-        if Int(position/1000) >= Int(duration/1000) {
+        if Int(position/1000)-1 >= Int(duration/1000) {
             isTimerRunning = false
         }
     }
@@ -356,7 +356,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             guard let contents = snapshot?.data() else {
-                self.mapDelegate?.clear()
+                self.mapDelegate?.showHelpLabel()
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)

@@ -196,7 +196,7 @@ class PlayerView: UIView, PlayerDelegate {
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
-                self.clear()
+                self.showInactiveLabel()
                 if(posMinutes == durMinutes){
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
                 }else{
@@ -219,14 +219,25 @@ class PlayerView: UIView, PlayerDelegate {
         }
     }
     
-    func clear() {
+    func showHelpLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = false
+        inactiveHostLabel.isHidden = true
+    }
+    
+    func showInactiveLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = true
+        inactiveHostLabel.isHidden = false
+    }
+    
+    func clearPlayerUI() {
         playPauseImage.image = nil
         skipSongImage.image = nil
         albumImageView.image = nil
         titleLabel.text = nil
         timeLabel.text = nil
-        helpLabel.isHidden = false
-        inactiveHostLabel.isHidden = true
         likeIconImageView.isHidden = true
     }
+    
 }
