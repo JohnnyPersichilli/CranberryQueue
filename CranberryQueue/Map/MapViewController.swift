@@ -259,7 +259,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
-        hideActivityIndicator()
         /// branched lifecycle depending on why the app remote was connected
         switch connectionStatusInvoker {
         case .queueCreation:
@@ -269,9 +268,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             else {
                 showAppRemoteAlert()
             }
+            hideActivityIndicator()
         case .returningHost:
             if connected {
                 self.db?.collection("location").document(queueId!).getDocument(completion: { (snapshot, error) in
+                    self.hideActivityIndicator()
                     guard let snap = snapshot else { return }
                     guard let oldQueueName = snap["name"] as? String else { return }
                     self.name = oldQueueName
