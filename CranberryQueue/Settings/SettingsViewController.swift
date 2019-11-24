@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import GoogleMaps
 
 protocol SettingsMapDelegate: class {
     func logoutTapped()
@@ -40,24 +39,24 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     struct SettingsOption {
         var name = String()
-        var text = String()
+        var text = NSAttributedString()
     }
     
     var aboutUsOption = SettingsOption(
         name: "About us",
-        text: "Explore music playlists from around the world or share your own. Spotify's SDK provides local playback for hosts and Firestore supports a location-based voting scheme."
+        text: Constants.aboutUsBlurb()
     )
     var legalNoticeOption = SettingsOption(
         name: "Legal Notices",
-        text: GMSServices.openSourceLicenseInfo()
+        text: Constants.legalBlurb()
     )
     var faqOption = SettingsOption(
         name: "FAQ",
-        text: "Insert FAQ questions here"
+        text: Constants.faqBlurb()
     )
     var reportBugOption = SettingsOption(
         name: "Report A Bug",
-        text: "Insert bug reporting here"
+        text: Constants.bugReportBlurb()
     )
     
     lazy var optionsArray = [
@@ -175,7 +174,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         DispatchQueue.main.async {
             self.moreDetailTitleLabel.text = option.name
-            self.moreDetailTextView.text = option.text
+            self.moreDetailTextView.attributedText = option.text
         }
     }
     
