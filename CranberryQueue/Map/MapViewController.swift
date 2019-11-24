@@ -19,7 +19,7 @@ protocol ControllerMapDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate {
+class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, activityIndicatorPresenter {
 
     // Labels
     @IBOutlet var cityLabel: UILabel!
@@ -49,6 +49,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @IBOutlet var queueDetailModal: QueueDetailModal!
     @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
     @IBOutlet var bottomDetailModalConstraint: NSLayoutConstraint!
+    
+    // Spinner
+    var activityIndicator = UIActivityIndicatorView()
     
     // Personal delegates
     weak var controllerMapDelegate: ControllerMapDelegate?
@@ -256,6 +259,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when appRemote has finished attempting to connect # RemoteDelegate
     func updateConnectionStatus(connected: Bool) {
+        hideActivityIndicator()
         /// branched lifecycle depending on why the app remote was connected
         switch connectionStatusInvoker {
         case .queueCreation:
@@ -382,6 +386,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // start session
     func startSession() {
+        showActivityIndicator()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
