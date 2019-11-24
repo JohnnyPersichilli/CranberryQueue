@@ -17,7 +17,7 @@ protocol QueueSegmentedDelegate: class {
     func searchTapped(shouldHideContents: Bool)
 }
 
-class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, SegmentedJointDelegate, SongTableDelegate {
+class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, SegmentedJointDelegate, SongTableDelegate, activityIndicatorPresenter {
     var queueName: String? = nil
     var queueId: String? = nil
     var uid: String? = nil
@@ -39,6 +39,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     @IBOutlet var nextUpLabel: UILabel!
     @IBOutlet var globeIcon: UIImageView!
     @IBOutlet var playerView: PlayerView!
+    var activityIndicator = UIActivityIndicatorView()
     
     @IBOutlet var segmentedContainerView: UIView!
     
@@ -180,12 +181,17 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     }
     
     func updateConnectionStatus(connected: Bool) {
+        hideActivityIndicator()
         if !connected {
             self.showAppRemoteAlert()
         }
     }
     
-    func updateSessionStatus(connected: Bool) {}
+    func updateSessionStatus(connected: Bool) {
+        if !isHost {
+            hideActivityIndicator()
+        }
+    }
     
     // Helper shows app remote not connected alert
     func showAppRemoteAlert() {
@@ -203,6 +209,7 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     
     // start session
     func startSession() {
+        showActivityIndicator()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
