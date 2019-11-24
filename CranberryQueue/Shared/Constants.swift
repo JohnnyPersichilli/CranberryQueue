@@ -70,7 +70,14 @@ struct Constants {
     
     static func aboutUsBlurb() -> NSAttributedString {
         let text0 = NSAttributedString(
-            string: "\n\nDeveloped by four Engineers at Villanova University.\n\n",
+            string: "\n\nDeveloped by four Engineers at Villanova University.",
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 12),
+                .foregroundColor: UIColor.white
+            ]
+        )
+        let text1 = NSAttributedString(
+            string: "\n\nEnjoy using our senior Capstone to explore music in your community and around the world. We hope you find the app as useful as we do when listening to music with friends.",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor.white
@@ -78,33 +85,24 @@ struct Constants {
         )
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
-        let text1 = NSAttributedString(
-            string: "\n\nCarl Reiser\nJohnny Persichilli\nMatt Innocenzo\nRolf Locher\n\n\n",
+        let text2 = NSAttributedString(
+            string: "\n\nCarl Reiser\nJohnny Persichilli\nMatt Innocenzo\nRolf Locher\n",
             attributes: [
                 .paragraphStyle: paragraph,
                 .font: UIFont.systemFont(ofSize: 13),
                 .foregroundColor: UIColor.white
             ]
         )
-        let text2 = NSAttributedString(
-            string: "Enjoy using our senior Capstone to explore music in your community and around the world. We hope you find the app as useful as we do when listening to music with friends.",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: 12),
-                .foregroundColor: UIColor.white
-            ]
-        )
         let text3 = NSAttributedString(
-            string: "Built with Spotify SDK 1.0.2, Google Maps SDK 3.6.0, and Firebase SDK 6.13.0",
+            string: "\n\nBuilt with Spotify SDK 1.0.2, Google Maps SDK 3.6.0, and Firebase SDK 6.13.0",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor.white
             ]
         )
         let result = NSMutableAttributedString()
-        result.append(text0)
-        result.append(text2)
-        result.append(text1)
-        result.append(text3)
+        let texts = [text0, text1, text2, text3]
+        for text in texts { result.append(text) }
         return result
     }
     
@@ -122,27 +120,27 @@ struct Constants {
             attributes: titleAttributes
         )
         let text1 = NSAttributedString(
-            string: "\n\tYou can create a queue by tapping the plus icon in the Map screen, but you will need the Spotify app installed on your phone to continue.\n\n",
+            string: "\n\tYou can create a queue by tapping the plus icon in the Map screen, but you will need the Spotify app installed on your phone to continue.",
             attributes: answerAttributes
         )
         let text2 = NSAttributedString(
-            string: "How do I join a queue?",
+            string: "\n\nHow do I join a queue?",
             attributes: titleAttributes
         )
         let text3 = NSAttributedString(
-            string: "\n\tTapping a queue marker on the Map screen will bring up details about the queue. If you are close enough to the marker, select the green join button.\n\n",
+            string: "\n\tTapping a queue marker on the Map screen will bring up details about the queue. If you are close enough to the marker, select the green join button.",
             attributes: answerAttributes
         )
         let text4 = NSAttributedString(
-            string: "Spotify could not connect?",
+            string: "\n\nSpotify could not connect?",
             attributes: titleAttributes
         )
         let text5 = NSAttributedString(
-            string: "\n\tSometimes you need to close the Spotify app before you can successfully create a queue. This is due to issues between Spotify SDK and Apple iOS.\n\n",
+            string: "\n\tSometimes you need to close the Spotify app before you can successfully create a queue. This is due to issues between Spotify SDK and Apple iOS.",
             attributes: answerAttributes
         )
         let text6 = NSAttributedString(
-            string: "Where are all the queues?",
+            string: "\n\nWhere are all the queues?",
             attributes: titleAttributes
         )
         let text7 = NSAttributedString(
@@ -165,12 +163,23 @@ struct Constants {
     }
     
     static func bugReportBlurb() -> NSAttributedString {
-        return NSAttributedString(
-            string: "\n\nUntil the offical release, bug reporting should be done through the TestFlight app.\n\nThanks for helping us improve.",
+        let text0 = NSAttributedString(
+            string: "\n\nUntil the offical release, bug reporting should be done through the TestFlight app.",
+            attributes: [
+                .font: UIFont.boldSystemFont(ofSize: 12),
+                .foregroundColor: UIColor.white
+            ]
+        )
+        let text1 = NSAttributedString(
+            string: "\n\nThanks for helping us improve.",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor.white
             ]
         )
+        let result = NSMutableAttributedString()
+        let texts = [text0, text1]
+        for text in texts { result.append(text) }
+        return result
     }
 }
