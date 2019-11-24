@@ -101,12 +101,10 @@ struct Constants {
             ]
         )
         let result = NSMutableAttributedString()
-        
         result.append(text0)
         result.append(text2)
         result.append(text1)
         result.append(text3)
-        
         return result
     }
     
