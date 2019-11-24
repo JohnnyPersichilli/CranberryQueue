@@ -100,7 +100,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         settingsIconImageView.addGestureRecognizer(settingsTap)
         settingsIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue as () -> ()))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinDetailQueue))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -128,7 +128,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
         
-        let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
+        let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(playerTapped))
         playerView.addGestureRecognizer(playerHomeTap)
         playerView.isUserInteractionEnabled = true
     }
@@ -406,21 +406,27 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return result;
     }
     
-    // Join Public queue from queue detail modal
-    @objc func joinPublicQueue() {
-        if(queueDetailModal.inRange){
-            let data = queueDetailModal.currentQueue!
-            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-                if isHost {
-                    if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
-                        self.showAppRemoteAlert()
-                        return
-                    }
-                }
-                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
-            }
-        } else {
+    // Join queue from detail modal
+    @objc func joinDetailQueue() {
+        if queueDetailModal.isInRange {
+            guard let data = queueDetailModal.currentQueue else { return }
+            joinPublicQueue(queueId: data.queueId, name: data.name)
+        }
+        else {
             queueDetailModal.flashDistance()
+        }
+    }
+    
+    // Join public queue from queue detail modal or player
+    func joinPublicQueue(queueId: String, name: String) {
+        self.getIsUserHostOf(queueId: queueId) { (isHost) in
+            if isHost {
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.showAppRemoteAlert()
+                    return
+                }
+            }
+            self.presentQueueScreen(queueId: queueId, name: name, code: nil, isHost: isHost)
         }
     }
 
@@ -585,17 +591,15 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.controllerMapDelegate?.setLocationEnabled(true)
     }
     
-    // Home tapped while in private queue brings user to queue screen
-    @objc func homeTapped() {
+    // Player tapped while in queue brings user to queue screen
+    @objc func playerTapped() {
         self.closeJoinForm()
         self.closeDetailModal()
         self.closeCreateForm()
         if(code != nil){
             joinPrivateQueue(code: code!)
         }else if(queueId != nil && name != nil){
-            self.getIsUserHostOf(queueId: queueId!) { (isHost) in
-                self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
-            }
+            joinPublicQueue(queueId: queueId!, name: name!)
         }
 
     }
