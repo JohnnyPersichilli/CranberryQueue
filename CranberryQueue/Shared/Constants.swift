@@ -109,65 +109,47 @@ struct Constants {
     }
     
     static func faqBlurb() -> NSAttributedString {
-        let result = NSMutableAttributedString()
-        let titleSize: CGFloat = 13
-        let answerSize: CGFloat = 12
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.boldSystemFont(ofSize: 13),
+            .foregroundColor: UIColor.white
+        ]
+        let answerAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 12),
+            .foregroundColor: UIColor.white
+        ]
         let text0 = NSAttributedString(
             string: "\n\nHow do I create a queue?",
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: titleSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: titleAttributes
         )
         let text1 = NSAttributedString(
             string: "\n\tYou can create a queue by tapping the plus icon in the Map screen, but you will need the Spotify app installed on your phone to continue.\n\n",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: answerSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: answerAttributes
         )
         let text2 = NSAttributedString(
             string: "How do I join a queue?",
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: titleSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: titleAttributes
         )
         let text3 = NSAttributedString(
             string: "\n\tTapping a queue marker on the Map screen will bring up details about the queue. If you are close enough to the marker, select the green join button.\n\n",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: answerSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: answerAttributes
         )
         let text4 = NSAttributedString(
             string: "Spotify could not connect?",
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: titleSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: titleAttributes
         )
         let text5 = NSAttributedString(
             string: "\n\tSometimes you need to close the Spotify app before you can successfully create a queue. This is due to issues between Spotify SDK and Apple iOS.\n\n",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: answerSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: answerAttributes
         )
         let text6 = NSAttributedString(
             string: "Where are all the queues?",
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: titleSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: titleAttributes
         )
         let text7 = NSAttributedString(
             string: "\n\tThis app has only been released to a few individuals - if you don’t see any queues in your area then create a queue and get the party started!",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: answerSize),
-                .foregroundColor: UIColor.white
-            ]
+            attributes: answerAttributes
         )
+        let result = NSMutableAttributedString()
         let texts = [text0, text1, text2, text3, text4, text5, text6, text7]
         for text in texts { result.append(text) }
         return result
