@@ -112,7 +112,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         helpIconImageView.isUserInteractionEnabled = true
         
         let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue))
-
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -246,6 +245,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     @objc func helpCloseTapped() {
         self.helpContainer.isHidden = true
+        self.helpIconImageView.isHidden = false
     }
     
     // Called when "+" icon tapped
@@ -442,7 +442,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Join public queue from queue detail modal or player
-    func joinPublicQueue(queueId: String, name: String) {
+    @objc func joinPublicQueue(queueId: String, name: String) {
         self.getIsUserHostOf(queueId: queueId) { (isHost) in
             if isHost {
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
@@ -631,7 +631,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     // Called when help icon is tapped
     @objc func helpTapped() {
         helpContainer.isHidden = false
-        print("help tapped ran")
+        helpIconImageView.isHidden = true
     }
     
     func playbackDocToSongDoc(doc: [String:Any]) -> [String:Any]{
