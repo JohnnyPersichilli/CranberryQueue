@@ -208,7 +208,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
-        
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
         
@@ -361,6 +360,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             }
             let info = self.playbackJsonToInfo(json: contents)
             
+            self.mapDelegate?.updatePlayPauseUI(isPaused: false, isHost: false)
+            self.queueDelegate?.updatePlayPauseUI(isPaused: false, isHost: false)
             
             self.mapDelegate?.updateSongUI(withInfo: info)
             self.queueDelegate?.updateSongUI(withInfo: info)

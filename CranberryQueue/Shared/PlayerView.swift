@@ -18,18 +18,12 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
-    
     @IBOutlet var titleLabel: UILabel!
-    
     @IBOutlet var timeLabel: UILabel!
-    
     @IBOutlet weak var likeIconImageView: UIImageView!
-    
     @IBOutlet var helpLabel: UILabel!
-    @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
-    @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -51,13 +45,7 @@ class PlayerView: UIView, PlayerDelegate {
         albumImageView.layer.cornerRadius = albumImageView.frame.height/2
         albumImageView.clipsToBounds = true
         
-        titleLabel.text = nil
-        timeLabel.text = nil
-        playPauseImage.image = nil
-        skipSongImage.image = nil
-        
-        inactiveHostLabel.isHidden = true
-        self.likeIconImageView.isHidden = true
+        clearPlayerUI()
 
         setupGestureRecognizers()
     }
@@ -104,7 +92,7 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
         if(isHost){
-            bottomGuestTimeLabelConstraint.constant = 7.5
+            titleLabel.trailingAnchor.constraint(equalTo: likeIconImageView.leadingAnchor, constant: -8).isActive = false
             self.isPaused = isPaused
             skipSongImage.image = UIImage(named: "ios-skip-forward-white")
             if(isPaused){
@@ -123,7 +111,7 @@ class PlayerView: UIView, PlayerDelegate {
             playPauseImage.isUserInteractionEnabled = true
             skipSongImage.isUserInteractionEnabled = true
         }else{
-            bottomGuestTimeLabelConstraint.constant = 25
+            titleLabel.trailingAnchor.constraint(equalTo: likeIconImageView.leadingAnchor, constant: -8).isActive = true
             playPauseImage.image = nil
             skipSongImage.image = nil
             playPauseImage.isUserInteractionEnabled = false
@@ -158,7 +146,6 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
         helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
         let url = URL( string: getURLFrom(state) )
         
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
@@ -175,7 +162,6 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updateSongUI(withInfo info: PlaybackInfo) {
         helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
         let url = URL(string: info.imageURL)
         let task = URLSession.shared.dataTask(with: url!) { data, response, error in
             guard let data = data, error == nil else {
@@ -196,13 +182,15 @@ class PlayerView: UIView, PlayerDelegate {
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
-                self.showInactiveLabel()
-                if(posMinutes == durMinutes){
-                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
+                self.helpLabel.isHidden = true
+                //1 hour = 1000msec * 60sec * 60min
+                if( position - duration > (60*60*1000)){
+                    self.timeLabel.text = "Host has been inactive for over an hour"
+                }else if(posMinutes == durMinutes){
+                    self.timeLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
                 }else{
-                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
+                    self.timeLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
                 }
-                
             }
             return
         }
@@ -222,13 +210,6 @@ class PlayerView: UIView, PlayerDelegate {
     func showHelpLabel() {
         clearPlayerUI()
         helpLabel.isHidden = false
-        inactiveHostLabel.isHidden = true
-    }
-    
-    func showInactiveLabel() {
-        clearPlayerUI()
-        helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = false
     }
     
     func clearPlayerUI() {
@@ -239,5 +220,4 @@ class PlayerView: UIView, PlayerDelegate {
         timeLabel.text = nil
         likeIconImageView.isHidden = true
     }
-    
 }
