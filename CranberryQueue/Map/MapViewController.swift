@@ -19,7 +19,8 @@ protocol ControllerMapDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, activityIndicatorPresenter, HelpMapDelegate {
+    class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, activityIndicatorPresenter, HelpMapDelegate {
+
 
     // Labels
     @IBOutlet var cityLabel: UILabel!
@@ -665,6 +666,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 })
         })
     }
+
     
     // Called when settings icon is tapped
     @objc func settingsTapped() {
