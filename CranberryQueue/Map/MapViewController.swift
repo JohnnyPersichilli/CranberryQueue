@@ -19,7 +19,7 @@ protocol ControllerMapDelegate: class {
     func getDistanceFrom(_ queue: CQLocation) -> Double
 }
 
-class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, HelpMapDelegate {
+class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, activityIndicatorPresenter, HelpMapDelegate {
     
 
     // Labels
@@ -54,6 +54,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     @IBOutlet var queueDetailModal: QueueDetailModal!
     @IBOutlet weak var topDetailModalConstraint: NSLayoutConstraint!
     @IBOutlet var bottomDetailModalConstraint: NSLayoutConstraint!
+    
+    // Spinner
+    var activityIndicator = UIActivityIndicatorView()
     
     // Personal delegates
     weak var controllerMapDelegate: ControllerMapDelegate?
@@ -109,7 +112,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         helpIconImageView.addGestureRecognizer(helpTap)
         helpIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue as () -> ()))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -279,9 +282,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             else {
                 showAppRemoteAlert()
             }
+            hideActivityIndicator()
         case .returningHost:
             if connected {
                 self.db?.collection("location").document(queueId!).getDocument(completion: { (snapshot, error) in
+                    self.hideActivityIndicator()
                     guard let snap = snapshot else { return }
                     guard let oldQueueName = snap["name"] as? String else { return }
                     self.name = oldQueueName
@@ -398,6 +403,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // start session
     func startSession() {
+        showActivityIndicator()
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
@@ -613,6 +619,38 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         helpContainer.isHidden = false
         print("help tapped ran")
     }
+    
+    func playbackDocToSongDoc(doc: [String:Any]) -> [String:Any]{
+        return [
+            "artist": doc["artist"]!,
+            "imageURL": doc["imageURL"]!,
+            "name": doc["name"]!,
+            "uri": doc["uri"]!,
+            "votes": 0,
+            "next": false,
+        ]
+    }
+    
+    // Called when add song icon is tapped in the Queue Detail Modal
+        @objc func addSongFromDetail() {
+            guard let queueId = queueId else {
+                return
+            }
+            var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
+            var ref: DocumentReference? = nil
+            ref = db?.collection("song").addDocument(data: [
+                "queueId": queueId
+                ], completion: { (val) in
+                    newSong["docID"] = ref!.documentID
+                    self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
+                            let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil))
+                            self.present(alert, animated: true)
+                        })
+                    })
+            })
+        }
     
     // Called when settings icon is tapped
     @objc func settingsTapped() {
