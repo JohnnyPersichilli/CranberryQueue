@@ -217,7 +217,19 @@ class PlayerView: UIView, PlayerDelegate {
         }
     }
     
-    func clear() {
+    func showHelpLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = false
+        inactiveHostLabel.isHidden = true
+    }
+    
+    func showInactiveLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = true
+        inactiveHostLabel.isHidden = false
+    }
+    
+    func clearPlayerUI() {
         playPauseImage.image = nil
         skipSongImage.image = nil
         albumImageView.image = nil
@@ -226,4 +238,5 @@ class PlayerView: UIView, PlayerDelegate {
         helpLabel.isHidden = false
         likeIconImageView.isHidden = true
     }
+    
 }
