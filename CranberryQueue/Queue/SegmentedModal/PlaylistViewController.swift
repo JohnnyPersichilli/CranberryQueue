@@ -155,7 +155,7 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
     
     func requestAdditionalData(fromIndex index: Int, limit: Int) {
         guard let url = selectedTrackURL else { return }
-        getTracksFrom(url: url, fromIndex: index-1, limit: 20) { (songs) in
+        getTracksFrom(url: url, fromIndex: index+1, limit: 20) { (songs) in
             if songs.count == 0 {
                 self.songTableView.shouldStopRequestingSongs = true
                 return
