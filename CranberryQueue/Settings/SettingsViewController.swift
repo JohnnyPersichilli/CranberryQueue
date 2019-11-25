@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import GoogleMaps
 
 protocol SettingsMapDelegate: class {
     func logoutTapped()
@@ -40,24 +39,24 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     
     struct SettingsOption {
         var name = String()
-        var text = String()
+        var text = NSAttributedString()
     }
     
     var aboutUsOption = SettingsOption(
         name: "About us",
-        text: "Explore music playlists from around the world or share your own. Spotify's SDK provides local playback for hosts and Firestore supports a location-based voting scheme."
+        text: Constants.aboutUsBlurb()
     )
     var legalNoticeOption = SettingsOption(
         name: "Legal Notices",
-        text: GMSServices.openSourceLicenseInfo()
+        text: Constants.legalBlurb()
     )
     var faqOption = SettingsOption(
         name: "FAQ",
-        text: "Insert FAQ questions here"
+        text: Constants.faqBlurb()
     )
     var reportBugOption = SettingsOption(
         name: "Report A Bug",
-        text: "Insert bug reporting here"
+        text: Constants.bugReportBlurb()
     )
     
     lazy var optionsArray = [
@@ -141,11 +140,21 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     @objc func logoutTapped() {
-        mapDelegate?.logoutTapped()
-        setDefaultInfo()
-        self.presentingViewController?.dismiss(animated:true, completion: {
-            self.navigationController?.popToRootViewController(animated: true)
-        })
+        if(token != ""){
+            let alert = UIAlertController(title: "Are you sure want to sign out of Spotify?", message: "Signing out of Spotify will delete or leave your current queue.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Sign Out", style: .default, handler: { action in
+                self.mapDelegate?.logoutTapped()
+                self.setDefaultInfo()
+                self.presentingViewController?.dismiss(animated:true, completion: {
+                    self.navigationController?.popToRootViewController(animated: true)
+                })
+             }
+            ))
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
     }
     
     @objc func globeTapped() {
@@ -165,7 +174,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         DispatchQueue.main.async {
             self.moreDetailTitleLabel.text = option.name
-            self.moreDetailTextView.text = option.text
+            self.moreDetailTextView.attributedText = option.text
         }
     }
     

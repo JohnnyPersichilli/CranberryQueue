@@ -19,6 +19,8 @@ class Colors {
     static let colorDark = UIColor(red: 73.0 / 255.0, green: 71.0 / 255.0, blue: 71.0 / 255.0, alpha: 1.0)
     static let colorLight = UIColor(red: 48.0 / 255.0, green: 65.0 / 255.0, blue: 97.0 / 255.0, alpha: 1.0)
     
+    static let genericGray = UIColor(red: 100 / 255.0, green: 100 / 255.0, blue: 100 / 255.0, alpha: 0.7)
+    
     static var mapGradient = gradientFromColors(
         top: genericTop,
         middle: genericMiddle,

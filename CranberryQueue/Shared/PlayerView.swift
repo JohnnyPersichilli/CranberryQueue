@@ -11,41 +11,10 @@ import UIKit
 protocol PlayerControllerDelegate: class {
     func swiped()
     func playPause(isPaused: Bool)
+    func toggleLikeRequest()
 }
 
 class PlayerView: UIView, PlayerDelegate {
-    func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
-        if(isHost){
-            bottomGuestTimeLabelConstraint.constant = 7.5
-            self.isPaused = isPaused
-            skipSongImage.image = UIImage(named: "ios-skip-forward-white")
-            if(isPaused){
-                if #available(iOS 13.0, *) {
-                    playPauseImage.image = UIImage(systemName: "play.fill")
-                }else{
-                    playPauseImage.image = UIImage(named: "whitePlayIcon")
-                }
-            }else{
-                if #available(iOS 13.0, *) {
-                    playPauseImage.image = UIImage(systemName: "pause.fill")
-                }else{
-                    playPauseImage.image = UIImage(named: "ios-pause-white")
-                }
-            }
-            playPauseImage.isUserInteractionEnabled = true
-            skipSongImage.isUserInteractionEnabled = true
-        }else{
-            bottomGuestTimeLabelConstraint.constant = 25
-            playPauseImage.image = nil
-            skipSongImage.image = nil
-            playPauseImage.isUserInteractionEnabled = false
-            skipSongImage.isUserInteractionEnabled = false
-            
-        }
-
-    }
-    
-    
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
@@ -54,13 +23,13 @@ class PlayerView: UIView, PlayerDelegate {
     
     @IBOutlet var timeLabel: UILabel!
     
+    @IBOutlet weak var likeIconImageView: UIImageView!
+    
     @IBOutlet var helpLabel: UILabel!
     @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
     @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
-    
-    
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -88,7 +57,8 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.image = nil
         
         inactiveHostLabel.isHidden = true
-        
+        self.likeIconImageView.isHidden = true
+
         setupGestureRecognizers()
     }
     
@@ -100,6 +70,10 @@ class PlayerView: UIView, PlayerDelegate {
         let playPauseTap = UITapGestureRecognizer(target: self, action: #selector(playPauseTapped))
         playPauseImage.addGestureRecognizer(playPauseTap)
         playPauseImage.isUserInteractionEnabled = true
+        
+        let likeTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.likeIconTapped))
+        self.likeIconImageView.addGestureRecognizer(likeTapGesture)
+        self.likeIconImageView.isUserInteractionEnabled = true
     }
     
     @objc func playPauseTapped(){
@@ -109,6 +83,10 @@ class PlayerView: UIView, PlayerDelegate {
     @objc func skipSongTapped() {
         delegate?.swiped()
     }
+    
+     @objc func likeIconTapped() {
+        delegate?.toggleLikeRequest()
+     }
     
     //Same function as player controller
     func getURLFrom(_ playerState: SPTAppRemotePlayerState ) -> String {
@@ -121,8 +99,61 @@ class PlayerView: UIView, PlayerDelegate {
             print("no track image in JSON file for:", playerState.track.name)
             imageURL = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg"
         }
-        
         return imageURL
+    }
+    
+    func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
+        if(isHost){
+            bottomGuestTimeLabelConstraint.constant = 7.5
+            self.isPaused = isPaused
+            skipSongImage.image = UIImage(named: "ios-skip-forward-white")
+            if(isPaused){
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "play.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "whitePlayIcon")
+                }
+            }else{
+                if #available(iOS 13.0, *) {
+                    playPauseImage.image = UIImage(systemName: "pause.fill")
+                }else{
+                    playPauseImage.image = UIImage(named: "ios-pause-white")
+                }
+            }
+            playPauseImage.isUserInteractionEnabled = true
+            skipSongImage.isUserInteractionEnabled = true
+        }else{
+            bottomGuestTimeLabelConstraint.constant = 25
+            playPauseImage.image = nil
+            skipSongImage.image = nil
+            playPauseImage.isUserInteractionEnabled = false
+            skipSongImage.isUserInteractionEnabled = false
+        }
+    }
+    
+    func updateLikeUI(liked: Bool) {
+        DispatchQueue.main.async {
+            // if the incoming song is already in your library
+            if liked {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart.fill")!
+                    self.likeIconImageView.tintColor = UIColor.red
+                    self.likeIconImageView.isHidden = false
+                } else {
+                  // Fallback on earlier versions
+                }
+                
+            } else {
+                if #available(iOS 13.0, *) {
+                    self.likeIconImageView.image = UIImage(systemName: "heart")!
+                    self.likeIconImageView.tintColor = UIColor.white
+                    self.likeIconImageView.isHidden = false
+                } else {
+                  // Fallback on earlier versions
+                }
+                
+            }
+        }
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
@@ -165,13 +196,7 @@ class PlayerView: UIView, PlayerDelegate {
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
-                self.inactiveHostLabel.isHidden = false
-                self.playPauseImage.image = nil
-                self.skipSongImage.image = nil
-                self.albumImageView.image = nil
-                self.titleLabel.text = nil
-                self.timeLabel.text = nil
-                self.helpLabel.isHidden = true
+                self.showInactiveLabel()
                 if(posMinutes == durMinutes){
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
                 }else{
@@ -194,14 +219,25 @@ class PlayerView: UIView, PlayerDelegate {
         }
     }
     
-    func clear() {
+    func showHelpLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = false
+        inactiveHostLabel.isHidden = true
+    }
+    
+    func showInactiveLabel() {
+        clearPlayerUI()
+        helpLabel.isHidden = true
+        inactiveHostLabel.isHidden = false
+    }
+    
+    func clearPlayerUI() {
         playPauseImage.image = nil
         skipSongImage.image = nil
         albumImageView.image = nil
         titleLabel.text = nil
         timeLabel.text = nil
-        helpLabel.isHidden = false
-        inactiveHostLabel.isHidden = true
+        likeIconImageView.isHidden = true
     }
-
+    
 }
