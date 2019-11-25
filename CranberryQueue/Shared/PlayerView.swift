@@ -193,8 +193,6 @@ class PlayerView: UIView, PlayerDelegate {
         if(position > duration){
             DispatchQueue.main.async {
                 self.helpLabel.isHidden = true
-                self.playPauseImage.image = nil
-                self.skipSongImage.image = nil
                 //1 hour = 1000msec * 60sec * 60min
                 if( position - duration > (60*60*1000)){
                     self.timeLabel.text = "Host has been inactive for over an hour"
