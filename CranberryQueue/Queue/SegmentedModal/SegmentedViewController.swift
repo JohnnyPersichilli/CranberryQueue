@@ -14,6 +14,7 @@ protocol SegmentedJointDelegate: class {
 }
 
 protocol SegmentedChildDelegate: class {
+    func populate()
     func clear()
 }
 
@@ -24,7 +25,9 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
     @IBOutlet var searchContainerView: UIView!
     
     weak var jointDelegate: SegmentedJointDelegate?
-    weak var childDelegate: SegmentedChildDelegate?
+    weak var searchDelegate: SegmentedChildDelegate?
+    weak var playlistDelegate: SegmentedChildDelegate?
+    weak var featuredDelegate: SegmentedChildDelegate?
     
     var queueId: String?
     var uid: String?
@@ -51,7 +54,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
         }
         /// clears search table when you navigate away
         if control.selectedSegmentIndex != 0 {
-            childDelegate?.clear()
+            searchDelegate?.clear()
         }
         UIView.animate(withDuration: 0.3, animations: {
             self.stackHorizontalConstraint.constant = newConstant
@@ -63,31 +66,27 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
     
     func searchTapped(shouldHideContents: Bool) {
         if shouldHideContents {
-            childDelegate?.clear()
+            searchDelegate?.clear()
+        }
+        else {
+            playlistDelegate?.populate()
+            featuredDelegate?.populate()
         }
     }
     
     func addSongTapped(song: Song) {
-        var newSong = self.songToJSON(song: song)
         var ref: DocumentReference? = nil
         ref = db?.collection("song").addDocument(data: [
             "queueId": self.queueId!
-            ], completion: { (val) in
-                newSong["docID"] = ref!.documentID
-                self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
-                
-                self.db?.collection("playlist").document(self.queueId!).collection("songs").getDocuments(completion: { (snapshot, error) in
-                    guard let snap = snapshot else {
-                        print(error!)
-                        return
-                    }
-                    if snap.documents.count == 0 {
-                        newSong["next"] = true
-                    }
-                    self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
-                    })
-                })
+        ], completion: { (val) in
+            var newSong = self.songToJSON(song: song)
+            newSong["docID"] = ref!.documentID
+            newSong["timestamp"] = FieldValue.serverTimestamp()
+            self.jointDelegate?.addSongTapped(song: self.JSONToSong(json: newSong))
+            
+            self.db?.collection("playlist").document(self.queueId!).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                ref?.collection("upvoteUsers").document(self.uid!).setData([:], completion: { (err) in  })
+            })
         })
     }
     
@@ -99,7 +98,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             "docID": song.docID,
             "votes": 0,
             "uri": song.uri,
-            "next": song.next
+            "next": song.next,
         ]
     }
     
@@ -120,7 +119,7 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             /// swap delegates with SearchController
             let vc = segue.destination as? SearchController
             vc?.delegate = self
-            childDelegate = vc
+            searchDelegate = vc
         }
         else if segue.destination is FeaturedController {
             let vc = segue.destination as? FeaturedController
@@ -128,10 +127,12 @@ class SegmentedViewController: UIViewController, QueueSegmentedDelegate, Segment
             vc?.city = self.city
             vc?.region = self.region
             vc?.db = self.db
+            featuredDelegate = vc
         }
         else if segue.destination is PlaylistViewController {
             let vc = segue.destination as? PlaylistViewController
             vc?.delegate = self
+            playlistDelegate = vc
         }
     }
 }

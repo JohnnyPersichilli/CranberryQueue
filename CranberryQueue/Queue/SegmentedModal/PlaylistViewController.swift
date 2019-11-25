@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PlaylistViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SegmentedJointDelegate {
+class PlaylistViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SegmentedChildDelegate, TableSegmentedDelegate {
     
     @IBOutlet var playlistTableView: UITableView!
     @IBOutlet var songTableView: SearchTableView!
@@ -20,6 +20,8 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
     weak var delegate: SegmentedJointDelegate?
     
     var playlists = [Playlist]()
+    var selectedTrackURL: String? = nil
+    var shouldStopRequestingPlaylists = false
     
     var token: String {
         get {
@@ -32,9 +34,7 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         playlistTableView.delegate = self
         playlistTableView.dataSource = self
-        if token != "" {
-            getPlaylists()
-        }
+
         songTableView.delegate = songTableView
         songTableView.dataSource = songTableView
         songTableView.controllerDelegate = self
@@ -44,7 +44,32 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         returnIconImageView.isUserInteractionEnabled = true
     }
     
+    func populate() {
+        if playlists.count != 0 || token == "" {
+            return
+        }
+        playlists = [
+            Playlist(
+                name: "Liked Songs",
+                author: "Spotify",
+                imageURL: "https://static.thenounproject.com/png/5604-200.png",
+                tracksURL: "https://api.spotify.com/v1/me/tracks"
+            )
+        ]
+        getPlaylists(fromIndex: 0, limit: 20, completion: { playlists in
+            self.playlists += playlists
+            DispatchQueue.main.async {
+                self.playlistTableView.reloadData()
+            }
+        })
+    }
+    
+    func clear() {
+        // did not previously conform to this proto
+    }
+    
     @objc func returnTapped() {
+        selectedTrackURL = nil
         UIView.animate(withDuration: 0.5) {
             self.horizontalConstraint.constant = 0
             self.view.layoutIfNeeded()
@@ -56,8 +81,8 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         delegate?.addSongTapped(song: song)
     }
     
-    func getPlaylists() {
-        let url = URL(string: "https://api.spotify.com/v1/me/playlists")!
+    func getPlaylists(fromIndex index: Int, limit: Int, completion: @escaping ([Playlist]) -> Void) {
+        let url = URL(string: "https://api.spotify.com/v1/me/playlists?offset=\(index)&limit=\(limit)")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -66,9 +91,9 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
                 return
             }
             do {
-                self.playlists = [Playlist(name: "Liked Songs", author: "Spotify", imageURL: "https://static.thenounproject.com/png/5604-200.png", tracksURL: "https://api.spotify.com/v1/me/tracks")]
                 let jsonRes = try JSONSerialization.jsonObject(with: data0, options: []) as! [String: Any]
                 let items = jsonRes["items"] as! [[String:Any]]
+                var newPlaylists = [Playlist]()
                 for item in items {
                     let name = item["name"] as! String
                     let author = (item["owner"] as! [String:Any])["display_name"] as! String
@@ -80,11 +105,9 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
                     }
                     let tracksURL = (item["tracks"] as! [String:Any])["href"] as! String
                     let playlist = Playlist(name: name, author: author, imageURL: imageURL, tracksURL: tracksURL)
-                    self.playlists.append(playlist)
+                    newPlaylists.append(playlist)
                 }
-                DispatchQueue.main.async {
-                    self.playlistTableView.reloadData()
-                }
+                completion(newPlaylists)
             } catch {
                 print(error.localizedDescription)
             }
@@ -92,8 +115,8 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         task.resume()
     }
     
-    func getTracksFrom(url: String, completion: @escaping ([Song])-> Void) {
-        let url = URL(string: url)!
+    func getTracksFrom(url: String, fromIndex index: Int, limit: Int, completion: @escaping ([Song])-> Void) {
+        let url = URL(string: url + "?offset=\(index)&limit=\(limit)")!
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -130,12 +153,34 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         task.resume()
     }
     
+    func requestAdditionalData(fromIndex index: Int, limit: Int) {
+        guard let url = selectedTrackURL else { return }
+        getTracksFrom(url: url, fromIndex: index+1, limit: 20) { (songs) in
+            if songs.count == 0 {
+                self.songTableView.shouldStopRequestingSongs = true
+                return
+            }
+            DispatchQueue.main.async {
+                self.songTableView.songs += songs
+                self.songTableView.reloadData()
+            }
+            UIView.animate(withDuration: 0.5) {
+                self.horizontalConstraint.constant = -self.view.frame.width
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = playlistTableView.cellForRow(at: indexPath) as? PlaylistCell else { return }
         let tracksURL = cell.tracksURL
-        getTracksFrom(url: tracksURL) { (songs) in
-            self.songTableView.songs = songs
-            self.songTableView.reloadData()
+        selectedTrackURL = tracksURL
+        songTableView.shouldStopRequestingSongs = false
+        getTracksFrom(url: tracksURL, fromIndex: 0, limit: 20) { (songs) in
+            DispatchQueue.main.async {
+                self.songTableView.songs = songs
+                self.songTableView.reloadData()
+            }
             UIView.animate(withDuration: 0.5) {
                 self.horizontalConstraint.constant = -self.view.frame.width
                 self.view.layoutIfNeeded()
@@ -162,6 +207,23 @@ class PlaylistViewController: UIViewController, UITableViewDelegate, UITableView
         cell.imageURL = playlist.imageURL
         cell.tracksURL = playlist.tracksURL
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if shouldStopRequestingPlaylists { return }
+        let endIndex = playlists.count - 1
+        if indexPath.section == endIndex {
+            getPlaylists(fromIndex: endIndex, limit: 20) { (playlists) in
+                if playlists.count == 0 {
+                    self.shouldStopRequestingPlaylists = true
+                    return
+                }
+                self.playlists += playlists
+                DispatchQueue.main.async {
+                    self.playlistTableView.reloadData()
+                }
+            }
+        }
     }
     
     struct Playlist {

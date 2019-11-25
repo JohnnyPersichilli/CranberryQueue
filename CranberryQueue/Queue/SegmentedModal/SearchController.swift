@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SearchController: UIViewController, UISearchBarDelegate, SegmentedChildDelegate, SegmentedJointDelegate {
+class SearchController: UIViewController, UISearchBarDelegate, SegmentedChildDelegate, TableSegmentedDelegate {
         
     @IBOutlet var searchTableView: SearchTableView!
     
@@ -32,6 +32,10 @@ class SearchController: UIViewController, UISearchBarDelegate, SegmentedChildDel
         
         searchBar.delegate = self
         searchBar.showsCancelButton = false
+    }
+    
+    func populate() {
+        // called on search tapped
     }
     
     func clear() {
@@ -110,6 +114,10 @@ class SearchController: UIViewController, UISearchBarDelegate, SegmentedChildDel
         searchBar.text = ""
         clear()
         delegate?.addSongTapped(song: song)
+    }
+    
+    func requestAdditionalData(fromIndex index: Int, limit: Int) {
+        // used to query more data when scrolling
     }
     
 }

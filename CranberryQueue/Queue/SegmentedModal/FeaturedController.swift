@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJointDelegate {
+class FeaturedController: UIViewController, SegmentedChildDelegate, TableSegmentedDelegate {
     
     @IBOutlet weak var featuredTableView: SearchTableView!
     
@@ -32,6 +32,10 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
                 self.featuredTableView.reloadData()
             }
         }
+    }
+    
+    func populate() {
+        // called on search tapped
     }
     
     func clear() {
@@ -59,6 +63,10 @@ class FeaturedController: UIViewController, SegmentedChildDelegate, SegmentedJoi
             }
             completion(songs)
         })
+    }
+    
+    func requestAdditionalData(fromIndex index: Int, limit: Int) {
+        // used to query more data when scrolling
     }
     
     func addSongTapped(song: Song) {

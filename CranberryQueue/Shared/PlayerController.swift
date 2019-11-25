@@ -232,14 +232,32 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
+            getRefToDeleteWith(uri, completion: { deleteDocRef in
+                self.getNextSongDoc(ignoringDoc: deleteDocRef) { (updateDoc) in
+                    self.popSongBatch(deleteDoc: deleteDocRef, updateDoc: updateDoc?.reference)
+                    if let uri = updateDoc?.data()?["uri"] as? String {
+                        self.enqueueSongWith(uri)
+                    }
+                }
             // will prepopulate the like icon to be already liked or not
             self.updateLikeIcon()
-            removeSongWith(uri, completion: {
-                self.enqueueNextSong()
             })
         }
     }
-    
+
+    func popSongBatch(deleteDoc: DocumentReference?, updateDoc: DocumentReference?) {
+        let batch = db?.batch()
+        if let delDoc = deleteDoc {
+            batch?.deleteDocument(delDoc)
+        }
+        if let upDoc = updateDoc {
+            batch?.updateData([
+                "next": true
+            ], forDocument: upDoc)
+        }
+        batch?.commit()
+    }
+
     func updateLikeIcon() {
         if let id = getIdFromCurrentUri() {
             let url = URL(string: "https://api.spotify.com/v1/me/tracks/contains?ids=\(id)")!
@@ -274,13 +292,60 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
     }
     
+    func getNextSongDoc(ignoringDoc: DocumentReference?, completion: @escaping (DocumentSnapshot?) -> Void) {
+        songTableWith(queueId!)?.order(by: "next", descending: true).order(by: "votes", descending: true).limit(to: 2).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.isEmpty {
+                completion(nil)
+                return
+            }
+            var doc = snap.documents[0]
+            if let ignoreDoc = ignoringDoc {
+                if doc.reference == ignoreDoc {
+                    if snap.documents.count > 1 {
+                        doc = snap.documents[1]
+                    }
+                    else {
+                        completion(nil)
+                        return
+                    }
+                }
+            }
+            completion(doc)
+        })
+    }
+    
+    func getRefToDeleteWith(_ uri: String, completion: @escaping (DocumentReference?)-> Void) {
+        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            var docs = snap.documents
+            if docs.count == 0 {
+                completion(nil)
+                return
+            }
+            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
+                completion(doc.reference)
+            }
+            else {
+                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
+                completion(docs[0].reference)
+            }
+            
+        })
+    }
+    
     func enqueueNextSong() {
         songTableWith(queueId!)?.order(by: "votes", descending: true).limit(to: 1).getDocuments(completion: { (snapshot, error) in
             guard let snap = snapshot else {
                 print(error!)
                 return
             }
-            
             if snap.isEmpty {
                 return
             }
@@ -291,32 +356,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             ref.setData(data, merge: true)
             
             self.enqueueSongWith(data["uri"] as! String)
-        })
-    }
-    
-    func removeSongWith(_ uri: String, completion: @escaping ()-> Void) {
-        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            var docs = snap.documents
-            if docs.count == 0 {
-                completion()
-                return
-            }
-            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
-                doc.reference.delete { (val) in
-                    completion()
-                }
-            }
-            else {
-                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
-                docs[0].reference.delete { (val) in
-                    completion()
-                }
-            }
-            
         })
     }
     
