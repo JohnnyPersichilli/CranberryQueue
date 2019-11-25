@@ -41,7 +41,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
     func watchPlaylist() {
         db = Firestore.firestore()
         
-        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).addSnapshotListener({ (snapshot, error) in
+        songRef = db?.collection("playlist").document(queueId!).collection("songs").order(by: "next", descending: true).order(by: "votes", descending: true).order(by: "timestamp", descending: false).addSnapshotListener({ (snapshot, error) in
             var newSongs = [Song]()
             let oldSongs = self.songs
             guard let snap = snapshot else {
@@ -219,7 +219,7 @@ class SongTableView: UITableView, UITableViewDelegate, UITableViewDataSource, Qu
         cell.songId = song.docID
         cell.voteLabel.text = String(song.votes)
         
-        cell.song = song // need to depreciate above
+        cell.song = song // need to deprecate above
         cell.delegate = self
         cell.uid = self.uid
         

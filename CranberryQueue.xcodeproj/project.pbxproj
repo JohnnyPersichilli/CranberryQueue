@@ -66,7 +66,6 @@
 		4C55CCBD232CB8C00059C898 /* CustomObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObjects.swift; sourceTree = "<group>"; };
 		4C8469CF2357C1BF0098AE59 /* JoinQueueForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinQueueForm.xib; sourceTree = "<group>"; };
 		4C8469D12357C1D40098AE59 /* JoinQueueForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinQueueForm.swift; sourceTree = "<group>"; };
-		4C94F6652370B961009843FB /* SearchTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
 		4C94F6672370CF67009843FB /* PlaylistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewController.swift; sourceTree = "<group>"; };
 		4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BC04232D4B8D007F8D38 /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
@@ -127,11 +126,10 @@
 			children = (
 				4CBFCF5B236672410087B66F /* SegmentedViewController.swift */,
 				4CA5BC04232D4B8D007F8D38 /* SearchController.swift */,
-				1CAA4621236FBD7D00D34440 /* SearchTableView.swift */,
-				1CAA461D236E910D00D34440 /* FeaturedController.swift */,
-				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
-				4C94F6652370B961009843FB /* SearchTableView.swift */,
 				4C94F6672370CF67009843FB /* PlaylistViewController.swift */,
+				1CAA461D236E910D00D34440 /* FeaturedController.swift */,
+				1CAA4621236FBD7D00D34440 /* SearchTableView.swift */,
+				4CA5BC02232D48D0007F8D38 /* SearchTableViewCell.swift */,
 			);
 			path = SegmentedModal;
 			sourceTree = "<group>";

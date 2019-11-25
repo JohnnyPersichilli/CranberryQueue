@@ -14,11 +14,11 @@ protocol PlayerDelegate: class {
     func updateSongUI(withState: SPTAppRemotePlayerState)
     func updateTimerUI(position: Int, duration: Int)
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool)
-    func clear()
+    func updateLikeUI(liked: Bool)
+    func showHelpLabel()
 }
 
 class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegate, PlayerControllerDelegate {
-    
     func updateConnectionStatus(connected: Bool) {
         if connected && isHost {
             let delegate = UIApplication.shared.delegate as! AppDelegate
@@ -32,6 +32,12 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         if queueId != nil && isHost {
             skipSong()
         }
+    }
+    
+    func getIdFromCurrentUri() -> String? {
+        let index = self.currentUri.index(self.currentUri.startIndex, offsetBy: 13)
+        let range = self.currentUri.index(after: index)..<self.currentUri.endIndex
+        return String(self.currentUri[range])
     }
     
     func playPause(isPaused: Bool){
@@ -73,6 +79,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var position = 0
     
     var isEnqueuing = false
+    var isSongLiked: Bool = false
     
     var mapDelegate: PlayerDelegate?
     var queueDelegate: PlayerDelegate?
@@ -81,7 +88,26 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var hostListener: ListenerRegistration? = nil
     
     static let sharedInstance = PlayerController()
+    
+    func toggleLikeRequest() {
+        let id = getIdFromCurrentUri()!
+        let url = URL(string: "https://api.spotify.com/v1/me/tracks?ids=\(id)")!
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = isSongLiked ? "DELETE" : "PUT"
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let err = error {
+                return
+            }
+            self.isSongLiked.toggle()
+            self.mapDelegate?.updateLikeUI(liked: self.isSongLiked)
+            self.queueDelegate?.updateLikeUI(liked: self.isSongLiked)
+        }
+        task.resume()
+    }
+    
     func setupPlayer(queueId: String?, isHost: Bool) {
         let oldQueueId = self.queueId
         
@@ -102,8 +128,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
             timer.invalidate()
             position = 0
-            mapDelegate?.clear()
-            queueDelegate?.clear()
+            mapDelegate?.showHelpLabel()
+            queueDelegate?.showHelpLabel()
             hostListener?.remove()
             guestListener?.remove()
         }
@@ -141,7 +167,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         position += 1000
         mapDelegate?.updateTimerUI(position: position, duration: duration)
         queueDelegate?.updateTimerUI(position: position, duration: duration)
-        if Int(position/1000) >= Int(duration/1000) {
+        if Int(position/1000)-1 >= Int(duration/1000) {
             isTimerRunning = false
         }
     }
@@ -178,6 +204,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             })
             return
         }
+        
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
         
@@ -205,10 +232,112 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         let uri = playerState.track.uri
         if currentUri != uri {
             currentUri = uri
-            removeSongWith(uri, completion: {
-                self.enqueueNextSong()
+            getRefToDeleteWith(uri, completion: { deleteDocRef in
+                self.getNextSongDoc(ignoringDoc: deleteDocRef) { (updateDoc) in
+                    self.popSongBatch(deleteDoc: deleteDocRef, updateDoc: updateDoc?.reference)
+                    if let uri = updateDoc?.data()?["uri"] as? String {
+                        self.enqueueSongWith(uri)
+                    }
+                }
+            // will prepopulate the like icon to be already liked or not
+            self.updateLikeIcon()
             })
         }
+    }
+
+    func popSongBatch(deleteDoc: DocumentReference?, updateDoc: DocumentReference?) {
+        let batch = db?.batch()
+        if let delDoc = deleteDoc {
+            batch?.deleteDocument(delDoc)
+        }
+        if let upDoc = updateDoc {
+            batch?.updateData([
+                "next": true
+            ], forDocument: upDoc)
+        }
+        batch?.commit()
+    }
+
+    func updateLikeIcon() {
+        if let id = getIdFromCurrentUri() {
+            let url = URL(string: "https://api.spotify.com/v1/me/tracks/contains?ids=\(id)")!
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(self.token!)", forHTTPHeaderField: "Authorization")
+            request.httpMethod = "GET"
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+               if let httpResponse = response as? HTTPURLResponse {
+                   //print(httpResponse.statusCode) ~> 200 OK
+               }
+                guard let data = data else {
+                     return
+                }
+                do {
+                    let jsonRes = try JSONSerialization.jsonObject(with: data, options: []) as! NSArray
+                    let value = jsonRes.firstObject as! Int
+                    self.mapDelegate?.updateLikeUI(liked: value == 1)
+                    self.queueDelegate?.updateLikeUI(liked: value == 1)
+                    self.isSongLiked = value == 1
+                }
+                catch {
+                    print("error")
+                }
+
+               if let err = error {
+                   print(err)
+               }
+            }
+            task.resume()
+        }
+    }
+    
+    func getNextSongDoc(ignoringDoc: DocumentReference?, completion: @escaping (DocumentSnapshot?) -> Void) {
+        songTableWith(queueId!)?.order(by: "next", descending: true).order(by: "votes", descending: true).limit(to: 2).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            if snap.isEmpty {
+                completion(nil)
+                return
+            }
+            var doc = snap.documents[0]
+            if let ignoreDoc = ignoringDoc {
+                if doc.reference == ignoreDoc {
+                    if snap.documents.count > 1 {
+                        doc = snap.documents[1]
+                    }
+                    else {
+                        completion(nil)
+                        return
+                    }
+                }
+            }
+            completion(doc)
+        })
+    }
+    
+    func getRefToDeleteWith(_ uri: String, completion: @escaping (DocumentReference?)-> Void) {
+        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
+            guard let snap = snapshot else {
+                print(error!)
+                return
+            }
+            var docs = snap.documents
+            if docs.count == 0 {
+                completion(nil)
+                return
+            }
+            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
+                completion(doc.reference)
+            }
+            else {
+                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
+                completion(docs[0].reference)
+            }
+            
+        })
     }
     
     func enqueueNextSong() {
@@ -217,7 +346,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 print(error!)
                 return
             }
-            
             if snap.isEmpty {
                 return
             }
@@ -228,32 +356,6 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             ref.setData(data, merge: true)
             
             self.enqueueSongWith(data["uri"] as! String)
-        })
-    }
-    
-    func removeSongWith(_ uri: String, completion: @escaping ()-> Void) {
-        songTableWith(queueId!)?.whereField("uri", isEqualTo: uri ).getDocuments(completion: { (snapshot, error) in
-            guard let snap = snapshot else {
-                print(error!)
-                return
-            }
-            var docs = snap.documents
-            if docs.count == 0 {
-                completion()
-                return
-            }
-            if let doc = docs.first(where: {$0.data()["next"] as! Bool == true}) {
-                doc.reference.delete { (val) in
-                    completion()
-                }
-            }
-            else {
-                docs.sort(by: {$0.data()["votes"] as! Int > $1.data()["votes"] as! Int})
-                docs[0].reference.delete { (val) in
-                    completion()
-                }
-            }
-            
         })
     }
     
@@ -293,7 +395,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             guard let contents = snapshot?.data() else {
-                self.mapDelegate?.clear()
+                self.mapDelegate?.showHelpLabel()
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)

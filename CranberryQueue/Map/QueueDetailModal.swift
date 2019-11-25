@@ -30,7 +30,8 @@ class QueueDetailModal: UIView {
     @IBOutlet var closeIconImageView: UIImageView!
     
     var currentQueue: CQLocation? = nil
-    var inRange: Bool = false
+    var isInRange: Bool = false
+    var currPlaybackDoc: [String: Any] = [:]
         
     var distance: Double = 0 {
         didSet {
@@ -70,12 +71,12 @@ class QueueDetailModal: UIView {
         //can set this as the radius if we are letting users do that or an arbitrary number like 500m
         let maxDistance = 500.0
         if(distance > maxDistance){
-            inRange = false
+            isInRange = false
             distanceLabel.textColor = UIColor.red.withAlphaComponent(0.6)
             joinButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
             joinButton.isOpaque = true
         }else{
-            inRange = true
+            isInRange = true
             distanceLabel.textColor = UIColor.white
             joinButton.backgroundColor = joinGreen
             joinButton.isOpaque = false
@@ -98,6 +99,7 @@ class QueueDetailModal: UIView {
     }
     
     func updateWithPlaybackDoc(doc: [String:Any]) {
+        currPlaybackDoc = doc
         let currSong = doc["name"] as? String ?? ""
         let currArtist = doc["artist"] as? String ?? ""
         let songImage = doc["imageURL"] as? String ?? ""

@@ -20,7 +20,6 @@ protocol ControllerMapDelegate: class {
 }
 
 class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDelegate, SessionDelegate, LoginMapDelegate, QueueMapDelegate, SettingsMapDelegate, RemoteDelegate, activityIndicatorPresenter, HelpMapDelegate {
-    
 
     // Labels
     @IBOutlet var cityLabel: UILabel!
@@ -113,12 +112,17 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         helpIconImageView.isUserInteractionEnabled = true
         
         let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue))
+
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
         let closeModalTap = UITapGestureRecognizer(target: self, action: #selector(closeDetailModal))
         queueDetailModal.closeIconImageView.addGestureRecognizer(closeModalTap)
         queueDetailModal.closeIconImageView.isUserInteractionEnabled = true
+        
+        let addSongFromDetailTap = UITapGestureRecognizer(target: self, action: #selector(addSongFromDetail))
+        queueDetailModal.addIconImageView.addGestureRecognizer(addSongFromDetailTap)
+        queueDetailModal.addIconImageView.isUserInteractionEnabled = true
         
         let searchTap = UITapGestureRecognizer(target: self, action: #selector(searchTapped))
         privateSearchIconImageView.addGestureRecognizer(searchTap)
@@ -136,7 +140,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
         backToQueueIconImageView.isUserInteractionEnabled = true
         
-        let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(homeTapped))
+        let playerHomeTap = UITapGestureRecognizer(target: self, action: #selector(playerTapped))
         playerView.addGestureRecognizer(playerHomeTap)
         playerView.isUserInteractionEnabled = true
         
@@ -328,7 +332,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
-    
     // Helper to close create queue modal
     @objc func closeCreateForm() {
         controllerMapDelegate?.setQueue(nil)
@@ -370,7 +373,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         if textField.text == nil || textField.text == "" {
             return false
         }
-
     
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
@@ -428,21 +430,27 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return result;
     }
     
-    // Join Public queue from queue detail modal
-    @objc func joinPublicQueue() {
-        if(queueDetailModal.inRange){
-            let data = queueDetailModal.currentQueue!
-            self.getIsUserHostOf(queueId: data.queueId) { (isHost) in
-                if isHost {
-                    if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
-                        self.showAppRemoteAlert()
-                        return
-                    }
-                }
-                self.presentQueueScreen(queueId: data.queueId, name: data.name, code: nil, isHost: isHost)
-            }
-        } else {
+    // Join queue from detail modal
+    @objc func joinDetailQueue() {
+        if queueDetailModal.isInRange {
+            guard let data = queueDetailModal.currentQueue else { return }
+            joinPublicQueue(queueId: data.queueId, name: data.name)
+        }
+        else {
             queueDetailModal.flashDistance()
+        }
+    }
+    
+    // Join public queue from queue detail modal or player
+    func joinPublicQueue(queueId: String, name: String) {
+        self.getIsUserHostOf(queueId: queueId) { (isHost) in
+            if isHost {
+                if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
+                    self.showAppRemoteAlert()
+                    return
+                }
+            }
+            self.presentQueueScreen(queueId: queueId, name: name, code: nil, isHost: isHost)
         }
     }
 
@@ -547,13 +555,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
     }
     
-    // Helper removes user from their current queue or deletes the queue if they are the host
-    func leaveCurrentQueue() {
+    func removeUser() {
         guard let queueId = queueId else {
-            return
-        }
-        if isHost {
-            self.db?.collection("location").document(queueId).delete()
             return
         }
         let url = URL(string: "https://us-central1-cranberryqueue.cloudfunctions.net/removeFromMembers")!
@@ -570,6 +573,19 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             }
         }
         task.resume()
+    }
+    
+    // Helper removes user from their current queue or deletes the queue if they are the host
+    func leaveCurrentQueue() {
+        guard let queueId = queueId else {
+            return
+        }
+        if isHost {
+            self.db?.collection("location").document(queueId).delete()
+            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+            return
+        }
+        removeUser()
     }
     
     // Checks if user is host of any queues by querying contributor table
@@ -599,17 +615,15 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         self.controllerMapDelegate?.setLocationEnabled(true)
     }
     
-    // Home tapped while in private queue brings user to queue screen
-    @objc func homeTapped() {
+    // Player tapped while in queue brings user to queue screen
+    @objc func playerTapped() {
         self.closeJoinForm()
         self.closeDetailModal()
         self.closeCreateForm()
         if(code != nil){
             joinPrivateQueue(code: code!)
         }else if(queueId != nil && name != nil){
-            self.getIsUserHostOf(queueId: queueId!) { (isHost) in
-                self.presentQueueScreen(queueId: self.queueId!, name: self.name!, code: nil, isHost: isHost)
-            }
+            joinPublicQueue(queueId: queueId!, name: name!)
         }
 
     }
@@ -632,25 +646,25 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     // Called when add song icon is tapped in the Queue Detail Modal
-        @objc func addSongFromDetail() {
-            guard let queueId = queueId else {
-                return
-            }
-            var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
-            var ref: DocumentReference? = nil
-            ref = db?.collection("song").addDocument(data: [
-                "queueId": queueId
-                ], completion: { (val) in
-                    newSong["docID"] = ref!.documentID
-                    self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
-                        self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
-                            let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil))
-                            self.present(alert, animated: true)
-                        })
-                    })
-            })
+    @objc func addSongFromDetail() {
+        guard let queueId = queueId else {
+            return
         }
+        var newSong = playbackDocToSongDoc(doc: queueDetailModal.currPlaybackDoc)
+        var ref: DocumentReference? = nil
+        ref = db?.collection("song").addDocument(data: [
+            "queueId": queueId
+            ], completion: { (val) in
+                newSong["docID"] = ref!.documentID
+                self.db?.collection("playlist").document(queueId).collection("songs").document(ref!.documentID).setData(newSong, completion: { err in
+                    self.db?.collection("song").document(ref!.documentID).collection("upvoteUsers").document(self.uid).setData([:], completion: { (err) in
+                        let alert = UIAlertController(title: "Success", message: "\"" + (newSong["name"] as! String) + "\" has been successfully added to your queue.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler:nil))
+                        self.present(alert, animated: true)
+                    })
+                })
+        })
+    }
     
     // Called when settings icon is tapped
     @objc func settingsTapped() {
@@ -665,12 +679,11 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
     // Called when logout is tapped from settings # SettingsMapDelegate
     func logoutTapped() {
-        loginContainer.isHidden = false
+        leaveCurrentQueue()
         isPremium = false
-        if isHost {
-            (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
-            self.playerController.setupPlayer(queueId: nil, isHost: false)
-        }
+        (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
+        self.playerController.setupPlayer(queueId: nil, isHost: false)
+        self.queueId = nil
         isHost = false
         shouldPlayMusic = false
         (UIApplication.shared.delegate as? AppDelegate)?.token = ""
@@ -712,6 +725,13 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 self.closeDetailModal()
             }
         })
+    }
+    
+    // Called on idle camera with boolean to highlight map recenter icon # MapDelegate
+    func updateCanRecenter(val: Bool) {
+        if #available(iOS 13.0, *) {
+            backToQueueIconImageView.image = UIImage(systemName: val ? "location" : "location.fill")
+        }
     }
     
     // Helper animates queue detail modal open

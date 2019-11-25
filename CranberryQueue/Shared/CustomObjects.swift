@@ -16,6 +16,7 @@ struct Song {
     var votes = 0
     var uri = String()
     var next = false
+    var timestamp = Int()
 }
 
 struct CQLocation {
