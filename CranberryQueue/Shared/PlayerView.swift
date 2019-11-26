@@ -157,36 +157,46 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func updateSongUI(withState state: SPTAppRemotePlayerState) {
-        helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
-        let url = URL( string: getURLFrom(state) )
-        
-        let task = URLSession.shared.dataTask(with: url!) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error!)
-                return }
-            DispatchQueue.main.async() {
-                self.titleLabel.text = state.track.name + " - " + state.track.artist.name
-                self.albumImageView.image = UIImage(data: data)
+        let position = state.playbackPosition
+        if position <= state.track.duration {
+            inactiveHostLabel.isHidden = true
+            
+            let url = URL( string: getURLFrom(state) )
+            let task = URLSession.shared.dataTask(with: url!) { data, response, error in
+                guard let data = data, error == nil else {
+                    print(error!)
+                    return }
+                DispatchQueue.main.async() {
+                    self.titleLabel.text = state.track.name + " - " + state.track.artist.name
+                    self.albumImageView.image = UIImage(data: data)
+                }
             }
+            task.resume()
         }
-        task.resume()
+        
+        helpLabel.isHidden = true
+        updateTimerUI(position: position, duration: Int(state.track.duration))
     }
     
-    func updateSongUI(withInfo info: PlaybackInfo) {
-        helpLabel.isHidden = true
-        inactiveHostLabel.isHidden = true
-        let url = URL(string: info.imageURL)
-        let task = URLSession.shared.dataTask(with: url!) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error!)
-                return }
-            DispatchQueue.main.async() {
-                self.titleLabel.text = info.name + " - " + info.artist
-                self.albumImageView.image = UIImage(data: data)
+    func updateSongUI(withInfo info: PlaybackInfo, position: Int) {
+        if position <= info.duration {
+            inactiveHostLabel.isHidden = true
+            
+            let url = URL(string: info.imageURL)
+            let task = URLSession.shared.dataTask(with: url!) { data, response, error in
+                guard let data = data, error == nil else {
+                    print(error!)
+                    return }
+                DispatchQueue.main.async() {
+                    self.titleLabel.text = info.name + " - " + info.artist
+                    self.albumImageView.image = UIImage(data: data)
+                }
             }
+            task.resume()
         }
-        task.resume()
+        
+        helpLabel.isHidden = true
+        updateTimerUI(position: position, duration: info.duration)
     }
     
     func updateTimerUI(position: Int, duration: Int) {
@@ -197,12 +207,14 @@ class PlayerView: UIView, PlayerDelegate {
         if(position > duration){
             DispatchQueue.main.async {
                 self.showInactiveLabel()
-                if(posMinutes == durMinutes){
-                    self.inactiveHostLabel.text = "Host has been inactive for " + String(posSeconds-durSeconds) + " seconds"
+                if( position - duration > (60*60*1000)){
+                    self.inactiveHostLabel.text = "Host has been inactive for over an hour"
+                }
+                else if(posMinutes == durMinutes){
+                    self.inactiveHostLabel.text = "Host has been inactive for less than 1 minute"
                 }else{
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
                 }
-                
             }
             return
         }
