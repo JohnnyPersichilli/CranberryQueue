@@ -26,6 +26,8 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
+    @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var authorTrailingConstraint: NSLayoutConstraint!
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -53,7 +55,8 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.image = nil
         
         inactiveHostLabel.isHidden = true
-        self.likeIconImageView.isHidden = true
+        likeIconImageView.isHidden = true
+        songProgressBar.isHidden = true
 
         setupGestureRecognizers()
     }
@@ -100,6 +103,9 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
         if(isHost){
+            //113 = playPauseImage.frame.width + likeIconImageView.frame.width + skipSongImage.frame.width + 8 + 7 + 7 + 7
+            self.titleTrailingConstraint.constant = 113
+            self.authorTrailingConstraint.constant = 113
             self.isPaused = isPaused
             skipSongImage.image = UIImage(named: "ios-skip-forward-white")
             if(isPaused){
@@ -118,6 +124,9 @@ class PlayerView: UIView, PlayerDelegate {
             playPauseImage.isUserInteractionEnabled = true
             skipSongImage.isUserInteractionEnabled = true
         }else{
+            //43 = likeIconImageView.frame.width + 8 + 7
+            self.titleTrailingConstraint.constant = 43
+            self.authorTrailingConstraint.constant = 43
             playPauseImage.image = nil
             skipSongImage.image = nil
             playPauseImage.isUserInteractionEnabled = false
@@ -238,7 +247,7 @@ class PlayerView: UIView, PlayerDelegate {
         titleLabel.text = nil
         authorLabel.text = nil
         likeIconImageView.isHidden = true
-        songProgressBar.progress = 0.0
+        songProgressBar.isHidden = true
     }
     
 }

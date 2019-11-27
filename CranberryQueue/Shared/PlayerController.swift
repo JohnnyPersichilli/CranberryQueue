@@ -409,6 +409,9 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             self.mapDelegate?.updateSongUI(withInfo: info, position: self.position)
             self.queueDelegate?.updateSongUI(withInfo: info, position: self.position)
             
+            self.mapDelegate?.updatePlayPauseUI(isPaused: info.isPaused, isHost: self.isHost)
+            self.queueDelegate?.updatePlayPauseUI(isPaused: info.isPaused, isHost: self.isHost)
+            
             if (info.isPaused) {
                 self.timer.invalidate()
             }
