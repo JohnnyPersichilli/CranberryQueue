@@ -151,6 +151,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 if let state = curPlayerState {
                     queueDelegate?.updateSongUI(withState: state)
                     mapDelegate?.updateSongUI(withState: state)
+                    self.queueDelegate?.updatePlayPauseUI(isPaused: state.isPaused, isHost: true)
                 }
             }
             else {
