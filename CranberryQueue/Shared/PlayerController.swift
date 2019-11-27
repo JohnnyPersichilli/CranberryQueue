@@ -74,6 +74,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
     var timer = Timer()
     var isTimerRunning = false
     
+    var curPlayerState: SPTAppRemotePlayerState? = nil
+    var curPlayerInfo: PlaybackInfo? = nil
     var currentUri = String()
     var duration = 200
     var position = 0
@@ -132,6 +134,8 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             queueDelegate?.showHelpLabel()
             hostListener?.remove()
             guestListener?.remove()
+            curPlayerState = nil
+            curPlayerInfo = nil
         }
         else if oldQueueId != queueId { /// leaving current queue, joining new one
             if isHost {
@@ -143,14 +147,18 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         }
         else { /// rejoining same queue
             if isHost {
-                remote?.playerAPI?.getPlayerState({ (state, error) in
-                    guard let info = state as? SPTAppRemotePlayerState else { return }
-                    self.playerStateDidChange(info)
-                    self.updateLikeIcon()
-                })
+                self.updateLikeIcon()
+                if let state = curPlayerState {
+                    queueDelegate?.updateSongUI(withState: state)
+                    mapDelegate?.updateSongUI(withState: state)
+                    self.queueDelegate?.updatePlayPauseUI(isPaused: state.isPaused, isHost: true)
+                }
             }
             else {
-                setupGuestListeners()
+                if let info = curPlayerInfo {
+                    queueDelegate?.updateSongUI(withInfo: info, position: position)
+                    mapDelegate?.updateSongUI(withInfo: info, position: position)
+                }
             }
         }
     }
@@ -206,9 +214,10 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
             return
         }
         
+        curPlayerState = playerState
+        
         mapDelegate?.updateSongUI(withState: playerState)
         queueDelegate?.updateSongUI(withState: playerState)
-        
         
         let json = playbackStateToJson(playerState)
         db?.collection("playback").document(queueId!).setData(json)
@@ -390,6 +399,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
         guestListener = db?.collection("playback").document(queueId!).addSnapshotListener({ (snapshot, error) in
             if let err = error {
                 print(err)
+                self.curPlayerInfo = nil
                 return
             }
             guard let contents = snapshot?.data() else {
@@ -397,7 +407,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                 return
             }
             let info = self.playbackJsonToInfo(json: contents)
-            
+            self.curPlayerInfo = info
             
             self.duration = info.duration
             if (Int(Date().timeIntervalSince1970) - info.timestamp) < 0 {
