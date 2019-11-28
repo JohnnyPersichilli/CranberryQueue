@@ -368,13 +368,26 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             })
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
-                createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
+                containsProfanity(wordToCheck: createQueueForm.queueNameTextField.text ?? "", completion: { isProfane in
+                    if(!isProfane){
+                        DispatchQueue.main.async {
+                            self.createPublicQueue(withName: self.createQueueForm.queueNameTextField.text ?? "")
+                            self.closeCreateForm()
+                        }
+                    }else{
+                        DispatchQueue.main.async {
+                            self.createQueueForm.queueNameTextField.text = ""
+                            let alert = UIAlertController(title: "Inapropriate Queue Name", message: "Please change the name and try again.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
+                            self.present(alert, animated: true)
+                        }
+                    }
+                })
             }
             else {
                 createPrivateQueue(withCode: eventCodeFromTimestamp())
+                self.closeCreateForm()
             }
-            /// close the create queue modal
-            self.closeCreateForm()
         }
         else if textField == joinQueueForm.eventCodeTextField {
             /// join queue textfield is always private
@@ -383,6 +396,23 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             closeJoinForm()
         }
         return true
+    }
+    
+    func containsProfanity(wordToCheck: String, completion: @escaping (Bool)->Void){
+        let concatURL = "https://www.purgomalum.com/service/containsprofanity?text="+wordToCheck
+        let urlString = concatURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let url = URL(string: urlString)!
+
+        let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+            guard let data = data else {
+                print("Error reaching profanity API")
+                return
+            }
+            let result = String(data: data, encoding: .utf8)!
+            let isProfane = (result=="true")
+            completion(isProfane)
+        }
+        task.resume()
     }
     
     // start session
