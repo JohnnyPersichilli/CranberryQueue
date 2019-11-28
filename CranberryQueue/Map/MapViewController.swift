@@ -406,6 +406,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
             guard let data = data else {
                 print("Error reaching profanity API")
+                completion(false)
                 return
             }
             let result = String(data: data, encoding: .utf8)!
