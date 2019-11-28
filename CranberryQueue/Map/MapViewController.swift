@@ -126,6 +126,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let createCancelTap = UITapGestureRecognizer(target: self, action: #selector(closeCreateForm))
         createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
+        
+        let createPrivateButtonTap = UITapGestureRecognizer(target: self, action: #selector(createPrivateButtonTapped))
+        createQueueForm.createPrivateButton.addGestureRecognizer(createPrivateButtonTap)
+        createQueueForm.createPrivateButton.isUserInteractionEnabled = true
 
         let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
         backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
@@ -298,6 +302,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func openCreateQueueModal() {
         controllerMapDelegate?.addTapped()
         createQueueForm.isHidden = false
+        createQueueForm.createPrivateButton.isHidden = true
         UIView.animate(withDuration: 0.3) {
          self.createQueueForm.alpha = 1
         }
@@ -349,6 +354,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
+    @objc func createPrivateButtonTapped(){
+        let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
+        remote?.playerAPI!.resume({ (response, error) in
+            if let err = error {
+                print(err)
+                return
+            }
+        })
+        createPrivateQueue(withCode: createQueueForm.privateCode!)
+        self.closeCreateForm()
+    }
+    
     // Called when create or join textfield's keyboard enter is tapped
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         /// empty textfield cannot be submitted
@@ -371,7 +388,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
             }
             else {
-                createPrivateQueue(withCode: eventCodeFromTimestamp())
+                //this is not possible because there is no keyboard when the switch is on private
+                //will delete and edit the if statement once the final create queue mock up is finished
+                createPrivateQueue(withCode: createQueueForm.privateCode!)
             }
             /// close the create queue modal
             self.closeCreateForm()
@@ -391,25 +410,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         let delegate = UIApplication.shared.delegate as! AppDelegate
         delegate.startSession(shouldPlayMusic: shouldPlayMusic)
         delegate.seshDelegate = self
-    }
-    
-    
-    // Takes the current timestamp in decimal and returns a short string of base n
-    func eventCodeFromTimestamp() -> String {
-        /// choose possible characters
-        let possibleChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/")
-        let radix = possibleChars.count
-        var rixit = 0
-        var residual = Int(Double(Date().timeIntervalSince1970)*1000) / radix
-        var result = ""
-        /// modulo timestamp by radix and repeat until done
-        while(residual != 0) {
-            rixit = residual % radix
-            result = String(possibleChars[rixit]) + result;
-            residual = (residual / radix);
-        }
-        result.removeFirst(1)
-        return result;
     }
     
     // Join queue from detail modal
