@@ -38,7 +38,7 @@
                     </constraints>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Soul Foog" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SVW-cU-kTq">
-                    <rect key="frame" x="70" y="10.999999999999998" width="231" height="27.333333333333329"/>
+                    <rect key="frame" x="70" y="10.999999999999998" width="301" height="27.333333333333329"/>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="22"/>
                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <nil key="highlightedColor"/>
@@ -105,7 +105,7 @@
                 <constraint firstItem="igS-h2-awn" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="4It-CQ-qBD"/>
                 <constraint firstItem="3El-yP-lWb" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="1" id="9LY-k9-Age"/>
                 <constraint firstItem="gAR-Ux-jFY" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="9q8-9A-h6k"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="SVW-cU-kTq" secondAttribute="trailing" constant="113" id="BIm-Ju-9U0"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="SVW-cU-kTq" secondAttribute="trailing" constant="43" id="BIm-Ju-9U0"/>
                 <constraint firstItem="9SS-Sc-xSm" firstAttribute="leading" secondItem="igS-h2-awn" secondAttribute="trailing" constant="10" id="Gsm-W8-ZQU"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="9SS-Sc-xSm" secondAttribute="trailing" constant="113" id="H5E-Ta-4UM"/>
                 <constraint firstItem="SVW-cU-kTq" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="11" id="Ihq-DG-OZV"/>
