@@ -127,8 +127,8 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.addGestureRecognizer(createCancelTap)
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
         
-        let createPrivateButtonTap = UITapGestureRecognizer(target: self, action: #selector(createPrivateButtonTapped))
-        createQueueForm.createPrivateButton.addGestureRecognizer(createPrivateButtonTap)
+        let createButtonTap = UITapGestureRecognizer(target: self, action: #selector(createButtonTapped))
+        createQueueForm.createPrivateButton.addGestureRecognizer(createButtonTap)
         createQueueForm.createPrivateButton.isUserInteractionEnabled = true
 
         let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
@@ -302,7 +302,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func openCreateQueueModal() {
         controllerMapDelegate?.addTapped()
         createQueueForm.isHidden = false
-        createQueueForm.createPrivateButton.isHidden = true
         UIView.animate(withDuration: 0.3) {
          self.createQueueForm.alpha = 1
         }
@@ -328,6 +327,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }) { (val) in
             self.createQueueForm.isHidden = true
             self.createQueueForm.scopeSwitch.isOn = true
+            self.createQueueForm.setPublicToggleUI()
         }
     }
     
@@ -354,7 +354,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         }
     }
     
-    @objc func createPrivateButtonTapped(){
+    @objc func createButtonTapped(){
+        createQueueModalClicked()
+    }
+    
+    func createQueueModalClicked(){
+        //resume music
         let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
         remote?.playerAPI!.resume({ (response, error) in
             if let err = error {
@@ -362,7 +367,18 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 return
             }
         })
-        createPrivateQueue(withCode: createQueueForm.privateCode!)
+        /// empty textfield cannot be submitted
+        if(createQueueForm.queueNameTextField.text == nil || createQueueForm.queueNameTextField.text == "" ){
+            return
+        }
+        /// create queue as either private or public queue from UISwitch
+        if createQueueForm.scopeSwitch.isOn {
+            createPublicQueue(withName: createQueueForm.queueNameTextField.text!)
+        }
+        else {
+            createPrivateQueue(withCode: createQueueForm.privateCode!)
+        }
+        /// close the create queue modal
         self.closeCreateForm()
     }
     
@@ -375,25 +391,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     
         /// determine which textfield called the delegate
         if textField == createQueueForm.queueNameTextField {
-            //resume music
-            let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
-            remote?.playerAPI!.resume({ (response, error) in
-                if let err = error {
-                    print(err)
-                    return
-                }
-            })
-            /// create queue as either private or public queue from UISwitch
-            if createQueueForm.scopeSwitch.isOn {
-                createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
-            }
-            else {
-                //this is not possible because there is no keyboard when the switch is on private
-                //will delete and edit the if statement once the final create queue mock up is finished
-                createPrivateQueue(withCode: createQueueForm.privateCode!)
-            }
-            /// close the create queue modal
-            self.closeCreateForm()
+            createQueueModalClicked()
         }
         else if textField == joinQueueForm.eventCodeTextField {
             /// join queue textfield is always private

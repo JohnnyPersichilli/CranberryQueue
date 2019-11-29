@@ -11,6 +11,7 @@ import UIKit
 class createQueueForm: UIView {
 
     @IBOutlet var contentView: UIView!
+    @IBOutlet weak var modalView: UIView!
     
     @IBOutlet var queueNameTextField: UITextField!
     
@@ -37,32 +38,22 @@ class createQueueForm: UIView {
         Bundle.main.loadNibNamed("createQueueForm", owner: self, options: nil)
         contentView.fixInView(self)
         
-        queueNameTextField.borderStyle = .none
+        modalView.layoutIfNeeded()
+        modalView.layer.cornerRadius = 5
+        modalView.layer.borderWidth = 1
+        modalView.layer.borderColor = UIColor.black.cgColor
+        
+        queueNameTextField.borderStyle = .roundedRect
         queueNameTextField.returnKeyType = .join
-        createPrivateButton.isHidden = true
     }
     
     @IBAction func switchChanged(_ sender: Any) {
         if scopeSwitch.isOn {
-            createPrivateButton.isHidden = true
-            
-            privateCode = nil
-            queueNameTextField.text = ""
-            queueNameTextField.textColor = UIColor.black
-            queueNameTextField.isEnabled = true
+            setPublicToggleUI()
             queueNameTextField.becomeFirstResponder()
-            queueNameTextField.isOpaque = false
-            scopeLabel.text = "Public"
         }
         else {
-            createPrivateButton.isHidden = false
-            
-            privateCode = eventCodeFromTimestamp()
-            queueNameTextField.textColor = UIColor.gray
-            queueNameTextField.text = privateCode
-            queueNameTextField.isEnabled = false
-            queueNameTextField.isOpaque = true
-            scopeLabel.text = "Private"
+            setPrivateToggleUI()
         }
     }
     
@@ -82,5 +73,23 @@ class createQueueForm: UIView {
         }
         result.removeFirst(1)
         return result;
+    }
+    
+    func setPublicToggleUI(){
+        privateCode = nil
+        queueNameTextField.text = ""
+        queueNameTextField.textColor = UIColor.black
+        queueNameTextField.isEnabled = true
+        queueNameTextField.isOpaque = false
+        scopeLabel.text = "Public"
+    }
+    
+    func setPrivateToggleUI(){
+        privateCode = eventCodeFromTimestamp()
+        queueNameTextField.textColor = UIColor.gray
+        queueNameTextField.text = privateCode
+        queueNameTextField.isEnabled = false
+        queueNameTextField.isOpaque = true
+        scopeLabel.text = "Private"
     }
 }
