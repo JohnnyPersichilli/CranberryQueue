@@ -369,6 +369,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         })
         /// empty textfield cannot be submitted
         if(createQueueForm.queueNameTextField.text == nil || createQueueForm.queueNameTextField.text == "" ){
+            let alert = UIAlertController(title: "Name must not be empty", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
             return
         }
         /// create queue as either private or public queue from UISwitch
@@ -386,6 +389,9 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         /// empty textfield cannot be submitted
         if textField.text == nil || textField.text == "" {
+            let alert = UIAlertController(title: "Name must not be empty", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true)
             return false
         }
     
