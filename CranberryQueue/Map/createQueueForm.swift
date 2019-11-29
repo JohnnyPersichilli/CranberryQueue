@@ -38,7 +38,6 @@ class createQueueForm: UIView {
         Bundle.main.loadNibNamed("createQueueForm", owner: self, options: nil)
         contentView.fixInView(self)
         
-        modalView.layoutIfNeeded()
         modalView.layer.cornerRadius = 5
         modalView.layer.borderWidth = 1
         modalView.layer.borderColor = UIColor.black.cgColor
