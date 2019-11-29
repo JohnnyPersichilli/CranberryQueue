@@ -12,9 +12,10 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="createQueueForm" customModule="CranberryQueue" customModuleProvider="target">
             <connections>
+                <outlet property="cancelButton" destination="qfb-Mo-DCZ" id="KoB-Dh-inc"/>
                 <outlet property="cancelIconImageView" destination="DuP-4q-rKT" id="M5U-Dj-Yb1"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Kn1-kz-TLm"/>
-                <outlet property="createPrivateButton" destination="lxl-Kc-Dcd" id="zTh-zR-DBb"/>
+                <outlet property="createButton" destination="lxl-Kc-Dcd" id="9NU-cP-SOL"/>
                 <outlet property="modalView" destination="ifz-8C-SwG" id="MYm-wT-nHt"/>
                 <outlet property="queueNameTextField" destination="8bY-8F-kEY" id="Iac-vq-h2J"/>
                 <outlet property="scopeLabel" destination="23F-Xh-qms" id="9Bg-mb-a0N"/>

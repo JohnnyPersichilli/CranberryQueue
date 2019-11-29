@@ -128,8 +128,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueForm.cancelIconImageView.isUserInteractionEnabled = true
         
         let createButtonTap = UITapGestureRecognizer(target: self, action: #selector(createButtonTapped))
-        createQueueForm.createPrivateButton.addGestureRecognizer(createButtonTap)
-        createQueueForm.createPrivateButton.isUserInteractionEnabled = true
+        createQueueForm.createButton.addGestureRecognizer(createButtonTap)
+        createQueueForm.createButton.isUserInteractionEnabled = true
+        
+        let cancelButtonTap = UITapGestureRecognizer(target: self, action: #selector(closeCreateForm))
+        createQueueForm.cancelButton.addGestureRecognizer(cancelButtonTap)
+        createQueueForm.cancelButton.isUserInteractionEnabled = true
 
         let recenterMapTap = UITapGestureRecognizer(target: self, action: #selector(recenterMapTapped))
         backToQueueIconImageView.addGestureRecognizer(recenterMapTap)
@@ -358,6 +362,10 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         createQueueModalClicked()
     }
     
+    @objc func cancelButtonTapped(){
+        closeCreateForm()
+    }
+    
     func createQueueModalClicked(){
         //resume music
         let remote = (UIApplication.shared.delegate as? AppDelegate)?.appRemote
@@ -379,7 +387,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             createPublicQueue(withName: createQueueForm.queueNameTextField.text!)
         }
         else {
-            createPrivateQueue(withCode: createQueueForm.privateCode!)
+            createPrivateQueue(withCode: createQueueForm.queueNameTextField.text!)
         }
         /// close the create queue modal
         self.closeCreateForm()

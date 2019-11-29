@@ -20,9 +20,8 @@ class createQueueForm: UIView {
     @IBOutlet var scopeLabel: UILabel!
     
     @IBOutlet var cancelIconImageView: UIImageView!
-    @IBOutlet weak var createPrivateButton: UIButton!
-    
-    var privateCode: String? = nil
+    @IBOutlet weak var createButton: UIButton!
+    @IBOutlet weak var cancelButton: UIButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,7 +74,6 @@ class createQueueForm: UIView {
     }
     
     func setPublicToggleUI(){
-        privateCode = nil
         queueNameTextField.text = ""
         queueNameTextField.textColor = UIColor.black
         queueNameTextField.isEnabled = true
@@ -84,9 +82,8 @@ class createQueueForm: UIView {
     }
     
     func setPrivateToggleUI(){
-        privateCode = eventCodeFromTimestamp()
         queueNameTextField.textColor = UIColor.gray
-        queueNameTextField.text = privateCode
+        queueNameTextField.text = eventCodeFromTimestamp()
         queueNameTextField.isEnabled = false
         queueNameTextField.isOpaque = true
         scopeLabel.text = "Private"
