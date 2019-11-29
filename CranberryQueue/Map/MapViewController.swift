@@ -42,7 +42,6 @@ protocol ControllerMapDelegate: class {
 
     // Login and Help Containers
     @IBOutlet weak var loginContainer: UIView!
-    
     @IBOutlet weak var helpContainer: UIView!
     
 
@@ -112,7 +111,7 @@ protocol ControllerMapDelegate: class {
         helpIconImageView.addGestureRecognizer(helpTap)
         helpIconImageView.isUserInteractionEnabled = true
         
-        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinPublicQueue))
+        let joinQueueTap = UITapGestureRecognizer(target: self, action: #selector(joinDetailQueue))
         queueDetailModal.joinButton.addGestureRecognizer(joinQueueTap)
         queueDetailModal.joinButton.isUserInteractionEnabled = true
         
@@ -443,7 +442,7 @@ protocol ControllerMapDelegate: class {
     }
     
     // Join public queue from queue detail modal or player
-    @objc func joinPublicQueue(queueId: String, name: String) {
+    func joinPublicQueue(queueId: String, name: String) {
         self.getIsUserHostOf(queueId: queueId) { (isHost) in
             if isHost {
                 if !((UIApplication.shared.delegate as? AppDelegate)?.appRemote.isConnected)! {
