@@ -17,33 +17,6 @@ protocol MapControllerDelegate: class {
     func setLocationEnabled(status: Bool)
 }
 
-class TCCircle : GMSCircle {
-    var duration : TimeInterval!
-    var begin : NSDate!
-    var to : CLLocationDistance = 0.0
-    var from : CLLocationDistance = 0.0
-    
-    func beginCircleAnimation(from: CLLocationDistance, to: CLLocationDistance, duration: TimeInterval) {
-        self.from = from
-        self.to = to
-        self.duration = duration
-        self.begin = NSDate()
-        self.performSelector(onMainThread: Selector("updateSelf"), with: nil, waitUntilDone: false)
-  }
-
-    func updateSelf() {
-        let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
-        if (i >= self.duration) {
-            self.radius = self.to
-            return
-        } else {
-            let d = (self.to - self.from) * i / duration + self.from
-            self.radius = d
-            self.performSelector(onMainThread: Selector("updateSelf"), with: nil, waitUntilDone: false)
-        }
-    }
-}
-
 class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, ControllerMapDelegate {
     
     weak var mapControllerDelegate: MapControllerDelegate?
@@ -59,7 +32,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     var queues = [CQLocation]()
     var markers = [GMSMarker]()
-    var circles = [GMSCircle]()
+    var circles = [TCCircle]()
     
     var isFirstLoad = true
     var queueId: String? = nil
@@ -137,10 +110,13 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("watch location err: ", error!)
                 return
             }
-            self.map!.clear()
-            self.markers = []
-            self.circles = []
-            self.queues = []
+//            self.map!.clear()
+//            self.markers = []
+//            self.circles = []
+//            self.queues = []
+            
+            var newQueues = [CQLocation]()
+            var missingQueues = self.queues
             for doc in snap.documents {
                 let newLoc = CQLocation(
                     name: doc.data()["name"] as! String,
@@ -151,9 +127,37 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     queueId: doc.documentID,
                     numMembers: doc.data()["numMembers"] as! Int
                 )
-                self.queues.append(newLoc)
+                
+                missingQueues.removeAll(where: {$0.queueId == newLoc.queueId})
+                
+                if let dex = self.queues.firstIndex(where: {$0.queueId == self.queueId}) {
+                    if self.queues[dex].numMembers != (doc.data()["numMembers"] as! Int) {
+                        self.queues[dex].numMembers = (doc.data()["numMembers"] as! Int)
+                    }
+                }
+                else if !self.queues.contains(where: {$0.queueId == doc.documentID})  {
+                    let newLoc = CQLocation(
+                        name: doc.data()["name"] as! String,
+                        city: doc.data()["city"] as! String,
+                        region: doc.data()["region"] as! String,
+                        long: doc.data()["long"] as! Double,
+                        lat: doc.data()["lat"] as! Double,
+                        queueId: doc.documentID,
+                        numMembers: doc.data()["numMembers"] as! Int
+                    )
+                    newQueues.append(newLoc)
+                    self.queues.append(newLoc)
+                }
+
             }
-            self.drawMarkers()
+            // remove missing queues from global
+            for location in missingQueues {
+                self.queues.removeAll(where: {$0.queueId == location.queueId})
+            }
+            self.removeMarkers(queues: missingQueues)
+            
+            //this function will append new queues to global
+            self.drawMarkers(queues: newQueues)
         })
     }
     
@@ -181,11 +185,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 )
                 self.queues.append(newLoc)
             }
-            self.drawMarkers()
+//            self.drawMarkers()
         })
     }
     
-    func setCircle (_ circle : GMSCircle) {
+    func setCircle (_ circle : TCCircle) {
         circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
         circle.strokeWidth = 2
         circle.zIndex = 0
@@ -193,27 +197,48 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         circles.append(circle)
     }
     
-    func drawMarkers() {
+    func removeMarkers(queues: [CQLocation]) {
+        for queue in queues {
+            // class that allows creation animation
+            let dex = queues.firstIndex(where: {$0.queueId == queue.queueId})!
+            let circle = circles[dex]
+            circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
+            setCircle(circle)
+            circle.beginCircleAnimation(to: 0, duration: 2, completion: {
+                let marker = self.markers[dex]
+                UIView.animate(withDuration: 2, animations: {
+                    marker.opacity = 0
+                }) { (_) in
+                    marker.map = nil
+                }
+
+            })
+        }
+    }
+    
+    func drawMarkers(queues: [CQLocation]) {
         for queue in queues {
             let circleCenter = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
             // class that allows creation animation
-//            let circle = TCCircle(position: circleCenter, radius: 0, from: 0, to: 200, duration: 3.0)
-            let circle = GMSCircle(position: circleCenter, radius: 200)
+            let circle = TCCircle(position: circleCenter, radius: 0.0)
             let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
             let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
             circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
-            setCircle(circle)
-             
-            let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
-            let marker = GMSMarker(position: position)
+            circle.beginCircleAnimation(to: 200.0, duration: 2, completion: {
+                let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
+                let marker = GMSMarker(position: position)
+                
+                //popup animation for markers
+                marker.appearAnimation = GMSMarkerAnimation.pop
+                marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
+                marker.title = queue.name
+                marker.map = self.map
+                marker.userData = queue
+                self.markers.append(marker)
+            })
             
-            //popup animation for markers
-            marker.appearAnimation = GMSMarkerAnimation.pop
-            marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
-            marker.title = queue.name
-            marker.map = map
-            marker.userData = queue
-            self.markers.append(marker)
+            setCircle(circle)
+            
         }
     }
    
@@ -325,11 +350,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         marker.map = map
         markers.append(marker)
         
-        let circle = GMSCircle(position: curCoords!, radius: 200)
+        let circle = TCCircle(position: curCoords!, radius: 200)
         circle.fillColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
         setCircle(circle)
         
-        self.drawMarkers()
+        self.drawMarkers(queues: [CQLocation(name: "", city: "", region: "", long: curCoords!.longitude, lat: curCoords!.latitude, queueId: "", numMembers: 0)])
     }
     
     func setQueue(_ queueId: String?) {
@@ -337,7 +362,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.markers = []
         self.circles = []
         self.map?.clear()
-        self.drawMarkers()
+        self.drawMarkers(queues: [self.queues.first(where: {$0.queueId == queueId})!])
     }
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {
@@ -359,4 +384,34 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         return locA.distance(from: locB)
     }
         
+}
+
+class TCCircle : GMSCircle {
+    var duration : TimeInterval!
+    var begin : NSDate!
+    var to : CLLocationDistance = 0.0
+    var completion: (() -> Void)? = nil
+    
+    func beginCircleAnimation(to: CLLocationDistance, duration: TimeInterval, completion: @escaping () -> Void ) {
+        self.to = to
+        self.completion = completion
+        self.duration = duration
+        self.begin = NSDate()
+        self.performSelector(onMainThread: #selector(updateSelf), with: nil, waitUntilDone: false)
+  }
+
+    @objc func updateSelf() {
+        let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
+        
+        if (i >= self.duration) {
+            self.radius = self.to
+            completion!()
+            return
+        } else {
+            let dex = (i/duration)
+            let d = to * ((dex*dex)/(2*(dex*dex-dex)+1))
+            self.radius = d
+            self.performSelector(onMainThread: #selector(updateSelf), with: nil, waitUntilDone: false)
+        }
+    }
 }
