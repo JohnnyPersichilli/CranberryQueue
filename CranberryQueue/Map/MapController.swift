@@ -17,6 +17,33 @@ protocol MapControllerDelegate: class {
     func setLocationEnabled(status: Bool)
 }
 
+class TCCircle : GMSCircle {
+    var duration : TimeInterval!
+    var begin : NSDate!
+    var to : CLLocationDistance = 0.0
+    var from : CLLocationDistance = 0.0
+    
+    func beginCircleAnimation(from: CLLocationDistance, to: CLLocationDistance, duration: TimeInterval) {
+        self.from = from
+        self.to = to
+        self.duration = duration
+        self.begin = NSDate()
+        self.performSelector(onMainThread: Selector("updateSelf"), with: nil, waitUntilDone: false)
+  }
+
+    func updateSelf() {
+        let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
+        if (i >= self.duration) {
+            self.radius = self.to
+            return
+        } else {
+            let d = (self.to - self.from) * i / duration + self.from
+            self.radius = d
+            self.performSelector(onMainThread: Selector("updateSelf"), with: nil, waitUntilDone: false)
+        }
+    }
+}
+
 class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, ControllerMapDelegate {
     
     weak var mapControllerDelegate: MapControllerDelegate?
@@ -36,6 +63,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     var isFirstLoad = true
     var queueId: String? = nil
+    var region: String? = nil
+    var city: String? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,18 +113,22 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             "long": mapView.camera.target.longitude
         ]
         getGeoCode(withLocation: mapCenter){ city, region in
+            if(self.curZoom > 10)   {
+                if self.city != city {
+                   self.getTopQueusInCity(city: city, region: region)
+                }
+            } else  {
+                if self.region != region {
+                    self.getTopQueusInState(region: region, zoom: self.curZoom)
+                }
+            }
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
-            self.watchLocationQueues(city: city, region: region)
+            self.city = city
+            self.region = region
         }
     }
 
-    func watchLocationQueues(city: String, region: String) {
-        if(self.curZoom > 10){
-            getTopQueusInCity(city: city, region: region)
-        }else{
-            getTopQueusInState(region: region, zoom: self.curZoom)
-        }
-    }
+
     
     func getTopQueusInCity(city: String, region: String) {
         queuesInLocationRef?.remove()
@@ -163,17 +196,21 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func drawMarkers() {
         for queue in queues {
             let circleCenter = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
+            // class that allows creation animation
+//            let circle = TCCircle(position: circleCenter, radius: 0, from: 0, to: 200, duration: 3.0)
             let circle = GMSCircle(position: circleCenter, radius: 200)
             let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
             let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
             circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
             setCircle(circle)
-            
+             
             let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
             let marker = GMSMarker(position: position)
+            
+            //popup animation for markers
+            marker.appearAnimation = GMSMarkerAnimation.pop
             marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
             marker.title = queue.name
-            marker.snippet = "Tap Here to Join"
             marker.map = map
             marker.userData = queue
             self.markers.append(marker)
@@ -226,10 +263,12 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         curCoords = center
         
         setupMap(withCoords: center)
-        getGeoCode(withLocation: ["lat": center.latitude, "long": center.longitude]){ city, region in
-            self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
-            self.watchLocationQueues(city: city, region: region)
-        }
+        
+        mapView(map!, idleAt: GMSCameraPosition(latitude: center.latitude, longitude: center.longitude, zoom: 14))
+//        getGeoCode(withLocation: ["lat": center.latitude, "long": center.longitude]){ city, region in
+//            self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
+////            self.watchLocationQueues(city: city, region: region)
+//        }
         
         self.locationManager.stopUpdatingLocation()
     }
