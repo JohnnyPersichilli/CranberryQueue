@@ -101,23 +101,28 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
 
-
-    
-    func getTopQueusInCity(city: String, region: String) {
-        queuesInLocationRef?.remove()
-        queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
-            guard let snap = snapshot else {
-                print("watch location err: ", error!)
-                return
-            }
-//            self.map!.clear()
-//            self.markers = []
-//            self.circles = []
-//            self.queues = []
+    func processLocationDocs(docs: [QueryDocumentSnapshot]) {
+        var newQueues = [CQLocation]()
+        var missingQueues = self.queues
+        for doc in docs {
+            let newLoc = CQLocation(
+                name: doc.data()["name"] as! String,
+                city: doc.data()["city"] as! String,
+                region: doc.data()["region"] as! String,
+                long: doc.data()["long"] as! Double,
+                lat: doc.data()["lat"] as! Double,
+                queueId: doc.documentID,
+                numMembers: doc.data()["numMembers"] as! Int
+            )
             
-            var newQueues = [CQLocation]()
-            var missingQueues = self.queues
-            for doc in snap.documents {
+            missingQueues.removeAll(where: {$0.queueId == newLoc.queueId})
+            
+            if let dex = self.queues.firstIndex(where: {$0.queueId == self.queueId}) {
+                if self.queues[dex].numMembers != (doc.data()["numMembers"] as! Int) {
+                    self.queues[dex].numMembers = (doc.data()["numMembers"] as! Int)
+                }
+            }
+            else if !self.queues.contains(where: {$0.queueId == doc.documentID})  {
                 let newLoc = CQLocation(
                     name: doc.data()["name"] as! String,
                     city: doc.data()["city"] as! String,
@@ -127,37 +132,29 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                     queueId: doc.documentID,
                     numMembers: doc.data()["numMembers"] as! Int
                 )
-                
-                missingQueues.removeAll(where: {$0.queueId == newLoc.queueId})
-                
-                if let dex = self.queues.firstIndex(where: {$0.queueId == self.queueId}) {
-                    if self.queues[dex].numMembers != (doc.data()["numMembers"] as! Int) {
-                        self.queues[dex].numMembers = (doc.data()["numMembers"] as! Int)
-                    }
-                }
-                else if !self.queues.contains(where: {$0.queueId == doc.documentID})  {
-                    let newLoc = CQLocation(
-                        name: doc.data()["name"] as! String,
-                        city: doc.data()["city"] as! String,
-                        region: doc.data()["region"] as! String,
-                        long: doc.data()["long"] as! Double,
-                        lat: doc.data()["lat"] as! Double,
-                        queueId: doc.documentID,
-                        numMembers: doc.data()["numMembers"] as! Int
-                    )
-                    newQueues.append(newLoc)
-                    self.queues.append(newLoc)
-                }
+                newQueues.append(newLoc)
+                self.queues.append(newLoc)
+            }
 
+        }
+
+        // remove missing queues from global
+        for location in missingQueues {
+            self.queues.removeAll(where: {$0.queueId == location.queueId})
+        }
+        self.removeLocations(queues: missingQueues)
+        self.drawMarkers(queues: newQueues)
+    }
+
+    
+    func getTopQueusInCity(city: String, region: String) {
+        queuesInLocationRef?.remove()
+        queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
+            guard let snap = snapshot else {
+                print("watch location err: ", error!)
+                return
             }
-            // remove missing queues from global
-            for location in missingQueues {
-                self.queues.removeAll(where: {$0.queueId == location.queueId})
-            }
-            self.removeMarkers(queues: missingQueues)
-            
-            //this function will append new queues to global
-            self.drawMarkers(queues: newQueues)
+            self.processLocationDocs(docs: snap.documents)
         })
     }
     
@@ -169,23 +166,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("watch location err: ", error!)
                 return
             }
-            self.map!.clear()
-            self.markers = []
-            self.circles = []
-            self.queues = []
-            for doc in snap.documents {
-                let newLoc = CQLocation(
-                    name: doc.data()["name"] as! String,
-                    city: doc.data()["city"] as! String,
-                    region: doc.data()["region"] as! String,
-                    long: doc.data()["long"] as! Double,
-                    lat: doc.data()["lat"] as! Double,
-                    queueId: doc.documentID,
-                    numMembers: doc.data()["numMembers"] as! Int
-                )
-                self.queues.append(newLoc)
-            }
-//            self.drawMarkers()
+            self.processLocationDocs(docs: snap.documents)
         })
     }
     
@@ -197,21 +178,21 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         circles.append(circle)
     }
     
-    func removeMarkers(queues: [CQLocation]) {
+    func removeLocations(queues: [CQLocation]) {
         for queue in queues {
             // class that allows creation animation
             let dex = queues.firstIndex(where: {$0.queueId == queue.queueId})!
             let circle = circles[dex]
             circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
-            setCircle(circle)
-            circle.beginCircleAnimation(to: 0, duration: 2, completion: {
-                let marker = self.markers[dex]
+            let marker = self.markers[dex]
+            markers.remove(at: dex)
+            circles.remove(at: dex)
+            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
                 UIView.animate(withDuration: 2, animations: {
                     marker.opacity = 0
                 }) { (_) in
                     marker.map = nil
                 }
-
             })
         }
     }
@@ -284,17 +265,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let location = locations.last
         let center = CLLocationCoordinate2D(latitude: (location?.coordinate.latitude)!, longitude: (location?.coordinate.longitude)!)
-        
         curCoords = center
-        
         setupMap(withCoords: center)
-        
         mapView(map!, idleAt: GMSCameraPosition(latitude: center.latitude, longitude: center.longitude, zoom: 14))
-//        getGeoCode(withLocation: ["lat": center.latitude, "long": center.longitude]){ city, region in
-//            self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
-////            self.watchLocationQueues(city: city, region: region)
-//        }
-        
         self.locationManager.stopUpdatingLocation()
     }
     
@@ -390,6 +363,7 @@ class TCCircle : GMSCircle {
     var duration : TimeInterval!
     var begin : NSDate!
     var to : CLLocationDistance = 0.0
+    var from : CLLocationDistance = 0.0
     var completion: (() -> Void)? = nil
     
     func beginCircleAnimation(to: CLLocationDistance, duration: TimeInterval, completion: @escaping () -> Void ) {
@@ -397,10 +371,18 @@ class TCCircle : GMSCircle {
         self.completion = completion
         self.duration = duration
         self.begin = NSDate()
-        self.performSelector(onMainThread: #selector(updateSelf), with: nil, waitUntilDone: false)
+        self.performSelector(onMainThread: #selector(expandRadius), with: nil, waitUntilDone: false)
   }
+    
+    func removeCircleAnimation(from: CLLocationDistance, duration: TimeInterval, completion: @escaping () -> Void ) {
+          self.from = from
+          self.completion = completion
+          self.duration = duration
+          self.begin = NSDate()
+          self.performSelector(onMainThread: #selector(shrinkRadius), with: nil, waitUntilDone: false)
+    }
 
-    @objc func updateSelf() {
+    @objc func expandRadius() {
         let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
         
         if (i >= self.duration) {
@@ -411,7 +393,22 @@ class TCCircle : GMSCircle {
             let dex = (i/duration)
             let d = to * ((dex*dex)/(2*(dex*dex-dex)+1))
             self.radius = d
-            self.performSelector(onMainThread: #selector(updateSelf), with: nil, waitUntilDone: false)
+            self.performSelector(onMainThread: #selector(expandRadius), with: nil, waitUntilDone: false)
+        }
+    }
+    
+    @objc func shrinkRadius() {
+        let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
+        
+        if (i >= self.duration) {
+            self.radius = 0
+            completion!()
+            return
+        } else {
+            let dex = (i/duration)
+            let d = from * ((dex*dex)/(2*(dex*dex-dex)+1))
+            self.radius = from - d
+            self.performSelector(onMainThread: #selector(shrinkRadius), with: nil, waitUntilDone: false)
         }
     }
 }
