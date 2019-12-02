@@ -374,12 +374,12 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                             self.createPublicQueue(withName: self.createQueueForm.queueNameTextField.text ?? "")
                             self.closeCreateForm()
                         }
+                        
                     }else{
                         DispatchQueue.main.async {
                             self.createQueueForm.queueNameTextField.text = ""
-                            let alert = UIAlertController(title: "Inapropriate Queue Name", message: "Please change the name and try again.", preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
-                            self.present(alert, animated: true)
+                            self.presentInapropriateQueueNameAlert()
+
                         }
                     }
                 })
@@ -398,10 +398,15 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         return true
     }
     
-    func containsProfanity(wordToCheck: String, completion: @escaping (Bool)->Void){
+    func presentInapropriateQueueNameAlert(){
+        let alert = UIAlertController(title: "Inapropriate Queue Name", message: "Please change the name and try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
+        self.present(alert, animated: true)
+    }
+    
+    func containsProfanity(wordToCheck: String, completion: @escaping (Bool) -> Void){
         let concatURL = "https://www.purgomalum.com/service/containsprofanity?text="+wordToCheck
-        let urlString = concatURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-        let url = URL(string: urlString)!
+        let url = URL(string: concatURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
 
         let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
             guard let data = data else {
@@ -409,8 +414,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 completion(false)
                 return
             }
-            let result = String(data: data, encoding: .utf8)!
-            let isProfane = (result=="true")
+            let isProfane = (String(data: data, encoding: .utf8)! == "true")
             completion(isProfane)
         }
         task.resume()
