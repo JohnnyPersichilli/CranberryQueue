@@ -41,7 +41,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.view.layer.borderWidth = 1        
     }
      
@@ -90,7 +89,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 if self.city != city {
                    self.getTopQueusInCity(city: city, region: region)
                 }
-            } else  {
+            } else {
                 if self.region != region {
                     self.getTopQueusInState(region: region, zoom: self.curZoom)
                 }
@@ -178,9 +177,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         circles.append(circle)
     }
     
+    // class that removes locations from the map one at a time, rather than clearing everything
     func removeLocations(queues: [CQLocation]) {
         for queue in queues {
-            // class that allows creation animation
             let dex = queues.firstIndex(where: {$0.queueId == queue.queueId})!
             let circle = circles[dex]
             circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
@@ -335,7 +334,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         self.markers = []
         self.circles = []
         self.map?.clear()
-        self.drawMarkers(queues: [self.queues.first(where: {$0.queueId == queueId})!])
+        if let setQueues = self.queues.first(where: {$0.queueId == queueId}) {
+            self.drawMarkers(queues: [setQueues])
+        }
     }
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {
@@ -399,10 +400,9 @@ class TCCircle : GMSCircle {
     
     @objc func shrinkRadius() {
         let i : TimeInterval = NSDate().timeIntervalSince(self.begin as Date)
-        
         if (i >= self.duration) {
             self.radius = 0
-            completion!()
+            completion?()
             return
         } else {
             let dex = (i/duration)
