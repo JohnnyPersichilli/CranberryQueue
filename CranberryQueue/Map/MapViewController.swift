@@ -369,7 +369,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
                 containsProfanity(wordToCheck: createQueueForm.queueNameTextField.text ?? "", completion: { isProfane in
-                    if(!isProfane){
+                    if !isProfane {
                         DispatchQueue.main.async {
                             self.createPublicQueue(withName: self.createQueueForm.queueNameTextField.text ?? "")
                             self.closeCreateForm()
