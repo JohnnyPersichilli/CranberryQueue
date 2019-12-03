@@ -270,3 +270,22 @@ exports.updateDownvotes = functions.firestore
     })
 
     });
+
+
+    exports.scatterLocations = functions.firestore
+
+
+      exports.scatterLocations = functions.https.onRequest((request, response) => {
+        for(i = 0; i < 20; i++) {
+          let inName = "generated-" + i
+          db.collection('location').add({
+            city: "Bryn Mawr",
+            currentSong: "",
+            lat: 40.02 + i/100,
+            long: -75.32672724780382 + i/100,
+            name: inName,
+            numMembers: i,
+            region: "PA"
+          })
+        }
+      });

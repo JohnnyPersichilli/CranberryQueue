@@ -138,9 +138,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
 
         // remove missing queues from global
-        for location in missingQueues {
-            self.queues.removeAll(where: {$0.queueId == location.queueId})
-        }
+//        for location in missingQueues {
+//            self.queues.removeAll(where: {$0.queueId == location.queueId})
+//        }
         self.removeLocations(queues: missingQueues)
         self.drawMarkers(queues: newQueues)
     }
@@ -180,12 +180,13 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     // class that removes locations from the map one at a time, rather than clearing everything
     func removeLocations(queues: [CQLocation]) {
         for queue in queues {
-            let dex = queues.firstIndex(where: {$0.queueId == queue.queueId})!
+            let dex = self.queues.firstIndex(where: {$0.queueId == queue.queueId})!
             let circle = circles[dex]
             circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
             let marker = self.markers[dex]
             markers.remove(at: dex)
             circles.remove(at: dex)
+            self.queues.remove(at: dex)
             circle.removeCircleAnimation(from: 200, duration: 2, completion: {
                 UIView.animate(withDuration: 2, animations: {
                     marker.opacity = 0
@@ -204,21 +205,18 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
             let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
             circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
+            let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
+            let marker = GMSMarker(position: position)
             circle.beginCircleAnimation(to: 200.0, duration: 2, completion: {
-                let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
-                let marker = GMSMarker(position: position)
-                
                 //popup animation for markers
                 marker.appearAnimation = GMSMarkerAnimation.pop
                 marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
                 marker.title = queue.name
                 marker.map = self.map
                 marker.userData = queue
-                self.markers.append(marker)
             })
-            
-            setCircle(circle)
-            
+            self.markers.append(marker)
+            self.setCircle(circle)
         }
     }
    
