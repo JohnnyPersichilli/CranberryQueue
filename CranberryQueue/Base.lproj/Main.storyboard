@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Bryn Mawr" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Yy-op-lK9">
-                                <rect key="frame" x="25" y="88" width="184" height="44"/>
+                                <rect key="frame" x="25" y="88" width="297" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="Z2V-RO-uUD"/>
                                 </constraints>
@@ -167,6 +167,7 @@
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="top" secondItem="k3h-bh-V8Z" secondAttribute="bottom" id="VbL-RT-T5b"/>
                             <constraint firstItem="8sS-eE-mqA" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Vfb-hz-joa"/>
                             <constraint firstItem="k3h-bh-V8Z" firstAttribute="top" secondItem="VLf-l2-j7u" secondAttribute="bottom" constant="10" id="WYH-xS-488"/>
+                            <constraint firstItem="J8Y-2d-cDx" firstAttribute="leading" secondItem="6Yy-op-lK9" secondAttribute="trailing" constant="8" id="cnq-zQ-pGD"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="J8Y-2d-cDx" secondAttribute="trailing" constant="20" id="dvd-jU-A7g"/>
                             <constraint firstItem="6Yy-op-lK9" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="eTj-Ut-QYP"/>
                             <constraint firstItem="vY5-7D-lLe" firstAttribute="top" secondItem="sku-rS-XwC" secondAttribute="bottom" constant="30" id="fhO-Br-Cfj"/>

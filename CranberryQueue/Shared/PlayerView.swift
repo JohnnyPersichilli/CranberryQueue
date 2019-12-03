@@ -18,18 +18,16 @@ class PlayerView: UIView, PlayerDelegate {
     @IBOutlet var contentView: UIView!
     
     @IBOutlet var albumImageView: UIRoundedImageView!
-    
     @IBOutlet var titleLabel: UILabel!
-    
-    @IBOutlet var timeLabel: UILabel!
-    
+    @IBOutlet weak var authorLabel: UILabel!
+    @IBOutlet weak var songProgressBar: UIProgressView!
     @IBOutlet weak var likeIconImageView: UIImageView!
-    
     @IBOutlet var helpLabel: UILabel!
     @IBOutlet weak var inactiveHostLabel: UILabel!
     @IBOutlet weak var playPauseImage: UIImageView!
     @IBOutlet weak var skipSongImage: UIImageView!
-    @IBOutlet weak var bottomGuestTimeLabelConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var authorTrailingConstraint: NSLayoutConstraint!
     
     var delegate: PlayerControllerDelegate?
     var isPaused = false
@@ -52,12 +50,13 @@ class PlayerView: UIView, PlayerDelegate {
         albumImageView.clipsToBounds = true
         
         titleLabel.text = nil
-        timeLabel.text = nil
+        authorLabel.text = nil
         playPauseImage.image = nil
         skipSongImage.image = nil
         
         inactiveHostLabel.isHidden = true
-        self.likeIconImageView.isHidden = true
+        likeIconImageView.isHidden = true
+        songProgressBar.isHidden = true
 
         setupGestureRecognizers()
     }
@@ -104,7 +103,9 @@ class PlayerView: UIView, PlayerDelegate {
     
     func updatePlayPauseUI(isPaused: Bool, isHost: Bool) {
         if(isHost){
-            bottomGuestTimeLabelConstraint.constant = 7.5
+            //113 = playPauseImage.frame.width + likeIconImageView.frame.width + skipSongImage.frame.width + 8 + 7 + 7 + 7
+            self.titleTrailingConstraint.constant = 113
+            self.authorTrailingConstraint.constant = 113
             self.isPaused = isPaused
             skipSongImage.image = UIImage(named: "ios-skip-forward-white")
             if(isPaused){
@@ -123,7 +124,9 @@ class PlayerView: UIView, PlayerDelegate {
             playPauseImage.isUserInteractionEnabled = true
             skipSongImage.isUserInteractionEnabled = true
         } else {
-            bottomGuestTimeLabelConstraint.constant = 25
+            //43 = likeIconImageView.frame.width + 8 + 7
+            self.titleTrailingConstraint.constant = 43
+            self.authorTrailingConstraint.constant = 43
             playPauseImage.image = nil
             skipSongImage.image = nil
             playPauseImage.isUserInteractionEnabled = false
@@ -167,7 +170,8 @@ class PlayerView: UIView, PlayerDelegate {
                     print(error!)
                     return }
                 DispatchQueue.main.async() {
-                    self.titleLabel.text = state.track.name + " - " + state.track.artist.name
+                    self.titleLabel.text = state.track.name
+                    self.authorLabel.text = state.track.artist.name
                     self.albumImageView.image = UIImage(data: data)
                 }
             }
@@ -188,7 +192,8 @@ class PlayerView: UIView, PlayerDelegate {
                     print(error!)
                     return }
                 DispatchQueue.main.async() {
-                    self.titleLabel.text = info.name + " - " + info.artist
+                    self.titleLabel.text = info.name
+                    self.authorLabel.text = info.artist
                     self.albumImageView.image = UIImage(data: data)
                 }
             }
@@ -200,13 +205,12 @@ class PlayerView: UIView, PlayerDelegate {
     }
     
     func updateTimerUI(position: Int, duration: Int) {
-        let posSeconds = (position/1000) % 60
         let posMinutes = (position/1000)/60 % 60
-        let durSeconds = (duration/1000) % 60
         let durMinutes = (duration/1000)/60 % 60
         if(position > duration){
             DispatchQueue.main.async {
                 self.showInactiveLabel()
+                self.songProgressBar.isHidden = true
                 if( position - duration > (60*60*1000)){
                     self.inactiveHostLabel.text = "Host has been inactive for over an hour"
                 }
@@ -218,16 +222,9 @@ class PlayerView: UIView, PlayerDelegate {
             }
             return
         }
-        var stringPosSeconds = String((position/1000) % 60)
-        var stringDurSeconds = String((duration/1000) % 60)
-        if posSeconds < 10 {
-            stringPosSeconds = "0" + String((position/1000) % 60)
-        }
-        if durSeconds < 10 {
-            stringDurSeconds = "0" + String((duration/1000) % 60)
-        }
+        self.songProgressBar.isHidden = false
         DispatchQueue.main.async {
-            self.timeLabel.text = "\(posMinutes):\(stringPosSeconds) | \(durMinutes):\(stringDurSeconds)"
+            self.songProgressBar.setProgress(Float(position)/Float(duration), animated: true)
         }
     }
     
@@ -248,8 +245,9 @@ class PlayerView: UIView, PlayerDelegate {
         skipSongImage.image = nil
         albumImageView.image = nil
         titleLabel.text = nil
-        timeLabel.text = nil
+        authorLabel.text = nil
         likeIconImageView.isHidden = true
+        songProgressBar.isHidden = true
     }
     
 }
