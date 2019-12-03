@@ -375,7 +375,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                             self.closeCreateForm()
                         }
                         
-                    }else{
+                    } else {
                         DispatchQueue.main.async {
                             self.createQueueForm.queueNameTextField.text = ""
                             self.presentInapropriateQueueNameAlert()
@@ -414,7 +414,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                 completion(false)
                 return
             }
-            let isProfane = (String(data: data, encoding: .utf8)! == "true")
+            let isProfane = String(data: data, encoding: .utf8)! == "true"
             completion(isProfane)
         }
         task.resume()
@@ -537,7 +537,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         var isPrivate = false
         if code != nil {
             isPrivate = true
-        }else{
+        } else {
             self.code = nil
         }
         

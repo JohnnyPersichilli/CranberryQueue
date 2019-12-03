@@ -523,7 +523,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="plus" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-J5-2qe">
-                                <rect key="frame" x="316" y="169" width="28" height="24.000000000000014"/>
+                                <rect key="frame" x="316" y="169" width="28" height="23.666666666666657"/>
                                 <color key="tintColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="Gws-hZ-jha"/>
@@ -1540,9 +1540,9 @@
         <image name="location.fill" catalog="system" width="64" height="56"/>
         <image name="magnifyingglass" catalog="system" width="64" height="56"/>
         <image name="peopleIcon" width="512" height="512"/>
+        <image name="plus" catalog="system" width="64" height="56"/>
         <image name="plus.circle" catalog="system" width="64" height="60"/>
         <image name="plus.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="searchIcon" width="503" height="503"/>
         <image name="settingsIcon" width="720" height="720"/>
         <image name="spotifyLogout" width="75.666664123535156" height="14.333333015441895"/>
         <image name="square.stack.3d.down.right.fill" catalog="system" width="62" height="64"/>

@@ -110,19 +110,19 @@ class PlayerView: UIView, PlayerDelegate {
             if(isPaused){
                 if #available(iOS 13.0, *) {
                     playPauseImage.image = UIImage(systemName: "play.fill")
-                }else{
+                } else {
                     playPauseImage.image = UIImage(named: "whitePlayIcon")
                 }
-            }else{
+            } else {
                 if #available(iOS 13.0, *) {
                     playPauseImage.image = UIImage(systemName: "pause.fill")
-                }else{
+                } else {
                     playPauseImage.image = UIImage(named: "ios-pause-white")
                 }
             }
             playPauseImage.isUserInteractionEnabled = true
             skipSongImage.isUserInteractionEnabled = true
-        }else{
+        } else {
             bottomGuestTimeLabelConstraint.constant = 25
             playPauseImage.image = nil
             skipSongImage.image = nil
@@ -212,7 +212,7 @@ class PlayerView: UIView, PlayerDelegate {
                 }
                 else if(posMinutes == durMinutes){
                     self.inactiveHostLabel.text = "Host has been inactive for less than 1 minute"
-                }else{
+                } else {
                     self.inactiveHostLabel.text = "Host has been inactive for " + String(posMinutes-durMinutes) + " min"
                 }
             }
