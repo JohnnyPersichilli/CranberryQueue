@@ -379,7 +379,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
                         DispatchQueue.main.async {
                             self.createQueueForm.queueNameTextField.text = ""
                             self.presentInapropriateQueueNameAlert()
-
                         }
                     }
                 })
@@ -405,7 +404,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
     }
     
     func containsProfanity(wordToCheck: String, completion: @escaping (Bool) -> Void){
-        let concatURL = "https://www.purgomalum.com/service/containsprofanity?text="+wordToCheck
+        let concatURL = "https://www.purgomalum.com/service/containsprofanity?text=" + wordToCheck
         let url = URL(string: concatURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
 
         let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
