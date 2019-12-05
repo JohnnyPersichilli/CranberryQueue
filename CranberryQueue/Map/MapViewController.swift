@@ -368,13 +368,25 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             })
             /// create queue as either private or public queue from UISwitch
             if createQueueForm.scopeSwitch.isOn {
-                createPublicQueue(withName: createQueueForm.queueNameTextField.text ?? "")
+                containsProfanity(wordToCheck: createQueueForm.queueNameTextField.text ?? "", completion: { isProfane in
+                    if !isProfane {
+                        DispatchQueue.main.async {
+                            self.createPublicQueue(withName: self.createQueueForm.queueNameTextField.text ?? "")
+                            self.closeCreateForm()
+                        }
+                        
+                    } else {
+                        DispatchQueue.main.async {
+                            self.createQueueForm.queueNameTextField.text = ""
+                            self.presentInapropriateQueueNameAlert()
+                        }
+                    }
+                })
             }
             else {
                 createPrivateQueue(withCode: eventCodeFromTimestamp())
+                self.closeCreateForm()
             }
-            /// close the create queue modal
-            self.closeCreateForm()
         }
         else if textField == joinQueueForm.eventCodeTextField {
             /// join queue textfield is always private
@@ -383,6 +395,28 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
             closeJoinForm()
         }
         return true
+    }
+    
+    func presentInapropriateQueueNameAlert(){
+        let alert = UIAlertController(title: "Inapropriate Queue Name", message: "Please change the name and try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: nil))
+        self.present(alert, animated: true)
+    }
+    
+    func containsProfanity(wordToCheck: String, completion: @escaping (Bool) -> Void){
+        let concatURL = "https://www.purgomalum.com/service/containsprofanity?text=" + wordToCheck
+        let url = URL(string: concatURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+
+        let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+            guard let data = data else {
+                print("Error reaching profanity API")
+                completion(false)
+                return
+            }
+            let isProfane = String(data: data, encoding: .utf8)! == "true"
+            completion(isProfane)
+        }
+        task.resume()
     }
     
     // start session
@@ -502,7 +536,7 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         var isPrivate = false
         if code != nil {
             isPrivate = true
-        }else{
+        } else {
             self.code = nil
         }
         

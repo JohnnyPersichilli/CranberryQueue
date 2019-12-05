@@ -42,7 +42,7 @@ class QueueDetailModal: UIView {
                 let distanceInFeet = (distance*feetInMeter)
                 let roundedFeetString = String(format: "%.2f", distanceInFeet)
                 distanceLabel.text = roundedFeetString + "ft"
-            }else{
+            } else {
                 let distanceInMiles = (distance/metersInMile)
                 let roundedMileString = String(format: "%.1f", distanceInMiles)
                 distanceLabel.text =  roundedMileString + "mi"
@@ -75,7 +75,7 @@ class QueueDetailModal: UIView {
             distanceLabel.textColor = UIColor.red.withAlphaComponent(0.6)
             joinButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
             joinButton.isOpaque = true
-        }else{
+        } else {
             isInRange = true
             distanceLabel.textColor = UIColor.white
             joinButton.backgroundColor = joinGreen
@@ -120,7 +120,7 @@ class QueueDetailModal: UIView {
                 )
             }
             task.resume()
-        }else{
+        } else {
             updateModalUI(
                 queueName: self.currentQueue!.name,
                 numMembers: self.currentQueue!.numMembers,

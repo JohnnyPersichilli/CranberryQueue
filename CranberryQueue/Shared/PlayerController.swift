@@ -49,7 +49,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                         return
                     }
                 })
-            }else{
+            } else {
                 self.remote?.playerAPI?.pause({ (response, error) in
                     if let err = error {
                         print(err)
@@ -57,7 +57,7 @@ class PlayerController: NSObject, SPTAppRemotePlayerStateDelegate, RemoteDelegat
                     }
                 })
             }
-        }else{
+        } else {
             
         }
 
