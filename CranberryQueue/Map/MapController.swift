@@ -90,7 +90,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
 
     func watchLocationQueues(city: String, region: String) {
-        if(curZoom > 10){
+        if curZoom > 10 {
             getTopQueusInCity(city: city, region: region)
         } else {
             getTopQueusInState(region: region, zoom: curZoom)
