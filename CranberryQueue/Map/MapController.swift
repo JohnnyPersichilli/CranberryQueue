@@ -88,10 +88,12 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         getGeoCode(withLocation: mapCenter){ city, region in
             if(self.curZoom > 10)   {
                 if self.city != city {
-                   self.getTopQueuesInCity(city: city, region: region)
+                    self.removeAllLocations()
+                    self.getTopQueuesInCity(city: city, region: region)
                 }
             } else {
                 if self.region != region {
+                    self.removeAllLocations()
                     self.getTopQueuesInState(region: region, zoom: self.curZoom)
                 }
             }
@@ -185,6 +187,20 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             if (diff.type == .removed) {
                self.removeLocation(diff: diff)
             }
+        }
+    }
+    
+    // this function iterates over the locations dictionary and removes all of them
+    func removeAllLocations() {
+        let keys = Array(locations.keys)
+        for key in keys {
+            let circle = locations[key]!["circle"] as! TCCircle
+            circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
+            let marker = locations[key]!["marker"] as! GMSMarker
+            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
+               marker.map = nil
+            })
+            locations[key] = nil
         }
     }
     
