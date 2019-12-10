@@ -88,11 +88,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         getGeoCode(withLocation: mapCenter){ city, region in
             if(self.curZoom > 10)   {
                 if self.city != city {
-                   self.getTopQueusInCity(city: city, region: region)
+                   self.getTopQueuesInCity(city: city, region: region)
                 }
             } else {
                 if self.region != region {
-                    self.getTopQueusInState(region: region, zoom: self.curZoom)
+                    self.getTopQueuesInState(region: region, zoom: self.curZoom)
                 }
             }
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
@@ -115,48 +115,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         )
         let docId = diff.document.documentID
         locations[docId]!["location"] = updatedLoc
-    }
-
-    func processLocationDocs(docs: [QueryDocumentSnapshot]) {
-        var newQueues = [CQLocation]()
-        var missingQueues = self.queues
-        for doc in docs {
-            let newLoc = CQLocation(
-                name: doc.data()["name"] as! String,
-                city: doc.data()["city"] as! String,
-                region: doc.data()["region"] as! String,
-                long: doc.data()["long"] as! Double,
-                lat: doc.data()["lat"] as! Double,
-                queueId: doc.documentID,
-                numMembers: doc.data()["numMembers"] as! Int
-            )
-            
-            missingQueues.removeAll(where: {$0.queueId == newLoc.queueId})
-            
-            if let dex = self.queues.firstIndex(where: {$0.queueId == self.queueId}) {
-                if self.queues[dex].numMembers != (doc.data()["numMembers"] as! Int) {
-                    self.queues[dex].numMembers = (doc.data()["numMembers"] as! Int)
-                }
-            }
-            else if !self.queues.contains(where: {$0.queueId == doc.documentID})  {
-                let newLoc = CQLocation(
-                    name: doc.data()["name"] as! String,
-                    city: doc.data()["city"] as! String,
-                    region: doc.data()["region"] as! String,
-                    long: doc.data()["long"] as! Double,
-                    lat: doc.data()["lat"] as! Double,
-                    queueId: doc.documentID,
-                    numMembers: doc.data()["numMembers"] as! Int
-                )
-                newQueues.append(newLoc)
-                self.queues.append(newLoc)
-            }
-
-        }
-
-        // remove missing queues from global
-        self.removeLocations(queues: missingQueues)
-        self.drawMarkers(queues: newQueues)
     }
     
     // add a new location to the locations dictionary, keyed by queueId
@@ -189,6 +147,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         locations[docId] = nil
     }
     
+    // draw a marker and circle at a given location
     func drawMarker(location: CQLocation) {
         let circleCenter = CLLocationCoordinate2D(latitude: location.lat, longitude: location.long)
         // class that allows creation animation
@@ -229,7 +188,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
     
-    func getTopQueusInCity(city: String, region: String) {
+    func getTopQueuesInCity(city: String, region: String) {
         queuesInLocationRef?.remove()
         queuesInLocationRef = db?.collection("location").whereField("city", isEqualTo: city).whereField("region", isEqualTo: region).addSnapshotListener({ (snapshot, error) in
             guard let snap = snapshot else {
@@ -241,7 +200,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         })
     }
     
-    func getTopQueusInState(region: String, zoom: Float) {
+    func getTopQueuesInState(region: String, zoom: Float) {
         let queueLimitFromZoom = (1/zoom)*150
         queuesInLocationRef?.remove()
         queuesInLocationRef = db?.collection("location").whereField("numMembers", isGreaterThan: 0).whereField("region", isEqualTo: region).order(by: "numMembers", descending: true).limit(to: Int(queueLimitFromZoom)).addSnapshotListener({ (snapshot, error) in
@@ -249,18 +208,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("watch location err: ", error!)
                 return
             }
-             snap.documentChanges.forEach { diff in
-                if (diff.type == .added) {
-                   print("New city: \(diff.document.data())")
-                }
-                if (diff.type == .modified) {
-                   print("Modified city: \(diff.document.data())")
-                }
-                if (diff.type == .removed) {
-                   print("Removed city: \(diff.document.data())")
-                }
-            }
-            self.processLocationDocs(docs: snap.documents)
+            // handle the incoming document changes
+            self.processDocumentChanges(documentChanges: snap.documentChanges)
         })
     }
     
@@ -292,29 +241,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
     }
     
-    func drawMarkers(queues: [CQLocation]) {
-        for queue in queues {
-            let circleCenter = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
-            // class that allows creation animation
-            let circle = TCCircle(position: circleCenter, radius: 0.0)
-            let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
-            let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
-            circle.fillColor = queue.queueId == self.queueId ? homeColor : defaultColor
-            let position = CLLocationCoordinate2D(latitude: queue.lat, longitude: queue.long)
-            let marker = GMSMarker(position: position)
-            circle.beginCircleAnimation(to: 200.0, duration: 2, completion: {
-                //popup animation for markers
-                marker.appearAnimation = GMSMarkerAnimation.pop
-                marker.icon = queue.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
-                marker.title = queue.name
-                marker.map = self.map
-                marker.userData = queue
-            })
-            self.markers.append(marker)
-            self.setCircle(circle)
-        }
-    }
-   
     func setupMap(withCoords coords: CLLocationCoordinate2D) {
         let camera = GMSCameraPosition.camera(withTarget: coords, zoom: 15.0)
         let mapView0 = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
@@ -404,32 +330,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         map!.animate(to: camera)
     }
     
-    func addTapped() {
-        markers = []
-        circles = []
-        self.map?.clear()
-        
-        let marker = GMSMarker()
-        marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
-        marker.position = curCoords!
-        marker.map = map
-        markers.append(marker)
-        
-        let circle = TCCircle(position: curCoords!, radius: 200)
-        circle.fillColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
-        setCircle(circle)
-        
-        self.drawMarkers(queues: [CQLocation(name: "", city: "", region: "", long: curCoords!.longitude, lat: curCoords!.latitude, queueId: "", numMembers: 0)])
-    }
-    
     func setQueue(_ queueId: String?) {
         self.queueId = queueId
-        self.markers = []
-        self.circles = []
-        self.map?.clear()
-        if let setQueues = self.queues.first(where: {$0.queueId == queueId}) {
-            self.drawMarkers(queues: [setQueues])
-        }
     }
     
     func getDistanceFrom(_ queue: CQLocation) -> Double {

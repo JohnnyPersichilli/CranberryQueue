@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 
 protocol ControllerMapDelegate: class {
-    func addTapped()
     func setQueue(_ queueId: String?)
     func recenterMap()
     func getCoords() -> [String:Double]
@@ -296,7 +295,6 @@ class MapViewController: UIViewController, UITextFieldDelegate, MapControllerDel
         
     // open the modal to create a queue
     func openCreateQueueModal() {
-        controllerMapDelegate?.addTapped()
         createQueueForm.isHidden = false
         UIView.animate(withDuration: 0.3) {
          self.createQueueForm.alpha = 1

@@ -142,7 +142,6 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
         self.present(alert, animated: true, completion: nil)
     }
     
-    
     func returnToMapFromAlert(alert: UIAlertAction!) {
         playerController.setupPlayer(queueId: nil, isHost: false)
         self.navigateToRoot()
@@ -174,10 +173,10 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     
     func handleLeaveQueueActions() {
         self.queueId = nil
+        self.navigateToRoot()
         (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
-        self.navigateToRoot()
     }
     
     func updateConnectionStatus(connected: Bool) {
