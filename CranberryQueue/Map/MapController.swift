@@ -34,6 +34,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var markers = [GMSMarker]()
     var circles = [TCCircle]()
     
+    var locations: [String: [String: Any]] = [:]
     var isFirstLoad = true
     var queueId: String? = nil
     var region: String? = nil
@@ -99,6 +100,22 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             self.region = region
         }
     }
+    
+    // when a locations data is modifed ex: numMembers or currentSong
+    func modifyLocation(diff: DocumentChange) {
+        let data = diff.document.data()
+        let updatedLoc = CQLocation(
+            name: data["name"] as! String,
+            city:  data["city"] as! String,
+            region:  data["region"] as! String,
+            long:  data["long"] as! Double,
+            lat:  data["lat"] as! Double,
+            queueId: diff.document.documentID,
+            numMembers: data["numMembers"] as! Int
+        )
+        let docId = diff.document.documentID
+        locations[docId]!["location"] = updatedLoc
+    }
 
     func processLocationDocs(docs: [QueryDocumentSnapshot]) {
         var newQueues = [CQLocation]()
@@ -138,13 +155,79 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         }
 
         // remove missing queues from global
-//        for location in missingQueues {
-//            self.queues.removeAll(where: {$0.queueId == location.queueId})
-//        }
         self.removeLocations(queues: missingQueues)
         self.drawMarkers(queues: newQueues)
     }
-
+    
+    // add a new location to the locations dictionary, keyed by queueId
+    func addLocation(diff: DocumentChange) {
+        let data = diff.document.data()
+        let newLoc = CQLocation(
+            name: data["name"] as! String,
+            city:  data["city"] as! String,
+            region:  data["region"] as! String,
+            long:  data["long"] as! Double,
+            lat:  data["lat"] as! Double,
+            queueId: diff.document.documentID,
+            numMembers:data["numMembers"] as! Int
+        )
+        let docId = diff.document.documentID
+        locations[docId] = ["location": newLoc]
+        self.drawMarker(location: newLoc)
+    }
+    
+    // remove a location from dict, also removes the circle and marker on the map
+    func removeLocation(diff: DocumentChange) {
+        let docId = diff.document.documentID
+        let circle = locations[docId]!["circle"] as! TCCircle
+        circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
+        let marker = locations[docId]!["marker"] as! GMSMarker
+        circle.removeCircleAnimation(from: 200, duration: 2, completion: {
+            marker.map = nil
+        })
+        // remove entire key from dictionary
+        locations[docId] = nil
+    }
+    
+    func drawMarker(location: CQLocation) {
+        let circleCenter = CLLocationCoordinate2D(latitude: location.lat, longitude: location.long)
+        // class that allows creation animation
+        let circle = TCCircle(position: circleCenter, radius: 0.0)
+        let defaultColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.3)
+        let homeColor = UIColor(displayP3Red: 189/255, green: 209/255, blue: 199/255, alpha: 0.7)
+        circle.fillColor = location.queueId == self.queueId ? homeColor : defaultColor
+        let position = CLLocationCoordinate2D(latitude: location.lat, longitude: location.long)
+        let marker = GMSMarker(position: position)
+        circle.beginCircleAnimation(to: 200.0, duration: 2, completion: {
+           //popup animation for markers
+           marker.appearAnimation = GMSMarkerAnimation.pop
+           marker.icon = location.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
+           marker.title = location.name
+           marker.map = self.map
+           marker.userData = location
+        })
+        circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
+        circle.strokeWidth = 2
+        circle.zIndex = 0
+        circle.map = map
+        locations[location.queueId]!["marker"] = marker
+        locations[location.queueId]!["circle"] = circle
+    }
+    
+    // this function takes in an array of document changes and handles them accordingly
+    func processDocumentChanges(documentChanges: [DocumentChange]) {
+        documentChanges.forEach { diff in
+            if (diff.type == .added) {
+                self.addLocation(diff: diff)
+            }
+            if (diff.type == .modified) {
+               self.modifyLocation(diff: diff)
+            }
+            if (diff.type == .removed) {
+               self.removeLocation(diff: diff)
+            }
+        }
+    }
     
     func getTopQueusInCity(city: String, region: String) {
         queuesInLocationRef?.remove()
@@ -153,7 +236,8 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 print("watch location err: ", error!)
                 return
             }
-            self.processLocationDocs(docs: snap.documents)
+            // handle the incoming document changes
+            self.processDocumentChanges(documentChanges: snap.documentChanges)
         })
     }
     
@@ -164,6 +248,17 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             guard let snap = snapshot else {
                 print("watch location err: ", error!)
                 return
+            }
+             snap.documentChanges.forEach { diff in
+                if (diff.type == .added) {
+                   print("New city: \(diff.document.data())")
+                }
+                if (diff.type == .modified) {
+                   print("Modified city: \(diff.document.data())")
+                }
+                if (diff.type == .removed) {
+                   print("Removed city: \(diff.document.data())")
+                }
             }
             self.processLocationDocs(docs: snap.documents)
         })
