@@ -30,10 +30,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     var curCoords: CLLocationCoordinate2D? = nil
     var curZoom: Float = 15.0
     
-    var queues = [CQLocation]()
-    var markers = [GMSMarker]()
-    var circles = [TCCircle]()
-    
     var locations: [String: [String: Any]] = [:]
     var isFirstLoad = true
     var queueId: String? = nil
@@ -104,9 +100,9 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     // this alters the color of a marker
     // called when leaveQueue is tapped and when a user joins a queue
-    func colorMarker(_ homeColor: Bool?, _ queueId: String?) {
+    func colorMarker(_ homeColor: Bool?, _ queueId: String) {
         //access the queue in hash
-        let marker = locations[queueId!]!["marker"] as! GMSMarker
+        let marker = locations[queueId]!["marker"] as! GMSMarker
         if homeColor! {
             marker.icon = GMSMarker.markerImage(with: UIColor.green)
         } else {
@@ -153,9 +149,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         let circle = locations[docId]!["circle"] as! TCCircle
         circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
         let marker = locations[docId]!["marker"] as! GMSMarker
-        circle.removeCircleAnimation(from: 200, duration: 2, completion: {
-            marker.map = nil
-        })
+        DispatchQueue.main.async {
+            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
+               marker.map = nil
+            })
+        }
         // remove entire key from dictionary
         locations[docId] = nil
     }
@@ -208,9 +206,11 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             let circle = locations[key]!["circle"] as! TCCircle
             circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
             let marker = locations[key]!["marker"] as! GMSMarker
-            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
-               marker.map = nil
-            })
+            DispatchQueue.main.async {
+                circle.removeCircleAnimation(from: 200, duration: 2, completion: {
+                  marker.map = nil
+                })
+            }
             locations[key] = nil
         }
     }
@@ -238,34 +238,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             // handle the incoming document changes
             self.processDocumentChanges(documentChanges: snap.documentChanges)
         })
-    }
-    
-    func setCircle (_ circle : TCCircle) {
-        circle.strokeColor = UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 0.5)
-        circle.strokeWidth = 2
-        circle.zIndex = 0
-        circle.map = map
-        circles.append(circle)
-    }
-    
-    // class that removes locations from the map one at a time, rather than clearing everything
-    func removeLocations(queues: [CQLocation]) {
-        for queue in queues {
-            let dex = self.queues.firstIndex(where: {$0.queueId == queue.queueId})!
-            let circle = circles[dex]
-            circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
-            let marker = self.markers[dex]
-            markers.remove(at: dex)
-            circles.remove(at: dex)
-            self.queues.remove(at: dex)
-            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
-                UIView.animate(withDuration: 2, animations: {
-                    marker.opacity = 0
-                }) { (_) in
-                    marker.map = nil
-                }
-            })
-        }
     }
     
     func setupMap(withCoords coords: CLLocationCoordinate2D) {
@@ -358,6 +330,18 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
     }
     
     func setQueue(_ queueId: String?) {
+        if let globalId = self.queueId {
+            if let newId = queueId {
+                colorMarker(false, globalId)
+                colorMarker(true, newId)
+            } else {
+                colorMarker(false, globalId)
+            }
+        } else {
+            if let newId = queueId {
+                 self.colorMarker(true, newId)
+            }
+        }
         self.queueId = queueId
     }
     
