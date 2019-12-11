@@ -173,10 +173,10 @@ class QueueViewController: UIViewController, RemoteDelegate, SessionDelegate, Se
     
     func handleLeaveQueueActions() {
         self.queueId = nil
-        self.navigateToRoot()
         (UIApplication.shared.delegate as? AppDelegate)?.pauseAndDisconnectAppRemote()
         mapDelegate?.update(queueId: nil, isHost: false, privateCode: nil, name: nil)
         playerController.setupPlayer(queueId: nil, isHost: false)
+        self.navigateToRoot()
     }
     
     func updateConnectionStatus(connected: Bool) {

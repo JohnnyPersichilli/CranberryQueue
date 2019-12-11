@@ -102,6 +102,17 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             self.region = region
         }
     }
+    // this alters the color of a marker
+    // called when leaveQueue is tapped and when a user joins a queue
+    func colorMarker(_ homeColor: Bool?, _ queueId: String?) {
+        //access the queue in hash
+        let marker = locations[queueId!]!["marker"] as! GMSMarker
+        if homeColor! {
+            marker.icon = GMSMarker.markerImage(with: UIColor.green)
+        } else {
+            marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
+        }
+    }
     
     // when a locations data is modifed ex: numMembers or currentSong
     func modifyLocation(diff: DocumentChange) {

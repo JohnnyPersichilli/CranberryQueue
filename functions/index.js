@@ -277,11 +277,11 @@ exports.updateDownvotes = functions.firestore
 
       exports.scatterLocations = functions.https.onRequest((request, response) => {
         for(i = 0; i < 10; i++) {
-          let randLat = 40.0068 + ((Math.random()*(i*2))-i)/1000
-          let randLong = -75.2855 + ((Math.random()*(i*2))-i)/1000
+          let randLat = 40.0230 + ((Math.random()*(i*2))-i)/1000
+          let randLong = -75.3152 + ((Math.random()*(i*2))-i)/1000
           let inName = "generated-" + i
           db.collection('location').add({
-            city: "Ardmore",
+            city: "Bryn Mawr",
             currentSong: "",
             lat: randLat,
             long: randLong,
