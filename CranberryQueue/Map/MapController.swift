@@ -81,32 +81,26 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             "lat": mapView.camera.target.latitude,
             "long": mapView.camera.target.longitude
         ]
-        getGeoCode(withLocation: mapCenter){ city, region in
-            if(self.curZoom > 10)   {
-                if self.city != city {
-                    self.removeAllLocations()
-                    self.getTopQueuesInCity(city: city, region: region)
-                }
-            } else {
-                if self.region != region {
-                    self.removeAllLocations()
-                    self.getTopQueuesInState(region: region, zoom: self.curZoom)
-                }
-            }
+        getGeoCode(withLocation: mapCenter) { city, region in
+            self.watchLocationQueues(city: city, region: region)
+            self.removeAllLocations()
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
             self.city = city
             self.region = region
         }
     }
+
     // this alters the color of a marker
     // called when leaveQueue is tapped and when a user joins a queue
     func colorMarker(_ homeColor: Bool?, _ queueId: String) {
         //access the queue in hash
-        let marker = locations[queueId]!["marker"] as! GMSMarker
+        guard let marker = locations[queueId]?["marker"] as? GMSMarker else {
+            return
+        }
         if homeColor! {
-            marker.icon = GMSMarker.markerImage(with: UIColor.green)
+          marker.icon = GMSMarker.markerImage(with: UIColor.green)
         } else {
-            marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
+          marker.icon = GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
         }
     }
     
@@ -212,6 +206,14 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 })
             }
             locations[key] = nil
+        }
+    }
+    
+    func watchLocationQueues(city: String, region: String) {
+        if curZoom > 10 {
+            getTopQueuesInCity(city: city, region: region)
+        } else {
+            getTopQueuesInState(region: region, zoom: curZoom)
         }
     }
     

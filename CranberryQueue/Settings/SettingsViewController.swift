@@ -214,7 +214,7 @@ class SettingsViewController: UIViewController, UITableViewDataSource, UITableVi
                             self.spotifyProfilePicture.image = UIImage(data: data)
                         }
                     }
-                }else{
+                } else {
                     self.setDefaultImage()
                 }
             } catch {
