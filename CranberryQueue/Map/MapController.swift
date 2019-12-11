@@ -82,8 +82,17 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
             "long": mapView.camera.target.longitude
         ]
         getGeoCode(withLocation: mapCenter) { city, region in
-            self.watchLocationQueues(city: city, region: region)
-            self.removeAllLocations()
+            if(self.curZoom > 10)   {
+                if self.city != city {
+                    self.removeAllLocations()
+                    self.getTopQueuesInCity(city: city, region: region)
+                }
+            } else {
+                if self.region != region {
+                    self.removeAllLocations()
+                    self.getTopQueuesInState(region: region, zoom: self.curZoom)
+                }
+            }
             self.mapControllerDelegate?.updateGeoCode(city: city, region: region)
             self.city = city
             self.region = region
@@ -144,7 +153,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         circle.fillColor = UIColor(red: 180/255, green: 0/255, blue: 0/255, alpha: 0.3)
         let marker = locations[docId]!["marker"] as! GMSMarker
         DispatchQueue.main.async {
-            circle.removeCircleAnimation(from: 200, duration: 2, completion: {
+            circle.removeCircleAnimation(from: 200, duration: 1, completion: {
                marker.map = nil
             })
         }
@@ -162,7 +171,7 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
         circle.fillColor = location.queueId == self.queueId ? homeColor : defaultColor
         let position = CLLocationCoordinate2D(latitude: location.lat, longitude: location.long)
         let marker = GMSMarker(position: position)
-        circle.beginCircleAnimation(to: 200.0, duration: 2, completion: {
+        circle.addCircleAnimation(to: 200.0, duration: 1, completion: {
            //popup animation for markers
            marker.appearAnimation = GMSMarkerAnimation.pop
            marker.icon = location.queueId == self.queueId ? GMSMarker.markerImage(with: UIColor.green) : GMSMarker.markerImage(with: UIColor(displayP3Red: 145/255, green: 158/255, blue: 188/255, alpha: 1))
@@ -206,14 +215,6 @@ class MapController: UIViewController, CLLocationManagerDelegate, GMSMapViewDele
                 })
             }
             locations[key] = nil
-        }
-    }
-    
-    func watchLocationQueues(city: String, region: String) {
-        if curZoom > 10 {
-            getTopQueuesInCity(city: city, region: region)
-        } else {
-            getTopQueuesInState(region: region, zoom: curZoom)
         }
     }
     
@@ -375,7 +376,7 @@ class TCCircle : GMSCircle {
     var from : CLLocationDistance = 0.0
     var completion: (() -> Void)? = nil
     
-    func beginCircleAnimation(to: CLLocationDistance, duration: TimeInterval, completion: @escaping () -> Void ) {
+    func addCircleAnimation(to: CLLocationDistance, duration: TimeInterval, completion: @escaping () -> Void ) {
         self.to = to
         self.completion = completion
         self.duration = duration
